@@ -1,7 +1,7 @@
 # Личный проект «Типотека» [![Build status][travis-image]][travis-url]
 
 * Студент: [Dmitriy Orlov](https://up.htmlacademy.ru/nodejs/3/user/987967).
-* Наставник: `Неизвестно`.
+* Наставник: [Александр Михайлович Соколов](https://htmlacademy.ru/profile/id1440657).
 
 ---
 
