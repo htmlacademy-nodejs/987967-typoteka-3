@@ -1,6 +1,11 @@
-module.exports = {
-  name: `--verson`,
-  run(onComplite, arg) {
+'use strict';
 
+const packageJSON = require(`../../../package.json`);
+
+module.exports = {
+  name: `--version`,
+  run(onComplite) {
+    console.info(packageJSON.version);
+    onComplite(true);
   }
-}
+};

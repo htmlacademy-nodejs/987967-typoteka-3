@@ -1,3 +1,5 @@
+'use strict';
+
 const generate = require(`./generate`);
 const help = require(`./help`);
 const version = require(`./version`);
@@ -8,4 +10,4 @@ module.exports = {
     [help.name]: help,
     [version.name]: version,
   }
-}
+};
