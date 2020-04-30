@@ -1,42 +1,32 @@
 'use strict';
 
+const {
+  DURATION,
+  MIN_SENTENCES_COUNT,
+  MAX_SENTENCES_COUNT,
+  ANNOUNCE_SENTENCES_COUNT,
+  TITLES,
+  SENTENCES,
+  CATEGORIES,
+} = require(`./const`);
+
 const getRandomInt = (min, max) => {
   const minInt = Math.ceil(min);
   const maxInt = Math.floor(max);
 
   return Math.floor(Math.random() * (maxInt - minInt) + minInt);
 };
-module.exports.getRandomInt = getRandomInt;
 
 const getRandomElement = (array) => array[getRandomInt(0, array.length - 1)];
-module.exports.getRandomElement = getRandomElement;
 
-module.exports.getRandomElements = (array, count) =>
+const getRandomElements = (array, count) =>
   new Array(count)
     .fill(``)
     .map(() => getRandomElement(array));
 
-const removeElement = (array, index) => {
-  const result = array.slice();
+const removeElement = (array, index) => array.filter((it, i) => i !== index);
 
-  switch (true) {
-    case index === 0:
-      result.shift();
-      return result;
-
-    case index === array.length - 1:
-      result.pop();
-      return result;
-
-    case index >= array.length:
-      return result;
-
-    default:
-      return result.slice(0, index).concat(result.slice(index + 1, result.length));
-  }
-};
-
-module.exports.getRandomUniqueElements = (array, count) => {
+const getRandomUniqueElements = (array, count) => {
   let truncatedArray = array.slice();
   return new Array(count)
     .fill(``)
@@ -53,6 +43,38 @@ module.exports.getRandomUniqueElements = (array, count) => {
     });
 };
 
-module.exports.getRandomBoolean = () => Math.random() > 0.5;
+const getRandomBoolean = () => Math.random() > 0.5;
+const getRandomDate = (min, max) => new Date(getRandomInt(min.valueOf(), max.valueOf()));
 
-module.exports.getRandomDate = (min, max) => new Date(getRandomInt(min.valueOf(), max.valueOf()));
+const generateDate = () => {
+  const now = Date.now();
+  const past = new Date(now - DURATION);
+  const [date, time] = getRandomDate(past, now).toLocaleString().split(`, `);
+
+  return `${date.split(`/`).reverse().join(`-`)}, ${time}`;
+};
+
+
+const generatePost = () => {
+  const textSentences = getRandomElements(SENTENCES, getRandomInt(MIN_SENTENCES_COUNT, MAX_SENTENCES_COUNT));
+  const announceSentences = getRandomUniqueElements(textSentences, ANNOUNCE_SENTENCES_COUNT);
+
+  return {
+    title: getRandomElement(TITLES),
+    createdDate: generateDate(),
+    announce: announceSentences.join(`\n`),
+    fullText: textSentences.join(`\n`),
+    сategory: getRandomElement(CATEGORIES),
+  };
+};
+
+module.exports = {
+  getRandomInt,
+  getRandomElement,
+  getRandomElements,
+  getRandomUniqueElements,
+  getRandomBoolean,
+  getRandomDate,
+  generateDate,
+  generatePost,
+};
