@@ -4,8 +4,7 @@ const packageJSON = require(`../../../package.json`);
 
 module.exports = {
   name: `--version`,
-  run(onComplite) {
+  run() {
     console.info(packageJSON.version);
-    onComplite(true);
   }
 };

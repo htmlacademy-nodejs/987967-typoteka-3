@@ -14,28 +14,29 @@ const Message = {
 
 const generatePosts = (count) => new Array(count).fill(``).map(() => generatePost());
 
+const createMockFile = async (count) => {
+  const posts = JSON.stringify(generatePosts(count));
+
+  try {
+    await fs.promises.writeFile(MOCK_FILE, posts);
+    console.info(Message.FILE_SUCCESS);
+  } catch (err) {
+    console.error(Message.FILE_ERROR);
+    throw new Error(err)
+  }
+}
+
 module.exports = {
   name: `--generate`,
-  run(onComplite, arg) {
+  async run(arg) {
     const [userParam] = arg;
     const postsCount = parseInt(userParam, 10) || DEFAULT_POSTS_COUNT;
 
     if (postsCount > MAX_POSTS_COUNT) {
       console.error(Message.WRONG_POSTS_COUNT);
-      onComplite(false);
-      return;
-    }
-
-    const posts = JSON.stringify(generatePosts(postsCount));
-
-    fs.writeFile(MOCK_FILE, posts, (err) => {
-      if (err) {
-        console.error(Message.FILE_ERROR);
-        onComplite(false);
-      } else {
-        console.info(Message.FILE_SUCCESS);
-        onComplite(true);
-      }
-    });
+      throw new Error(Message.WRONG_POSTS_COUNT);
+    };
+    
+    await createMockFile(postsCount)
   }
 };
