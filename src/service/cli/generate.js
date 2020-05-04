@@ -2,6 +2,7 @@
 
 const {generatePost} = require(`../../utils`);
 const fs = require(`fs`);
+const chalk = require(`chalk`);
 
 const MOCK_FILE = `mocks.json`;
 const DEFAULT_POSTS_COUNT = 1;
@@ -19,9 +20,9 @@ const createMockFile = async (count) => {
 
   try {
     await fs.promises.writeFile(MOCK_FILE, posts);
-    console.info(Message.FILE_SUCCESS);
+    console.info(chalk.green(Message.FILE_SUCCESS));
   } catch (err) {
-    console.error(Message.FILE_ERROR);
+    console.error(chalk.red(Message.FILE_ERROR));
     throw new Error(err)
   }
 }
@@ -33,7 +34,7 @@ module.exports = {
     const postsCount = parseInt(userParam, 10) || DEFAULT_POSTS_COUNT;
 
     if (postsCount > MAX_POSTS_COUNT) {
-      console.error(Message.WRONG_POSTS_COUNT);
+      console.error(chalk.red(Message.WRONG_POSTS_COUNT));
       throw new Error(Message.WRONG_POSTS_COUNT);
     };
     

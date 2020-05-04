@@ -1,5 +1,7 @@
 'use strict';
 
+const chalk = require(`chalk`);
+
 const HELP_MESSAGE = `Гайд:
     server <command>
     Команды:
@@ -10,6 +12,6 @@ const HELP_MESSAGE = `Гайд:
 module.exports = {
   name: `--help`,
   run() {
-    console.info(HELP_MESSAGE);
+    console.info(chalk.grey(HELP_MESSAGE));
   }
 };
