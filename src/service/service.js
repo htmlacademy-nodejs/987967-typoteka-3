@@ -13,9 +13,9 @@ const executeCommand = async (commandName, arg) => {
   const command = Cli[commandName] || Cli[DEFAULT_COMMAND];
   try {
     await command.run(arg);
-    process.exit(ExitCode.SUCCESS)
+    process.exit(ExitCode.SUCCESS);
   } catch (err) {
-    process.exit(ExitCode.ERROR)
+    process.exit(ExitCode.ERROR);
   }
 };
 

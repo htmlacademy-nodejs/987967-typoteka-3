@@ -23,9 +23,9 @@ const createMockFile = async (count) => {
     console.info(chalk.green(Message.FILE_SUCCESS));
   } catch (err) {
     console.error(chalk.red(Message.FILE_ERROR));
-    throw new Error(err)
+    throw new Error(err);
   }
-}
+};
 
 module.exports = {
   name: `--generate`,
@@ -36,8 +36,8 @@ module.exports = {
     if (postsCount > MAX_POSTS_COUNT) {
       console.error(chalk.red(Message.WRONG_POSTS_COUNT));
       throw new Error(Message.WRONG_POSTS_COUNT);
-    };
-    
-    await createMockFile(postsCount)
+    }
+
+    await createMockFile(postsCount);
   }
 };
