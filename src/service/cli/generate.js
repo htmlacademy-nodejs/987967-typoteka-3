@@ -13,7 +13,7 @@ const Message = {
   FILE_SUCCESS: `Operation success. File created.`,
 };
 
-const generatePosts = (count) => new Array(count).fill(``).map(() => generatePost());
+const generatePosts = (count) => new Array(count).fill(``).map(generatePost);
 
 const createMockFile = async (count) => {
   const posts = JSON.stringify(generatePosts(count));
