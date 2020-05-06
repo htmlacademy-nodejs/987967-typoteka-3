@@ -55,7 +55,7 @@ const generateDate = () => {
 };
 
 
-const generatePost = ({ sentences, titles, categories }) => {
+const generatePost = ({sentences, titles, categories}) => {
   const textSentences = getRandomElements(sentences, getRandomInt(MIN_SENTENCES_COUNT, MAX_SENTENCES_COUNT));
   const announceSentences = getRandomUniqueElements(textSentences, ANNOUNCE_SENTENCES_COUNT);
 
