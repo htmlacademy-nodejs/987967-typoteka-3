@@ -1,6 +1,6 @@
 'use strict';
 
-const {generatePost} = require(`../../utils`);
+const { generatePost, readContent } = require(`../../utils`);
 const fs = require(`fs`);
 const chalk = require(`chalk`);
 
@@ -13,10 +13,16 @@ const Message = {
   FILE_SUCCESS: `Operation success. File created.`,
 };
 
-const generatePosts = (count) => new Array(count).fill(``).map(generatePost);
+const generatePosts = (count, data) => new Array(count).fill(``).map(() => generatePost(data));
 
 const createMockFile = async (count) => {
-  const posts = JSON.stringify(generatePosts(count));
+  const data = {
+    titles: await readContent(`./data/${DataFileName.TITLE}`),
+    sentences: await readContent(`./data/${DataFileName.DESCRIPTION}`),
+    categories: await readContent(`./data/${DataFileName.CATEGORY}`),
+  }
+
+  const posts = JSON.stringify(generatePosts(count, data));
 
   try {
     await fs.promises.writeFile(MOCK_FILE, posts);
@@ -25,6 +31,12 @@ const createMockFile = async (count) => {
     console.error(chalk.red(Message.FILE_ERROR));
     throw new Error(err);
   }
+};
+
+const DataFileName = {
+  TITLE: `titles.txt`,
+  DESCRIPTION: `sentences.txt`,
+  CATEGORY: `categories.txt`,
 };
 
 module.exports = {
