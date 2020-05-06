@@ -9,12 +9,14 @@ const USER_COMMAND_INDEX = 2;
 const userInputs = process.argv.slice(USER_COMMAND_INDEX);
 const [userCommand, ...commandArgs] = userInputs;
 
-const handleProcessComplite = (isSuccess) => process.exit(isSuccess ? ExitCode.SUCCESS : ExitCode.ERROR);
+const executeCommand = async (commandName, arg) => {
+  const command = Cli[commandName] || Cli[DEFAULT_COMMAND];
+  try {
+    await command.run(arg);
+    process.exit(ExitCode.SUCCESS);
+  } catch (err) {
+    process.exit(ExitCode.ERROR);
+  }
+};
 
-if (!Cli[userCommand]) {
-  Cli[DEFAULT_COMMAND].run(handleProcessComplite, commandArgs);
-} else {
-  Cli[userCommand].run(handleProcessComplite, commandArgs);
-}
-
-
+executeCommand(userCommand, commandArgs);
