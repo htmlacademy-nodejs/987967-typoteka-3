@@ -1,13 +1,13 @@
 'use strict';
 
+const fs = require(`fs`);
+const chalk = require(`chalk`);
+
 const {
   DURATION,
   MIN_SENTENCES_COUNT,
   MAX_SENTENCES_COUNT,
   ANNOUNCE_SENTENCES_COUNT,
-  TITLES,
-  SENTENCES,
-  CATEGORIES,
 } = require(`./const`);
 
 const getRandomInt = (min, max) => {
@@ -55,17 +55,27 @@ const generateDate = () => {
 };
 
 
-const generatePost = () => {
-  const textSentences = getRandomElements(SENTENCES, getRandomInt(MIN_SENTENCES_COUNT, MAX_SENTENCES_COUNT));
+const generatePost = ({sentences, titles, categories}) => {
+  const textSentences = getRandomElements(sentences, getRandomInt(MIN_SENTENCES_COUNT, MAX_SENTENCES_COUNT));
   const announceSentences = getRandomUniqueElements(textSentences, ANNOUNCE_SENTENCES_COUNT);
 
   return {
-    title: getRandomElement(TITLES),
+    title: getRandomElement(titles),
     createdDate: generateDate(),
     announce: announceSentences.join(`\n`),
     fullText: textSentences.join(`\n`),
-    сategory: getRandomElement(CATEGORIES),
+    сategory: getRandomElement(categories),
   };
+};
+
+const readContent = async (filename) => {
+  try {
+    const content = await fs.promises.readFile(filename, `utf-8`);
+    return content.trim().split(`\n`);
+  } catch (err) {
+    console.error(chalk.red(err));
+    return [];
+  }
 };
 
 module.exports = {
@@ -77,4 +87,5 @@ module.exports = {
   getRandomDate,
   generateDate,
   generatePost,
+  readContent,
 };
