@@ -4,6 +4,7 @@ module.exports = {
   ExitCode: {
     SUCCESS: 0,
     ERROR: 1,
+    WORKING: 2,
   },
 
   DURATION: 1000 * 60 * 60 * 24 * 90,
