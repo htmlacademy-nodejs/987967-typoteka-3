@@ -71,7 +71,7 @@ const generatePost = ({ sentences, titles, categories }) => {
 const readContent = async (filename) => {
   try {
     const content = await fs.promises.readFile(filename, `utf-8`);
-    return content.trim().split(`\r\n`);
+    return content.trim().split(`\n`);
   } catch (err) {
     console.error(chalk.red(err));
     return [];
