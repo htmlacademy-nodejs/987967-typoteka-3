@@ -11,4 +11,5 @@ module.exports = {
   MIN_SENTENCES_COUNT: 5,
   MAX_SENTENCES_COUNT: 50,
   ANNOUNCE_SENTENCES_COUNT: 5,
+  MOCK_FILE: `mocks.json`,
 };

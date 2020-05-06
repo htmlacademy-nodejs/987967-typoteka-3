@@ -3,9 +3,8 @@
 const { generatePost, readContent } = require(`../../utils`);
 const fs = require(`fs`);
 const chalk = require(`chalk`);
-const { ExitCode } = require(`../../const`);
+const { ExitCode, MOCK_FILE } = require(`../../const`);
 
-const MOCK_FILE = `mocks.json`;
 const DEFAULT_POSTS_COUNT = 1;
 const MAX_POSTS_COUNT = 1000;
 const Message = {
@@ -30,7 +29,7 @@ const createMockFile = async (count) => {
     console.info(chalk.green(Message.FILE_SUCCESS));
     return ExitCode.SUCCESS
   } catch (err) {
-    console.error(chalk.red(Message.FILE_ERROR));
+    console.error(chalk.red(`${Message.FILE_ERROR}: ${err}`));
     return ExitCode.ERROR
   }
 };

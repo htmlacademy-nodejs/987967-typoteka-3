@@ -2,7 +2,8 @@
 
 const chalk = require(`chalk`);
 const http = require(`http`);
-const { ExitCode } = require(`../../const`);
+const fs = require(`fs`);
+const { ExitCode, MOCK_FILE } = require(`../../const`);
 
 const DEFAULT_PORT = 3000;
 const HttpStatusCode = {
@@ -10,12 +11,38 @@ const HttpStatusCode = {
   NOT_FOUND: 404,
 }
 
-const onConnect = (req, res) => {
-  res.writeHead(HttpStatusCode.OK, {
-    'Content-Type': 'text/plain'
-  });
+const sendResponse = (status, message, res) => {
+  const template = `
+    <!Doctype html>
+      <html lang="ru">
+      <head>
+        <title>987967-typoteka-3</title>
+      </head>
+      <body>${message}</body>
+    </html>`.trim();
 
-  res.end(`Test!!!`)
+  res.statusCode = status;
+  res.writeHead(status, {
+    "content-type": `text/html; charset=utf-8`
+  });
+  res.end(template);
+}
+
+const onConnect = async (req, res) => {
+  switch (req.url) {
+    case `/`:
+      try {
+        const posts = JSON.parse(await fs.promises.readFile(`./${MOCK_FILE}`));
+        const titles = posts.map(it => it.title);
+        const message = `<ul>${titles.map(it => `<li>${it}</li>`).join(`\n`)}</ul>`
+        sendResponse(HttpStatusCode.OK, message, res)
+      } catch (err) {
+        sendResponse(HttpStatusCode.NOT_FOUND, http.STATUS_CODES[HttpStatusCode.NOT_FOUND], res)
+      }
+      break;
+    
+    default: sendResponse(HttpStatusCode.NOT_FOUND, http.STATUS_CODES[HttpStatusCode.NOT_FOUND], res)
+  }
 }
 
 module.exports = {
