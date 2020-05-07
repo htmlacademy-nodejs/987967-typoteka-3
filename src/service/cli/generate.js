@@ -3,7 +3,7 @@
 const {generatePost, readContent} = require(`../../utils`);
 const fs = require(`fs`);
 const chalk = require(`chalk`);
-const { ExitCode, MOCK_FILE } = require(`../../const`);
+const {ExitCode, MOCK_FILE} = require(`../../const`);
 
 const DEFAULT_POSTS_COUNT = 1;
 const MAX_POSTS_COUNT = 1000;
@@ -27,10 +27,10 @@ const createMockFile = async (count) => {
   try {
     await fs.promises.writeFile(MOCK_FILE, posts);
     console.info(chalk.green(Message.FILE_SUCCESS));
-    return ExitCode.SUCCESS
+    return ExitCode.SUCCESS;
   } catch (err) {
     console.error(chalk.red(`${Message.FILE_ERROR}: ${err}`));
-    return ExitCode.ERROR
+    return ExitCode.ERROR;
   }
 };
 
@@ -48,7 +48,7 @@ module.exports = {
 
     if (postsCount > MAX_POSTS_COUNT) {
       console.error(chalk.red(Message.WRONG_POSTS_COUNT));
-      return ExitCode.ERROR
+      return ExitCode.ERROR;
     }
 
     return await createMockFile(postsCount);
