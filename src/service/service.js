@@ -11,11 +11,10 @@ const [userCommand, ...commandArgs] = userInputs;
 
 const executeCommand = async (commandName, arg) => {
   const command = Cli[commandName] || Cli[DEFAULT_COMMAND];
-  try {
-    await command.run(arg);
-    process.exit(ExitCode.SUCCESS);
-  } catch (err) {
-    process.exit(ExitCode.ERROR);
+  const exitCode = await command.run(arg);
+
+  if (exitCode !== ExitCode.WORKING) {
+    process.exit(exitCode);
   }
 };
 
