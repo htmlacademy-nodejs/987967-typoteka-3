@@ -14,6 +14,6 @@ module.exports = {
   name: `--help`,
   run() {
     console.info(chalk.grey(HELP_MESSAGE));
-    return ExitCode.SUCCESS
+    return ExitCode.SUCCESS;
   }
 };
