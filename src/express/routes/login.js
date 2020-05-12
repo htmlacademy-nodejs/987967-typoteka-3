@@ -5,7 +5,7 @@ const {Router} = require(`express`);
 const loginRouter = new Router();
 
 loginRouter.get(`/`, (req, res, next) => {
-  res.send(`/login`);
+  res.render(`login`);
   next();
 });
 

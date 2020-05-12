@@ -1,0 +1,86 @@
+doctype html
+html(lang='ru')
+  meta(charset="UTF-8")
+  meta(name="viewport" content="width=device-width, initial-scale=1.0")
+  meta(http-equiv="X-UA-Compatible" content="ie=edge")
+  title registration
+  link(rel="preload" href="./fonts/Inter-Regular.woff2" as="font" crossorigin="anonymous")
+  link(rel="preload" href="./fonts/Inter-Medium.woff2" as="font" crossorigin="anonymous")
+  link(rel="preload" href="./fonts/SFProDisplay-Regular.woff2" as="font" crossorigin="anonymous")
+  link(rel="stylesheet" href="css/style.min.css")
+body
+  div(class="wrapper")
+    header(class="header")
+      a(class="header__logo logo" href="#")
+        img(class="logo__image" src="img/icons/logo-image-only.svg" alt="логотип Тайпотеки")
+        span(class="logo__name") Типотека
+      
+      nav(class="header__nav")
+        ul(class="header__nav-list")
+          li(class="header__list-item")
+            a(class="header__popup" href="#") Регистрация
+          
+          li(class="header__list-item")
+            a(class="header__enter" href="#") Вход с паролем
+          
+        
+      
+      a(class="header__search button button--search" href="#" aria-label="поиск по сайту")
+    
+        main
+      h1(class="visually-hidden") Регистрация пользователя
+      section(class="modal")
+        div(class="popup popup--registration")
+          button(type="button" class="popup__button button button--popup-close" aria-label="Закрыть окно") Закрыть             окно
+          h2(class="visually-hidden") Форма регистрации
+          ul(class="popup__tabs")
+            li(class="popup__tab popup__tab--active popup__tab--register")
+              button(type="button" class="popup__tab-switcher button") Регистрация
+            
+            li(class="popup__tab popup__tab--log-in")
+              button(type="button" class="popup__tab-switcher button") Войти
+            
+          
+          div(class="popup__form popup__form--active form form--register")
+            form(action="#" method="get")
+              div(class="form__field")
+                label
+                  input(type="email" placeholder="Электронная почта" required="")
+              
+              div(class="form__field")
+                label
+                  input(type="text" placeholder="Имя" required="")
+              div(class="form__field")
+                label
+                  input(type="text" placeholder="Фамилия")
+              div(class="form__field")
+                label
+                  input(type="password" placeholder="Пароль" required="")
+              div(class="form__field")
+                label
+                  input(type="password" placeholder="Повтор пароля" required="")
+              div(class="form__image-loader")
+                a(class="form__avatar avatar")
+                  img(src="img/icons/smile.svg" alt="аватар пользователя")
+                
+                label Загрузить фото профиля
+                  input(type="file" class="visually-hidden")
+              
+              button(class="form__submit-btn form__submit-btn--register button button--colored" type="submit") Зарегистрироваться
+            
+          
+          div(class="popup__form popup__form--hidden form form--log-in")
+            form(action="#" method="get")
+              div(class="form__field")
+                label
+                  input(type="email" placeholder="Электронная почта" required="")
+              div(class="form__field")
+                label
+                  input(type="password" placeholder="Пароль" required="")
+              button(class="form__submit-btn form__submit-btn--log-in button button--colored" type="submit") Войти
+            
+        div(class="modal__overlay")
+    
+    include includes/footer.pug
+    script(src="js/main.js")
+  
