@@ -1,14 +1,14 @@
 'use strict';
 
 const express = require(`express`);
-const { DEFAULT_PORT } = require(`./const`);
-const { articleRouter } = require(`./routes/articles`);
-const { mainRouter } = require(`./routes/main`);
-const { categoryRouter } = require(`./routes/categories`);
-const { loginRouter } = require(`./routes/login`);
-const { myRouter } = require(`./routes/my`);
-const { registerRouter } = require(`./routes/register`);
-const { searchRouter } = require(`./routes/search`);
+const {DEFAULT_PORT} = require(`./const`);
+const {articleRouter} = require(`./routes/articles`);
+const {mainRouter} = require(`./routes/main`);
+const {categoryRouter} = require(`./routes/categories`);
+const {loginRouter} = require(`./routes/login`);
+const {myRouter} = require(`./routes/my`);
+const {registerRouter} = require(`./routes/register`);
+const {searchRouter} = require(`./routes/search`);
 
 const app = express();
 

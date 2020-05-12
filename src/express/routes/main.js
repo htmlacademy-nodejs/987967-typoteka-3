@@ -1,14 +1,14 @@
 'use strict';
 
-const { Router } = require(`express`);
+const {Router} = require(`express`);
 
 const mainRouter = new Router();
 
 mainRouter.get(`/`, (req, res, next) => {
   res.send(`/`);
-  next()
+  next();
 });
 
 module.exports = {
   mainRouter,
-}
+};
