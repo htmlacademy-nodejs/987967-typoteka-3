@@ -10,7 +10,7 @@
     "start": "node ./src/service/service.js",
     "start:dev": "nodemon ./src/service/service.js --server",
     "start-front-server": "node ./src/express/index.js",
-    "start-front-server:dev": "nodemon ./src/express/index.js"
+    "start-front-server:dev": "nodemon -e js,pug ./src/express/index.js"
   },
   "repository": {
     "type": "git",

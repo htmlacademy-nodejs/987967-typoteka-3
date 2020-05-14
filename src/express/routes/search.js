@@ -5,7 +5,7 @@ const {Router} = require(`express`);
 const searchRouter = new Router();
 
 searchRouter.get(`/`, (req, res, next) => {
-  res.send(`/search`);
+  res.render(`search`);
   next();
 });
 

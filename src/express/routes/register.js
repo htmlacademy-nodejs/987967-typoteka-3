@@ -5,7 +5,7 @@ const {Router} = require(`express`);
 const registerRouter = new Router();
 
 registerRouter.get(`/`, (req, res, next) => {
-  res.send(`/register`);
+  res.render(`login`);
   next();
 });
 

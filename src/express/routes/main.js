@@ -5,7 +5,7 @@ const {Router} = require(`express`);
 const mainRouter = new Router();
 
 mainRouter.get(`/`, (req, res, next) => {
-  res.send(`/`);
+  res.render(`main`);
   next();
 });
 

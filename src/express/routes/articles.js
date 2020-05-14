@@ -15,7 +15,7 @@ articleRouter.get(`/:id`, (req, res, next) => {
 });  
 
 articleRouter.get(`/category/:id`, (req, res, next) => {
-  res.send(`/articles/category/${req.params.id}`);
+  res.render(`articles-by-category`);
   next();
 });  
 
