@@ -4,9 +4,8 @@ const {Router} = require(`express`);
 
 const mainRouter = new Router();
 
-mainRouter.get(`/`, (req, res, next) => {
+mainRouter.get(`/`, (req, res) => {
   res.render(`main`);
-  next();
 });
 
 module.exports = {

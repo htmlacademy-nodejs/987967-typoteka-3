@@ -4,14 +4,12 @@ const {Router} = require(`express`);
 
 const myRouter = new Router();
 
-myRouter.get(`/`, (req, res, next) => {
+myRouter.get(`/`, (req, res) => {
   res.render(`my`);
-  next();
 });
 
-myRouter.get(`/comments`, (req, res, next) => {
+myRouter.get(`/comments`, (req, res) => {
   res.render(`comments`);
-  next();
 });
 
 module.exports = {

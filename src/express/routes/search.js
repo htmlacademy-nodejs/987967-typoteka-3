@@ -4,9 +4,8 @@ const {Router} = require(`express`);
 
 const searchRouter = new Router();
 
-searchRouter.get(`/`, (req, res, next) => {
+searchRouter.get(`/`, (req, res) => {
   res.render(`search`);
-  next();
 });
 
 module.exports = {
