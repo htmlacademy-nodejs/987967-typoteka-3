@@ -2,14 +2,14 @@
 
 const express = require(`express`);
 const path = require(`path`);
-const {DEFAULT_PORT} = require(`./const`);
-const {articleRouter} = require(`./routes/articles`);
-const {mainRouter} = require(`./routes/main`);
-const {categoryRouter} = require(`./routes/categories`);
-const {loginRouter} = require(`./routes/login`);
-const {myRouter} = require(`./routes/my`);
-const {registerRouter} = require(`./routes/register`);
-const {searchRouter} = require(`./routes/search`);
+const { DEFAULT_PORT } = require(`./const`);
+const { articleRouter } = require(`./routes/articles`);
+const { mainRouter } = require(`./routes/main`);
+const { categoryRouter } = require(`./routes/categories`);
+const { loginRouter } = require(`./routes/login`);
+const { myRouter } = require(`./routes/my`);
+const { registerRouter } = require(`./routes/register`);
+const { searchRouter } = require(`./routes/search`);
 
 const app = express();
 
@@ -25,5 +25,8 @@ app.use(`/login`, loginRouter);
 app.use(`/my`, myRouter);
 app.use(`/register`, registerRouter);
 app.use(`/search`, searchRouter);
+
+app.use((req, res) => res.status(404).render(`400.pug`));
+app.use((err, req, res, next) => res.status(500).render(`500.pug`));
 
 app.listen(DEFAULT_PORT);
