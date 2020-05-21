@@ -1,30 +1,19 @@
 'use strict';
 
 const chalk = require(`chalk`);
-const http = require(`http`);
-const {ExitCode, MOCK_FILE} = require(`../../const`);
-const {sendResponse, getMockTitles, getTitleList} = require(`../../utils`);
+const express = require(`express`);
+const {postsRouter} = require(`./routes/posts`);
+const {ExitCode} = require(`../../const`);
 
 const DEFAULT_PORT = 3000;
 const HttpStatusCode = {
   OK: 200,
   NOT_FOUND: 404,
+  SERVER_ERROR: 500,
 };
-
-const onConnect = async (req, res) => {
-  switch (req.url) {
-    case `/`:
-      try {
-        const titles = await getMockTitles(`./${MOCK_FILE}`);
-        const message = getTitleList(titles);
-        sendResponse(HttpStatusCode.OK, message, res);
-      } catch (err) {
-        sendResponse(HttpStatusCode.NOT_FOUND, http.STATUS_CODES[HttpStatusCode.NOT_FOUND], res);
-      }
-      break;
-
-    default: sendResponse(HttpStatusCode.NOT_FOUND, http.STATUS_CODES[HttpStatusCode.NOT_FOUND], res);
-  }
+const HttpStatusInfo = {
+  NOT_FOUND: `Not found`,
+  SERVER_ERROR: `Server error`,
 };
 
 module.exports = {
@@ -33,8 +22,22 @@ module.exports = {
     const [customPort] = arg;
     const port = parseInt(customPort, 10) || DEFAULT_PORT;
 
-    http.createServer(onConnect)
-      .listen(port)
+    const app = express();
+
+    app.use(express.json());
+    app.use(`/posts`, postsRouter);
+
+    app.use((req, res) =>
+      res.status(HttpStatusCode.NOT_FOUND)
+        .send(HttpStatusInfo.NOT_FOUND));
+
+    app.use((err, req, res, next) => {
+      res.status(HttpStatusCode.SERVER_ERROR)
+        .send(HttpStatusInfo.SERVER_ERROR);
+      next();
+    });
+
+    app.listen(port)
       .on(`listening`, (err) => {
         if (err) {
           console.error(chalk.red(`Server creation error: ${err}`));

@@ -1,7 +1,9 @@
 'use strict';
 
 const fs = require(`fs`);
+const path = require(`path`);
 const chalk = require(`chalk`);
+const {MOCK_FILE} = require(`./const`);
 
 const {
   DURATION,
@@ -95,7 +97,11 @@ const sendResponse = (status, message, res) => {
   res.end(template);
 };
 
-const getMockTitles = async (filename) => JSON.parse(await fs.promises.readFile(filename, `utf-8`)).map((it) => it.title);
+const getMockPosts = async () => {
+  const mockFile = path.resolve(process.cwd(), MOCK_FILE);
+  return JSON.parse(await fs.promises.readFile(mockFile, `utf-8`));
+};
+const getMockTitles = async () => await getMockPosts().map((it) => it.title);
 const getTitleList = (titles) => `<ul>${titles.map((it) => `<li>${it}</li>`).join(`\n`)}</ul>`;
 
 module.exports = {
@@ -109,6 +115,7 @@ module.exports = {
   generatePost,
   readContent,
   sendResponse,
+  getMockPosts,
   getMockTitles,
   getTitleList,
 };
