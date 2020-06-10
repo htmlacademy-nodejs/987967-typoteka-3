@@ -3,13 +3,17 @@
 const fs = require(`fs`);
 const path = require(`path`);
 const chalk = require(`chalk`);
+const {nanoid} = require(`nanoid`);
 const {MOCK_FILE} = require(`./const`);
 
 const {
   DURATION,
   MIN_SENTENCES_COUNT,
   MAX_SENTENCES_COUNT,
+  MIN_COMMENT_COUNT,
+  MAX_COMMENT_COUNT,
   ANNOUNCE_SENTENCES_COUNT,
+  ID_LENGTH
 } = require(`./const`);
 
 const getRandomInt = (min, max) => {
@@ -57,16 +61,21 @@ const generateDate = () => {
 };
 
 
-const generatePost = ({sentences, titles, categories}) => {
+const generatePost = ({sentences, titles, categories, comments}) => {
   const textSentences = getRandomElements(sentences, getRandomInt(MIN_SENTENCES_COUNT, MAX_SENTENCES_COUNT));
   const announceSentences = getRandomUniqueElements(textSentences, ANNOUNCE_SENTENCES_COUNT);
 
   return {
+    id: nanoid(ID_LENGTH),
     title: getRandomElement(titles),
     createdDate: generateDate(),
     announce: announceSentences.join(`\n`),
     fullText: textSentences.join(`\n`),
     сategory: getRandomElement(categories),
+    comments: getRandomElements(comments, getRandomInt(MIN_COMMENT_COUNT, MAX_COMMENT_COUNT)).map(it => ({
+      id: nanoid(ID_LENGTH),
+      text: it,
+    }))
   };
 };
 
