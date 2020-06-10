@@ -15,4 +15,16 @@ module.exports = {
   ANNOUNCE_SENTENCES_COUNT: 5,
   MOCK_FILE: `mocks.json`,
   ID_LENGTH: 6,
+  DEFAULT_PORT: 3000,
+
+  HttpStatusCode: {
+    OK: 200,
+    NOT_FOUND: 404,
+    SERVER_ERROR: 500,
+  },
+
+  HttpStatusInfo: {
+    NOT_FOUND: `Not found`,
+    SERVER_ERROR: `Server error`,
+  },
 };
