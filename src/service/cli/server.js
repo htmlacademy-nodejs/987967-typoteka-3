@@ -4,18 +4,28 @@ const chalk = require(`chalk`);
 const express = require(`express`);
 const {createAPI} = require(`../api`);
 const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo} = require(`../../const`);
+const {getLogger, LogMessage, LoggerName, logger} = require(`../../logger`);
+
+const serverLogger = getLogger(LoggerName.DATA_SERVER);
 
 const createServer = async () => {
   const app = express();
 
   app.use(express.json());
+  app.use((req, res, next) => {
+    logger.info(LogMessage.getStartRequest(req.url));
+    next();
+  });
+
   app.use(`/api`, await createAPI());
 
-  app.use((req, res) =>
-    res.status(HttpStatusCode.NOT_FOUND)
-        .send(HttpStatusInfo.NOT_FOUND));
+  app.use((req, res) => {
+    logger.error(LogMessage.getUnknownRoute(req.url));
+    res.status(HttpStatusCode.NOT_FOUND).send(HttpStatusInfo.NOT_FOUND);
+  });
 
   app.use((err, req, res, next) => {
+    logger.error(LogMessage.getError(err));
     res.status(HttpStatusCode.SERVER_ERROR).send(`Server error: ${err}`);
     next();
   });
@@ -32,8 +42,9 @@ module.exports = {
 
     try {
       app.listen(port);
+      serverLogger.info(LogMessage.getSuccessCreatingServer(port));
     } catch (err) {
-      console.error(chalk.red(`Server creation error: ${err}`));
+      serverLogger.error(LogMessage.getErrorCreatingServer(err));
       process.exit(ExitCode.ERROR);
     }
 

@@ -1,6 +1,7 @@
 'use strict';
 
 const {HttpStatusCode} = require(`../../const`);
+const {logger} = require(`../../logger`);
 
 const requiredFields = [`text`];
 
@@ -8,7 +9,9 @@ const validateComment = (req, res, next) => {
   const comment = req.body;
 
   if (!comment) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(`Comment is empty`);
+    const err = `Comment is empty`;
+    logger.error(err);
+    res.status(HttpStatusCode.BAD_REQUEST).send(err);
     return;
   }
 
@@ -17,7 +20,9 @@ const validateComment = (req, res, next) => {
   }, true);
 
   if (!isValid) {
-    res.status(HttpStatusCode.BAD_REQUEST).send(`Comment should contain following fields: ${requiredFields.join(`, `)}, but doesn't contain some`);
+    const err = `Comment should contain following fields: ${requiredFields.join(`, `)}, but doesn't contain some`;
+    logger.error(err);
+    res.status(HttpStatusCode.BAD_REQUEST).send(err);
     return;
   }
 
