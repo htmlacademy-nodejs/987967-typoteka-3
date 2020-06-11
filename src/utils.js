@@ -12,6 +12,8 @@ const {
   MAX_SENTENCES_COUNT,
   MIN_COMMENT_COUNT,
   MAX_COMMENT_COUNT,
+  MIN_CATEGORY_COUNT,
+  MAX_CATEGORY_COUNT,
   ANNOUNCE_SENTENCES_COUNT,
   ID_LENGTH
 } = require(`./const`);
@@ -71,8 +73,8 @@ const generatePost = ({sentences, titles, categories, comments}) => {
     createdDate: generateDate(),
     announce: announceSentences.join(`\n`),
     fullText: textSentences.join(`\n`),
-    сategory: getRandomElement(categories),
-    comments: getRandomElements(comments, getRandomInt(MIN_COMMENT_COUNT, MAX_COMMENT_COUNT)).map(it => ({
+    categories: getRandomUniqueElements(categories, getRandomInt(MIN_CATEGORY_COUNT, MAX_CATEGORY_COUNT)),
+    comments: getRandomElements(comments, getRandomInt(MIN_COMMENT_COUNT, MAX_COMMENT_COUNT)).map((it) => ({
       id: nanoid(ID_LENGTH),
       text: it,
     }))
@@ -113,6 +115,14 @@ const getMockPosts = async () => {
 const getMockTitles = async () => await getMockPosts().map((it) => it.title);
 const getTitleList = (titles) => `<ul>${titles.map((it) => `<li>${it}</li>`).join(`\n`)}</ul>`;
 
+const generateCategories = async (filename) => {
+  const categories = await readContent(filename);
+  return categories.map((it) => ({
+    id: nanoid(ID_LENGTH),
+    name: it,
+  }));
+};
+
 module.exports = {
   getRandomInt,
   getRandomElement,
@@ -121,6 +131,7 @@ module.exports = {
   getRandomBoolean,
   getRandomDate,
   generateDate,
+  generateCategories,
   generatePost,
   readContent,
   sendResponse,

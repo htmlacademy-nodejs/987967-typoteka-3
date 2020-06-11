@@ -1,6 +1,6 @@
 'use strict';
 
-const {generatePost, readContent} = require(`../../utils`);
+const {generatePost, readContent, generateCategories} = require(`../../utils`);
 const fs = require(`fs`);
 const chalk = require(`chalk`);
 const {ExitCode, MOCK_FILE} = require(`../../const`);
@@ -19,7 +19,7 @@ const createMockFile = async (count) => {
   const data = {
     titles: await readContent(`./data/${DataFileName.TITLE}`),
     sentences: await readContent(`./data/${DataFileName.DESCRIPTION}`),
-    categories: await readContent(`./data/${DataFileName.CATEGORY}`),
+    categories: await generateCategories(`./data/${DataFileName.CATEGORY}`),
     comments: await readContent(`./data/${DataFileName.COMMENT}`),
   };
 

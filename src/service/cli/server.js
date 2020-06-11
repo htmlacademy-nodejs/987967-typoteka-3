@@ -5,19 +5,18 @@ const express = require(`express`);
 const {createAPI} = require(`../api`);
 const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo} = require(`../../const`);
 
-const createServer = () => {
+const createServer = async () => {
   const app = express();
 
   app.use(express.json());
-  app.use(`/api`, createAPI());
+  app.use(`/api`, await createAPI());
 
   app.use((req, res) =>
     res.status(HttpStatusCode.NOT_FOUND)
         .send(HttpStatusInfo.NOT_FOUND));
 
   app.use((err, req, res, next) => {
-    res.status(HttpStatusCode.SERVER_ERROR)
-        .send(HttpStatusInfo.SERVER_ERROR);
+    res.status(HttpStatusCode.SERVER_ERROR).send(`Server error: ${err}`);
     next();
   });
 
@@ -26,10 +25,10 @@ const createServer = () => {
 
 module.exports = {
   name: `--server`,
-  run(arg) {
+  async run(arg) {
     const [customPort] = arg;
     const port = parseInt(customPort, 10) || DEFAULT_PORT;
-    const app = createServer();
+    const app = await createServer();
 
     try {
       app.listen(port);

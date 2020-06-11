@@ -12,6 +12,8 @@ module.exports = {
   MAX_SENTENCES_COUNT: 50,
   MIN_COMMENT_COUNT: 0,
   MAX_COMMENT_COUNT: 5,
+  MIN_CATEGORY_COUNT: 1,
+  MAX_CATEGORY_COUNT: 3,
   ANNOUNCE_SENTENCES_COUNT: 5,
   MOCK_FILE: `mocks.json`,
   ID_LENGTH: 6,
@@ -21,10 +23,14 @@ module.exports = {
     OK: 200,
     NOT_FOUND: 404,
     SERVER_ERROR: 500,
+    BAD_REQUEST: 400,
   },
 
   HttpStatusInfo: {
     NOT_FOUND: `Not found`,
     SERVER_ERROR: `Server error`,
+    BAD_REQUEST: `Bad request`,
   },
+
+  ANNOUNCE_LENGTH: 400,
 };
