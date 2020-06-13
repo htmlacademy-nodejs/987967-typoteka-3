@@ -3,7 +3,7 @@
 const chalk = require(`chalk`);
 const express = require(`express`);
 const {createAPI} = require(`../api`);
-const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo} = require(`../../const`);
+const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo} = require(`../const`);
 const {getLogger, LogMessage, LoggerName, logger} = require(`../../logger`);
 const {getMockPosts} = require(`../../utils`);
 

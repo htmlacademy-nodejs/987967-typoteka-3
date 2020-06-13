@@ -1,6 +1,6 @@
 'use strict';
 
-const {HttpStatusCode} = require(`../../const`);
+const {HttpStatusCode} = require(`../const`);
 const {logger} = require(`../../logger`);
 
 const requiredFields = [`title`, `createdDate`, `fullText`, `categories`, `announce`];

@@ -1,7 +1,7 @@
 'use strict';
 
 const chalk = require(`chalk`);
-const {ExitCode} = require(`../../const`);
+const {ExitCode} = require(`../const`);
 
 const HELP_MESSAGE = `Гайд:
     server <command>

@@ -1,7 +1,7 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {HttpStatusCode} = require(`../../const`);
+const {HttpStatusCode} = require(`../const`);
 const {logger, LogMessage} = require(`../../logger`);
 
 const createSearchRouter = (service) => {

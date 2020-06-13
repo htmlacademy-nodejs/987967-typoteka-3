@@ -1,7 +1,7 @@
 'use strict';
 
 const {nanoid} = require(`nanoid`);
-const {ID_LENGTH, ANNOUNCE_LENGTH} = require(`../../const`);
+const {ID_LENGTH, ANNOUNCE_LENGTH} = require(`../const`);
 
 class DataService {
   constructor(data) {

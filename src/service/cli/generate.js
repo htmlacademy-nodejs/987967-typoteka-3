@@ -3,7 +3,7 @@
 const {generatePost, readContent, generateCategories} = require(`../../utils`);
 const fs = require(`fs`);
 const chalk = require(`chalk`);
-const {ExitCode, MOCK_FILE} = require(`../../const`);
+const {ExitCode, MOCK_FILE} = require(`../const`);
 
 const DEFAULT_POSTS_COUNT = 1;
 const MAX_POSTS_COUNT = 1000;

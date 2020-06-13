@@ -1,7 +1,7 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {HttpStatusCode} = require(`../../const`);
+const {HttpStatusCode} = require(`../const`);
 const {createPostFinder, validatePost, validateComment, createCommentFinder} = require(`../middlewares`);
 const {logger, LogMessage} = require(`../../logger`);
 
