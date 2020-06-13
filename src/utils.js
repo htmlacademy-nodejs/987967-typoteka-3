@@ -4,7 +4,7 @@ const fs = require(`fs`);
 const path = require(`path`);
 const chalk = require(`chalk`);
 const {nanoid} = require(`nanoid`);
-const {MOCK_FILE} = require(`./const`);
+const {MOCK_FILE} = require(`./service/const`);
 
 const {
   DURATION,
@@ -16,7 +16,7 @@ const {
   MAX_CATEGORY_COUNT,
   ANNOUNCE_SENTENCES_COUNT,
   ID_LENGTH
-} = require(`./const`);
+} = require(`./service/const`);
 
 const getRandomInt = (min, max) => {
   const minInt = Math.ceil(min);
@@ -78,7 +78,8 @@ const generatePost = ({sentences, titles, categories, comments}) => {
       id: nanoid(ID_LENGTH),
       text: it,
       date: getRandomDate(createdDate, now)
-    }))
+    })),
+    picture: getRandomBoolean() ? `http://picsum.photos/400/240?r=${Math.random()}` : ``,
   };
 };
 
