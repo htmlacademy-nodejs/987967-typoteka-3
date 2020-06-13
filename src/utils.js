@@ -52,31 +52,32 @@ const getRandomUniqueElements = (array, count) => {
 };
 
 const getRandomBoolean = () => Math.random() > 0.5;
-const getRandomDate = (min, max) => new Date(getRandomInt(min.valueOf(), max.valueOf()));
+const getRandomDate = (min, max) => new Date(getRandomInt(min.valueOf(), max.valueOf())).valueOf();
 
 const generateDate = () => {
   const now = Date.now();
   const past = new Date(now - DURATION);
-  const [date, time] = getRandomDate(past, now).toLocaleString().split(`, `);
-
-  return `${date.split(`/`).reverse().join(`-`)}, ${time}`;
+  return getRandomDate(past, now);
 };
 
 
 const generatePost = ({sentences, titles, categories, comments}) => {
   const textSentences = getRandomElements(sentences, getRandomInt(MIN_SENTENCES_COUNT, MAX_SENTENCES_COUNT));
   const announceSentences = getRandomUniqueElements(textSentences, ANNOUNCE_SENTENCES_COUNT);
+  const createdDate = generateDate();
+  const now = Date.now();
 
   return {
     id: nanoid(ID_LENGTH),
     title: getRandomElement(titles),
-    createdDate: generateDate(),
+    createdDate,
     announce: announceSentences.join(`\n`),
     fullText: textSentences.join(`\n`),
     categories: getRandomUniqueElements(categories, getRandomInt(MIN_CATEGORY_COUNT, MAX_CATEGORY_COUNT)),
     comments: getRandomElements(comments, getRandomInt(MIN_COMMENT_COUNT, MAX_COMMENT_COUNT)).map((it) => ({
       id: nanoid(ID_LENGTH),
       text: it,
+      date: getRandomDate(createdDate, now)
     }))
   };
 };
