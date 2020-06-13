@@ -1,7 +1,7 @@
 'use strict';
 
-const DEFAULT_PORT = 8080;
-
 module.exports = {
-  DEFAULT_PORT,
+  DEFAULT_PORT: 8080,
+  DATA_SERVER_PORT: 3000,
+  TIMEOUT: 3000,
 };
