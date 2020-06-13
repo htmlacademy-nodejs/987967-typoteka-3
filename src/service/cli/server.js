@@ -5,10 +5,11 @@ const express = require(`express`);
 const {createAPI} = require(`../api`);
 const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo} = require(`../../const`);
 const {getLogger, LogMessage, LoggerName, logger} = require(`../../logger`);
+const {getMockPosts} = require(`../../utils`);
 
 const serverLogger = getLogger(LoggerName.DATA_SERVER);
 
-const createServer = async () => {
+const createServer = (rawData) => {
   const app = express();
 
   app.use(express.json());
@@ -17,7 +18,7 @@ const createServer = async () => {
     next();
   });
 
-  app.use(`/api`, await createAPI());
+  app.use(`/api`, createAPI(rawData));
 
   app.use((req, res) => {
     logger.error(LogMessage.getUnknownRoute(req.url));
@@ -38,7 +39,8 @@ module.exports = {
   async run(arg) {
     const [customPort] = arg;
     const port = parseInt(customPort, 10) || DEFAULT_PORT;
-    const app = await createServer();
+    const mockData = await getMockPosts();
+    const app = await createServer(mockData);
 
     try {
       app.listen(port);
@@ -51,5 +53,6 @@ module.exports = {
     console.info(chalk.green(`Listening port ${port}...`));
 
     return ExitCode.WORKING;
-  }
+  },
+  createServer
 };

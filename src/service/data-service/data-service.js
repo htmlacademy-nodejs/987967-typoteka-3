@@ -124,7 +124,9 @@ class DataService {
       return null;
     }
 
-    return post.comments.find((it) => it.id === commentID);
+    const removedComment = post.comments.find((it) => it.id === commentID);
+    post.comments = post.comments.filter((it) => it.id !== commentID);
+    return removedComment;
   }
 
   search(query) {

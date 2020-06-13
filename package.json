@@ -4,7 +4,8 @@
   "description": "Типотека",
   "main": "./src/service/service.js",
   "scripts": {
-    "test": "npm run eslint",
+    "test": "npm run test:rest",
+    "test:rest": "jest api",
     "eslint": "eslint --ext .js src/",
     "eslint:fix": "eslint --ext .js src/ --fix",
     "start": "node ./src/service/service.js",
@@ -24,6 +25,7 @@
   },
   "homepage": "https://github.com/dijeth/987967-typoteka-3#readme",
   "devDependencies": {
+    "@types/jest": "26.0.0",
     "eslint": "6.8.0",
     "eslint-config-htmlacademy": "0.5.2",
     "jest": "26.0.1",

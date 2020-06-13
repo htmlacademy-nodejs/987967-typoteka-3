@@ -2,13 +2,13 @@
 
 const path = require(`path`);
 const pino = require(`pino`);
-const fs = require(`fs`);
+// const fs = require(`fs`);
 
 const logFile = path.resolve(__dirname, `logs`);
 
-if (fs.existsSync(logFile)) {
-  fs.unlinkSync(logFile);
-}
+// if (fs.existsSync(logFile)) {
+//   fs.unlinkSync(logFile);
+// }
 
 const LogMessage = {
   getEndRequest(url, statusCode) {
