@@ -1,7 +1,7 @@
 'use strict';
 
 const {nanoid} = require(`nanoid`);
-const {ID_LENGTH, ANNOUNCE_LENGTH} = require(`../const`);
+const {ID_LENGTH, ANNOUNCE_LENGTH} = require(`./const`);
 
 class DataService {
   constructor(data) {
@@ -9,12 +9,7 @@ class DataService {
   }
 
   getPosts() {
-    return this._data.map((it) => {
-      const smallPost = {...it};
-      delete smallPost.fullText;
-      delete smallPost.comments;
-      return smallPost;
-    });
+    return this._data;
   }
 
   getPost(id) {

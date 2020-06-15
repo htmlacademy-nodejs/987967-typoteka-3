@@ -79,7 +79,7 @@ const generatePost = ({sentences, titles, categories, comments}) => {
       text: it,
       date: getRandomDate(createdDate, now)
     })),
-    picture: getRandomBoolean() ? `http://picsum.photos/400/240?r=${Math.random()}` : ``,
+    picture: getRandomBoolean() ? `http://picsum.photos/460/240?r=${Math.random()}` : ``,
   };
 };
 
@@ -149,6 +149,8 @@ const simplifyObject = (object) => {
   return simpleObject;
 };
 
+const formatNumber = (number) => `${number < 10 ? `0` : ``}${number}`;
+
 module.exports = {
   getRandomInt,
   getRandomElement,
@@ -165,4 +167,5 @@ module.exports = {
   getMockTitles,
   getTitleList,
   simplifyObject,
+  formatNumber,
 };
