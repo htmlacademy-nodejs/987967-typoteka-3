@@ -52,7 +52,8 @@ const LoggerName = {
   DATA_SERVER: `data-server`,
   DATA_SERVER_API: `data-server:api`,
   FRONT_SERVER: `front-server`,
-  FRONT_SERVER_DATA: `front-server:data`
+  FRONT_SERVER_DATA: `front-server:data`,
+  FRONT_SERVER_API: `front-server:api`,
 };
 
 const logger = pino({

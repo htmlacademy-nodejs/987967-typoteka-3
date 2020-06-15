@@ -2,6 +2,7 @@
 
 const axios = require(`axios`).default;
 const {TIMEOUT, DATA_SERVER_PORT} = require(`./const`);
+const {ServiceToExpressAdapter} = require(`./data-adapter`);
 const {getLogger, LoggerName, LogMessage} = require(`../logger`);
 
 const logger = getLogger(LoggerName.FRONT_SERVER_DATA);
@@ -35,13 +36,21 @@ class DataServer {
   }
 
   async getCategories() {
+    return await this._getRequest(`/categories`);
+  }
+
+  async getPostPreviews() {
+    const posts = await this._getRequest(`/articles`);
+    return posts.map((it) => ServiceToExpressAdapter.getPostPreview(it));
+  }
+
+  async _getRequest(url) {
     let res;
     try {
-      res = await this._api.get(`/categories`);
+      res = await this._api.get(url);
     } catch (err) {
       throw new Error(err);
     }
-
     return res.data;
   }
 }
