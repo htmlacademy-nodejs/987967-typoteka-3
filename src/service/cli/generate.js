@@ -1,6 +1,6 @@
 'use strict';
 
-const {generatePost, readContent} = require(`../../utils`);
+const {generatePost, readContent, generateCategories} = require(`../../utils`);
 const fs = require(`fs`);
 const chalk = require(`chalk`);
 const {ExitCode, MOCK_FILE} = require(`../../const`);
@@ -8,7 +8,7 @@ const {ExitCode, MOCK_FILE} = require(`../../const`);
 const DEFAULT_POSTS_COUNT = 1;
 const MAX_POSTS_COUNT = 1000;
 const Message = {
-  WRONG_POSTS_COUNT: `Не больше ${MAX_POSTS_COUNT} публикаций`,
+  WRONG_POSTS_COUNT: `No more than ${MAX_POSTS_COUNT} articles`,
   FILE_ERROR: `Can't write data to file...`,
   FILE_SUCCESS: `Operation success. File created.`,
 };
@@ -19,7 +19,8 @@ const createMockFile = async (count) => {
   const data = {
     titles: await readContent(`./data/${DataFileName.TITLE}`),
     sentences: await readContent(`./data/${DataFileName.DESCRIPTION}`),
-    categories: await readContent(`./data/${DataFileName.CATEGORY}`),
+    categories: await generateCategories(`./data/${DataFileName.CATEGORY}`),
+    comments: await readContent(`./data/${DataFileName.COMMENT}`),
   };
 
   const posts = JSON.stringify(generatePosts(count, data));
@@ -38,6 +39,7 @@ const DataFileName = {
   TITLE: `titles.txt`,
   DESCRIPTION: `sentences.txt`,
   CATEGORY: `categories.txt`,
+  COMMENT: `comments.txt`,
 };
 
 module.exports = {
