@@ -37,7 +37,7 @@ class DataServer {
   }
 
   async getCategories() {
-    return await this._getRequest(`/categories`);
+    return this._getRequest(`/categories`);
   }
 
   async getPostPreviews() {
@@ -54,6 +54,12 @@ class DataServer {
     const posts = await this._getRequest(`/articles`);
     const comments = collectComments(posts).map((it) => ServiceToExpressAdapter.getComment(it));
     return comments;
+  }
+
+  async getPost(id) {
+    const post = ServiceToExpressAdapter.getPost(await this._getRequest(`/articles/${id}`));
+    logger.info(post);
+    return post;
   }
 
   async _getRequest(url) {

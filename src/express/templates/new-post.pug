@@ -24,13 +24,13 @@ block content
         .new-publication
           form(action='#' method='POST')
             .new-publication__header
-              h1 &Ncy;&ocy;&vcy;&acy;&yacy; &pcy;&ucy;&bcy;&lcy;&icy;&kcy;&acy;&tscy;&icy;&yacy;
+              h1 #{title}
               .new-publication__date-form
                 h3 &Dcy;&acy;&tcy;&acy; &pcy;&ucy;&bcy;&lcy;&icy;&kcy;&acy;&tscy;&icy;&icy;
                 .new-publication__date-form-division
                   .new-publication__date-block
                     label(for='new-publication-date' aria-label='Календарь')
-                    input#new-publication-date(type='text' name='login' placeholder='21.03.2019')
+                    input#new-publication-date(type='text' name='date' placeholder=post.dateLocalized value=post.dateLocalized)
               button.new-publication__button.button.button--colored(type='submit') &Ocy;&pcy;&ucy;&bcy;&lcy;&icy;&kcy;&ocy;&vcy;&acy;&tcy;&softcy;
             button.popup__button.button.button--popup-close(type='button' aria-label='Закрыть окно')
               | &Zcy;&acy;&kcy;&rcy;&ycy;&tcy;&softcy;
@@ -39,21 +39,25 @@ block content
               .form__wrapper.form__wrapper--intro
                 .form__field
                   label
-                    input(type='text' placeholder='Заголовок' required='')
+                    input(type='text' placeholder='Заголовок' required='' name='title' value=post.title)
                 .form__field.form__field--post-image
                   label
-                    input#image-name-field(type='text' placeholder='Фотография' readonly='')
+                    input#image-name-field(type='text' placeholder='Фотография' readonly='' name='picture' value=post.picture)
                   .form__image-loader.form__image-loader--publication
                     label
                       input.visually-hidden(type='file')
                       | &Ocy;&bcy;&zcy;&ocy;&rcy;
+                .new-publication__checkbox.new-publication__checkbox--auto
+                  each category in categories
+                    input(id=`category-${category.id}` type='checkbox' name=`category-${category.id}` checked=category.checked)
+                    label(for=`category-${category.id}`) #{category.name}
                 a.new-publication__form-link.button.button--transparent(href='#') &Dcy;&ocy;&bcy;&acy;&vcy;&icy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
               .form__wrapper.form__wrapper--text
                 .form__field.form__field--publication-text
                   label
-                    textarea(rows='1' placeholder='Анонс публикации')
+                    textarea(rows='5' placeholder='Анонс публикации') #{post.announce}
                 .form__field.form__field--publication-text
                   label
-                    textarea(rows='1' placeholder='Полный текст публикации')
+                    textarea(rows='20' placeholder='Полный текст публикации') #{post.fullText}
       .modal__overlay
 

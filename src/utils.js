@@ -153,10 +153,15 @@ const collectComments = (posts) => posts.reduce((acc, cur) => {
 const formatDate = (date) => {
   const days = formatNumber(date.getDate());
   const month = formatNumber(date.getMonth() + 1);
+
+  return `${days}.${month}.${date.getFullYear()}`;
+};
+
+const formatDateTime = (date) => {
   const minutes = formatNumber(date.getMinutes());
   const hours = formatNumber(date.getHours());
 
-  return `${days}.${month}.${date.getFullYear()}, ${hours}:${minutes}`;
+  return `${formatDate(date)}, ${hours}:${minutes}`;
 };
 
 module.exports = {
@@ -180,5 +185,6 @@ module.exports = {
   sortPostsByPopular,
   sortCommentsByDate,
   collectComments,
+  formatDateTime,
   formatDate,
 };

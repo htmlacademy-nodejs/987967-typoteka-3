@@ -1,6 +1,6 @@
 'use strict';
 
-const {formatDate} = require(`../utils`);
+const {formatDateTime, formatDate} = require(`../utils`);
 
 const ServiceToExpressAdapter = {
   getComment(rawComment) {
@@ -9,7 +9,7 @@ const ServiceToExpressAdapter = {
     return {
       ...rawComment,
       dateTime: date.toISOString(),
-      dateTimeLocalized: formatDate(date),
+      dateTimeLocalized: formatDateTime(date),
     };
   },
 
@@ -19,7 +19,17 @@ const ServiceToExpressAdapter = {
     return {
       ...rawPost,
       dateTime: date.toISOString(),
-      dateTimeLocalized: formatDate(date),
+      dateTimeLocalized: formatDateTime(date),
+    };
+  },
+
+  getPost(rawPost) {
+    const date = new Date(rawPost.createdDate);
+
+    return {
+      ...rawPost,
+      dateTime: date.toISOString(),
+      dateLocalized: formatDate(date),
     };
   }
 };

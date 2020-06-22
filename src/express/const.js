@@ -9,4 +9,6 @@ module.exports = {
   LASTST_COMMENT_COUNT: 4,
   ANNOUNCE_PREVIEW_LENGTH: 100,
   COMMENT_PREVIEW_LENGTH: 100,
+  NEW_POST_TITLE: `Новая публикация`,
+  EDIT_POST_TITLE: `Редактирование публикации`,
 };
