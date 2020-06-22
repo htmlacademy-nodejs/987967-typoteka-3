@@ -13,12 +13,17 @@ const {registerRouter} = require(`./routes/register`);
 const {searchRouter} = require(`./routes/search`);
 
 const app = express();
-const logger = getLogger(LoggerName.FRONT_SERVER);
+const loggerAPI = getLogger(LoggerName.FRONT_SERVER_API);
+const loggerServer = getLogger(LoggerName.FRONT_SERVER);
 
 app.set(`views`, path.resolve(__dirname, `templates`));
 app.set(`view engine`, `pug`);
 
 app.use(express.static(path.resolve(__dirname, `public`)));
+app.use((req, res, next) => {
+  loggerAPI.info(LogMessage.getStartRequest(req.url));
+  next();
+});
 
 app.use(`/`, mainRouter);
 app.use(`/articles`, articleRouter);
@@ -29,20 +34,20 @@ app.use(`/register`, registerRouter);
 app.use(`/search`, searchRouter);
 
 app.use((req, res) => {
-  logger.error(LogMessage.getUnknownRoute(req.url));
+  loggerAPI.error(LogMessage.getUnknownRoute(req.url));
   res.status(404).render(`400.pug`);
 });
 
 app.use((err, req, res, next) => {
   const errorMessage = err.msg ? `${err.msg}: ${err.filename}, line: ${err.line}` : err;
-  logger.error(errorMessage);
+  loggerAPI.error(errorMessage);
   res.status(500).render(`500.pug`);
   next();
 });
 
 try {
   app.listen(DEFAULT_PORT);
-  logger.info(LogMessage.getSuccessCreatingServer(DEFAULT_PORT));
+  loggerServer.info(LogMessage.getSuccessCreatingServer(DEFAULT_PORT));
 } catch (err) {
-  logger.error(LogMessage.getErrorCreatingServer(err));
+  loggerServer.error(LogMessage.getErrorCreatingServer(err));
 }

@@ -8,9 +8,9 @@ li.preview__item(class=`${post.picture ? `` : `preview__item--noimage`}`)
       img.preview__background-image(src=post.picture width='460' height='240' srcset=`${post.picture} 1x, ${post.picture} 2x` alt='Фотография моря')
   time.preview__time(datetime=post.dateTime) #{post.dateTimeLocalized}
   h3.preview__name
-    a.preview__name-link(href='#') #{post.title}
+    a.preview__name-link(href=`/articles/${post.id}`) #{post.title}
   p.preview__text #{post.announce}
-  a.preview__comment(href='#')
+  a.preview__comment(href=`/articles/${post.id}`)
     | &Kcy;&ocy;&mcy;&mcy;&iecy;&ncy;&tcy;&acy;&rcy;&icy;&icy; 
     span.preview__cloud
     | 

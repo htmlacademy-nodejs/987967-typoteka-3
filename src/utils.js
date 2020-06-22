@@ -125,31 +125,39 @@ const generateCategories = async (filename) => {
   }));
 };
 
-const SIMPLE_STRING_LENGTH = 10;
-const SIMPLE_ARRAY_LENGTH = 2;
-const simplifyObject = (object) => {
+const simplifyObject = (object, fieldsToAdd) => {
   const simpleObject = {};
-  for (let field in object) {
-    if (object.hasOwnProperty(field)) {
-      const value = object[field];
-      switch (value.constructor.name) {
-        case `String`:
-          simpleObject[field] = `${value.slice(0, SIMPLE_STRING_LENGTH)}...`;
-          break;
-        case `Array`:
-          simpleObject[field] = value.slice(0, SIMPLE_ARRAY_LENGTH);
-          simpleObject[field].push(`...`);
-          break;
-        default:
-          simpleObject[field] = value;
-      }
+  fieldsToAdd.forEach((it) => {
+    if (object.hasOwnProperties(it)) {
+      simpleObject[it] = object[it];
     }
-  }
+  });
 
   return simpleObject;
 };
 
 const formatNumber = (number) => `${number < 10 ? `0` : ``}${number}`;
+
+const sortCommentsByDate = (comments) => comments.slice().sort((a, b) => b.date - a.date);
+const sortPostsByDate = (posts) => posts.slice().sort((a, b) => b.createdDate - a.createdDate);
+const sortPostsByPopular = (posts) => posts.slice().sort((a, b) => b.comments.length - a.comments.length);
+const collectComments = (posts) => posts.reduce((acc, cur) => {
+  const comments = cur.comments.map((it) => ({
+    ...it,
+    parentPost: cur
+  }));
+
+  return [...acc, ...comments];
+}, []);
+
+const formatDate = (date) => {
+  const days = formatNumber(date.getDate());
+  const month = formatNumber(date.getMonth() + 1);
+  const minutes = formatNumber(date.getMinutes());
+  const hours = formatNumber(date.getHours());
+
+  return `${days}.${month}.${date.getFullYear()}, ${hours}:${minutes}`;
+};
 
 module.exports = {
   getRandomInt,
@@ -168,4 +176,9 @@ module.exports = {
   getTitleList,
   simplifyObject,
   formatNumber,
+  sortPostsByDate,
+  sortPostsByPopular,
+  sortCommentsByDate,
+  collectComments,
+  formatDate,
 };

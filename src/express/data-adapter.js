@@ -1,19 +1,25 @@
 'use strict';
 
-const {formatNumber} = require(`../utils`);
+const {formatDate} = require(`../utils`);
 
 const ServiceToExpressAdapter = {
+  getComment(rawComment) {
+    const date = new Date(rawComment.date);
+
+    return {
+      ...rawComment,
+      dateTime: date.toISOString(),
+      dateTimeLocalized: formatDate(date),
+    };
+  },
+
   getPostPreview(rawPost) {
     const date = new Date(rawPost.createdDate);
-    const days = formatNumber(date.getDate());
-    const month = formatNumber(date.getMonth() + 1);
-    const minutes = formatNumber(date.getMinutes());
-    const hours = formatNumber(date.getHours());
 
     return {
       ...rawPost,
       dateTime: date.toISOString(),
-      dateTimeLocalized: `${days}.${month}.${date.getFullYear()}, ${hours}:${minutes}`,
+      dateTimeLocalized: formatDate(date),
     };
   }
 };
