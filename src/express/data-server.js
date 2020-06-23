@@ -37,36 +37,40 @@ class DataServer {
   }
 
   async getCategories() {
-    return this._getRequest(`/categories`);
+    return this._request(`/categories`);
   }
 
   async getPostPreviews() {
-    const posts = await this._getRequest(`/articles`);
+    const posts = await this._request(`/articles`);
     return posts.map((it) => ServiceToExpressAdapter.getPostPreview(it));
   }
 
   async getUserPosts() {
-    const posts = await this._getRequest(`/articles`);
+    const posts = await this._request(`/articles`);
     return posts.map((it) => ServiceToExpressAdapter.getPostPreview(it));
   }
 
   async getUserComments() {
-    const posts = await this._getRequest(`/articles`);
+    const posts = await this._request(`/articles`);
     const comments = collectComments(posts).map((it) => ServiceToExpressAdapter.getComment(it));
     return comments;
   }
 
   async getPost(id) {
-    const post = ServiceToExpressAdapter.getPost(await this._getRequest(`/articles/${id}`));
-    logger.info(post);
+    const post = ServiceToExpressAdapter.getPost(await this._request(`/articles/${id}`));
     return post;
   }
 
-  async _getRequest(url) {
+  async updatePost(post) {
+    return this._request(`/articles/${post.id}`, `put`, post);
+  }
+
+  async _request(url, method = `get`, data) {
     let res;
     try {
-      res = await this._api.get(url);
+      res = await this._api[method](url, data);
     } catch (err) {
+      logger.error(err);
       throw new Error(err);
     }
     return res.data;

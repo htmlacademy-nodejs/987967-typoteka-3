@@ -38,11 +38,16 @@ class DataService {
       return null;
     }
 
+    const allCategories = this.getCategories();
+    const categories = allCategories.reduce((acc, cur) => {
+      return post.categories.find((it) => it.id === cur.id) ? [...acc, cur] : acc;
+    }, []);
+
     this._data[index] = {
       ...this._data[index],
       ...post,
       id,
-      categories: Array.isArray(post.categories) ? post.categories : [post.categories],
+      categories,
     };
 
     return this._data[index];
