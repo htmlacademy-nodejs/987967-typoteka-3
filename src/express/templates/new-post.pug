@@ -47,6 +47,7 @@ block content
                     label
                       input.visually-hidden(type='file' name='picture')
                       | &Ocy;&bcy;&zcy;&ocy;&rcy;
+                  button.button--transparent Удалить
                 .new-publication__checkbox.new-publication__checkbox--auto
                   each category in categories
                     input(id=`category-${category.id}` type='checkbox' name=`category-id-${category.id}` checked=category.checked)
