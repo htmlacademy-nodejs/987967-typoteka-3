@@ -15,7 +15,7 @@ block prepend header
 block content
   main
     section.search-page
-      .search-page__wrapper(class=`${foundPosts.length ? `` : `search-page__wrapper--empty`}`)
+      .search-page__wrapper(class=`${query && foundPosts.length === 0 ? `search-page__wrapper--empty` : ``}`)
         h1 &Pcy;&ocy;&icy;&scy;&kcy;
         .search.search-page__form
           form(action='/search' method='get')
@@ -25,8 +25,8 @@ block content
           each post in foundPosts
             .search__result
               time.search__date(datetime=post.dateTime) #{post.dateTimeLocalized}
-              a.search__link !{post.title}
-          if foundPosts.length === 0
+              a.search__link(href=`/articles/${post.id}`) !{post.title}
+          if query && foundPosts.length === 0
             p.search-page__empty Ничего не нашлось
 
         

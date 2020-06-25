@@ -33,6 +33,7 @@ const ServiceToExpressAdapter = {
       dateTime: date.toISOString(),
       dateLocalized: formatDate(date),
       dateTimeLocalized: formatDateTime(date),
+      comments: rawPost.comments.map((it) => this.getComment(it))
     };
   }
 };

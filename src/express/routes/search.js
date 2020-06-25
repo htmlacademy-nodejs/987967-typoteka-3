@@ -8,7 +8,7 @@ const dataServer = new DataServer();
 
 searchRouter.get(`/`, async (req, res) => {
   const query = req.query.query;
-  const foundPosts = await dataServer.search(query);
+  const foundPosts = query ? await dataServer.search(query) : [];
   const markedPosts = foundPosts.map((it) => ({
     ...it,
     title: it.title.replace(RegExp(`(${query})`, `ig`), `<b>$1</b>`)

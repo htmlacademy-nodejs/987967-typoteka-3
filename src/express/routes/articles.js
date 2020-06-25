@@ -20,11 +20,6 @@ const MIN_ANNOUNCE_LENGTH = 30;
 const MAX_ANNOUNCE_LENGTH = 250;
 const MAX_TEXT_LENGTH = 1000;
 
-const UpdateMethod = {
-  UPDATE: `Update`,
-  CREATE: `Create`,
-};
-
 const validatePost = (post) => {
   switch (true) {
     case post.title.length < MIN_TITLE_LENGTH || post.title.length > MAX_TITLE_LENGTH:
@@ -46,6 +41,11 @@ const checkCategories = (post, categories) => categories.map((category) => ({
   checked: Boolean(post.categories.find((it) => it.id === category.id))
 }));
 
+const addCategoryCount = (postCategories, categories) => postCategories.reduce((acc, cur) => {
+  const category = categories.find((it) => it.id === cur.id);
+  return category ? [...acc, cur] : acc;
+}, []);
+
 articleRouter.get(`/add`, async (req, res) => {
   const categories = await dataServer.getCategories();
   const date = new Date();
@@ -62,8 +62,12 @@ articleRouter.get(`/add`, async (req, res) => {
   });
 });
 
-articleRouter.get(`/:id`, (req, res) => {
-  res.render(`post`);
+articleRouter.get(`/:id`, async (req, res) => {
+  const id = req.params.id;
+  const [categories, post] = await Promise.all([dataServer.getCategories(), dataServer.getPost(id)]);
+
+  post.categories = addCategoryCount(post.categories, categories);
+  res.render(`post`, {post});
 });
 
 articleRouter.get(`/category/:id`, (req, res) => {
