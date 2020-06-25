@@ -12,7 +12,8 @@
     "start:dev": "nodemon ./src/service/service.js --server",
     "start:debug": "cross-env LOG_LEVEL=debug nodemon ./src/service/service.js --server",
     "start-front-server": "node ./src/express/index.js",
-    "start-front-server:dev": "nodemon -e js,pug ./src/express/index.js"
+    "start-front-server:dev": "nodemon -e js,pug ./src/express/index.js",
+    "start-front-server:dev:debug": "cross-env LOG_LEVEL=debug nodemon -e js,pug ./src/express/index.js"
   },
   "repository": {
     "type": "git",
@@ -34,9 +35,11 @@
     "supertest": "4.0.2"
   },
   "dependencies": {
+    "axios": "0.19.2",
     "chalk": "^4.0.0",
     "cross-env": "7.0.2",
     "express": "4.17.1",
+    "multer": "1.4.2",
     "nanoid": "3.1.9",
     "pino": "6.3.2",
     "pino-pretty": "4.0.0",

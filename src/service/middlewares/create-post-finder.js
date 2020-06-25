@@ -1,6 +1,6 @@
 'use strict';
 
-const {HttpStatusCode} = require(`../../const`);
+const {HttpStatusCode} = require(`../const`);
 const {logger, LogMessage} = require(`../../logger`);
 
 const createPostFinder = (service) => (req, res, next) => {

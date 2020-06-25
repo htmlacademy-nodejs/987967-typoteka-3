@@ -1,0 +1,8 @@
+section.main-page__theme-list
+  h2.visually-hidden &Scy;&pcy;&icy;&scy;&ocy;&kcy; &tcy;&iecy;&mcy;
+  ul.themes
+    each category in categories
+      li.themes__item
+        a.themes__item-link(href=`/categories/${category.id}`)
+          | #{category.name}
+          sup #{category.count}
