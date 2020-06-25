@@ -123,30 +123,6 @@ const generateCategories = async (filename) => {
   }));
 };
 
-const SIMPLE_STRING_LENGTH = 10;
-const SIMPLE_ARRAY_LENGTH = 2;
-const simplifyObject = (object) => {
-  const simpleObject = {};
-  for (let field in object) {
-    if (object.hasOwnProperty(field)) {
-      const value = object[field];
-      switch (value.constructor.name) {
-        case `String`:
-          simpleObject[field] = `${value.slice(0, SIMPLE_STRING_LENGTH)}...`;
-          break;
-        case `Array`:
-          simpleObject[field] = value.slice(0, SIMPLE_ARRAY_LENGTH);
-          simpleObject[field].push(`...`);
-          break;
-        default:
-          simpleObject[field] = value;
-      }
-    }
-  }
-
-  return simpleObject;
-};
-
 module.exports = {
   getRandomInt,
   getRandomElement,
@@ -162,5 +138,4 @@ module.exports = {
   getMockPosts,
   getMockTitles,
   getTitleList,
-  simplifyObject,
 };

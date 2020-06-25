@@ -66,23 +66,22 @@ class DataService {
   }
 
   getCategories() {
-    const set = {};
+    const categoryMap = new Map();
 
     this._data.forEach((post) => {
-      post.categories.forEach((category) => {
-        const id = category.id;
-        if (!set[id]) {
-          set[id] = {
-            ...category,
-            count: 1
-          };
-        } else {
-          set[id].count++;
-        }
+      post.categories.forEach((it) => {
+        const id = it.id;
+        const countedCategory = categoryMap.get(id) || {
+          ...it,
+          count: 0,
+        };
+
+        countedCategory.count++;
+        categoryMap.set(id, countedCategory);
       });
     });
 
-    return Object.values(set);
+    return Array.from(categoryMap.values());
   }
 
   getComments(postID) {
