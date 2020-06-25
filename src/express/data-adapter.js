@@ -32,6 +32,7 @@ const ServiceToExpressAdapter = {
       ...rawPost,
       dateTime: date.toISOString(),
       dateLocalized: formatDate(date),
+      dateTimeLocalized: formatDateTime(date),
     };
   }
 };

@@ -1,5 +1,6 @@
 'use strict';
 
+const QueryString = require(`querystring`);
 const axios = require(`axios`).default;
 const {TIMEOUT, DATA_SERVER_PORT} = require(`./const`);
 const {ServiceToExpressAdapter} = require(`./data-adapter`);
@@ -67,6 +68,11 @@ class DataServer {
 
   async createPost(post) {
     return this._request(`/articles`, `post`, post);
+  }
+
+  async search(query) {
+    const queryString = QueryString.encode({query});
+    return (await this._request(`/search?${queryString}`)).map((it) => ServiceToExpressAdapter.getPost(it));
   }
 
   async _request(url, method = `get`, data) {

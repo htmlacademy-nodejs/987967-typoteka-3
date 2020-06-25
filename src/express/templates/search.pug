@@ -15,10 +15,18 @@ block prepend header
 block content
   main
     section.search-page
-      .search-page__wrapper
+      .search-page__wrapper(class=`${foundPosts.length ? `` : `search-page__wrapper--empty`}`)
         h1 &Pcy;&ocy;&icy;&scy;&kcy;
         .search.search-page__form
-          form(action='#' method='get')
+          form(action='/search' method='get')
             label
-              input(type='text' placeholder='Что ищем?')
+              input(type='text' placeholder='Что ищем?' name='query' value=query)
             button.search__button.button.button--transparent(type='submit') &Ncy;&acy;&jcy;&tcy;&icy;
+          each post in foundPosts
+            .search__result
+              time.search__date(datetime=post.dateTime) #{post.dateTimeLocalized}
+              a.search__link !{post.title}
+          if foundPosts.length === 0
+            p.search-page__empty Ничего не нашлось
+
+        
