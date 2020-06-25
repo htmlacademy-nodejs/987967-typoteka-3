@@ -125,17 +125,6 @@ const generateCategories = async (filename) => {
   }));
 };
 
-const simplifyObject = (object, fieldsToAdd) => {
-  const simpleObject = {};
-  fieldsToAdd.forEach((it) => {
-    if (object.hasOwnProperties(it)) {
-      simpleObject[it] = object[it];
-    }
-  });
-
-  return simpleObject;
-};
-
 const formatNumber = (number) => `${number < 10 ? `0` : ``}${number}`;
 
 const sortCommentsByDate = (comments) => comments.slice().sort((a, b) => b.date - a.date);
@@ -179,7 +168,6 @@ module.exports = {
   getMockPosts,
   getMockTitles,
   getTitleList,
-  simplifyObject,
   formatNumber,
   sortPostsByDate,
   sortPostsByPopular,
