@@ -5,7 +5,6 @@ const multer = require(`multer`);
 const {DataServer} = require(`../data-server`);
 const {NEW_POST_TITLE, EDIT_POST_TITLE} = require(`../const`);
 const {formatDate} = require(`../../utils`);
-const {HttpStatusCode} = require(`../../service/const`);
 const {getLogger, LoggerName} = require(`../../logger`);
 const {ExpressToServiceAdapter, ServiceToExpressAdapter} = require(`../data-adapter`);
 
