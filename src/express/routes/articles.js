@@ -20,6 +20,11 @@ const MIN_ANNOUNCE_LENGTH = 30;
 const MAX_ANNOUNCE_LENGTH = 250;
 const MAX_TEXT_LENGTH = 1000;
 
+const UpdateMethod = {
+  UPDATE: `Update`,
+  CREATE: `Create`,
+};
+
 const validatePost = (post) => {
   switch (true) {
     case post.title.length < MIN_TITLE_LENGTH || post.title.length > MAX_TITLE_LENGTH:
@@ -35,6 +40,11 @@ const validatePost = (post) => {
       throw new Error(`Text length must be less then ${MAX_TEXT_LENGTH}`);
   }
 };
+
+const checkCategories = (post, categories) => categories.map((category) => ({
+  ...category,
+  checked: Boolean(post.categories.find((it) => it.id === category.id))
+}));
 
 articleRouter.get(`/add`, async (req, res) => {
   const categories = await dataServer.getCategories();
@@ -67,10 +77,7 @@ articleRouter.get(`/edit/:id`, async (req, res) => {
   res.render(`new-post`, {
     title: EDIT_POST_TITLE,
     post,
-    categories: categories.map((category) => ({
-      ...category,
-      checked: Boolean(post.categories.find((it) => it.id === category.id))
-    })),
+    categories: checkCategories(post, categories),
     action: `/articles/edit/${id}`
   });
 });
@@ -95,10 +102,7 @@ articleRouter.post(`/edit/:id`, upload.single(`picture`), async (req, res) => {
     res.render(`new-post`, {
       title: EDIT_POST_TITLE,
       post,
-      categories: categories.map((category) => ({
-        ...category,
-        checked: Boolean(post.categories.find((it) => it.id === category.id))
-      })),
+      categories: checkCategories(post, categories),
       action: `/articles/edit/${id}`,
       errorMessage: err,
     });
@@ -111,8 +115,35 @@ articleRouter.post(`/edit/:id`, upload.single(`picture`), async (req, res) => {
   res.redirect(`/my`);
 });
 
-articleRouter.post(`/add`, async (req, res) => {
-  res.status(HttpStatusCode.OK).send(`456`);
+articleRouter.post(`/add`, upload.single(`picture`), async (req, res) => {
+  const postData = {
+    ...req.body,
+    picture: req.file ? req.file.filename : req.body[`picture-preview`],
+  };
+
+  const servicePost = ExpressToServiceAdapter.getPost(postData);
+
+  try {
+    validatePost(servicePost);
+    dataServer.createPost(servicePost);
+  } catch (err) {
+    const categories = await dataServer.getCategories();
+    const post = ServiceToExpressAdapter.getPost(servicePost);
+
+    res.render(`new-post`, {
+      title: NEW_POST_TITLE,
+      post,
+      categories: checkCategories(post, categories),
+      action: `/articles/add`,
+      errorMessage: err,
+    });
+
+    logger.error(`Invalid post data: ${err}`);
+
+    return;
+  }
+
+  res.redirect(`/my`);
 });
 
 module.exports = {

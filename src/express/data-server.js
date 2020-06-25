@@ -65,6 +65,10 @@ class DataServer {
     return this._request(`/articles/${post.id}`, `put`, post);
   }
 
+  async createPost(post) {
+    return this._request(`/articles`, `post`, post);
+  }
+
   async _request(url, method = `get`, data) {
     let res;
     try {
