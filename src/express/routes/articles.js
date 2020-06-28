@@ -37,20 +37,17 @@ const validatePost = (post) => {
 
 const checkCategories = (post, categories) => categories.map((category) => ({
   ...category,
-  checked: Boolean(post.categories.find((it) => it.id === category.id))
+  checked: !!post.categories.find((it) => it.id === category.id)
 }));
 
-const addCategoryCount = (postCategories, categories) => postCategories.reduce((acc, cur) => {
-  const category = categories.find((it) => it.id === cur.id);
-  return category ? [...acc, cur] : acc;
-}, []);
+const addCategoryCount = (postCategories, categories) => categories.filter((category) => postCategories.find((it) => it.id === category.id));
 
 articleRouter.get(`/add`, async (req, res) => {
   const categories = await dataServer.getCategories();
   const date = new Date();
   const post = {
     dateLocalized: formatDate(date),
-    dateTime: date.toISOString()
+    dateTime: date,
   };
 
   res.render(`new-post`, {
