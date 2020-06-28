@@ -4,7 +4,7 @@ const fs = require(`fs`);
 const path = require(`path`);
 const chalk = require(`chalk`);
 const {nanoid} = require(`nanoid`);
-const {MOCK_FILE} = require(`./const`);
+const {MOCK_FILE} = require(`./service/const`);
 
 const {
   DURATION,
@@ -16,7 +16,7 @@ const {
   MAX_CATEGORY_COUNT,
   ANNOUNCE_SENTENCES_COUNT,
   ID_LENGTH
-} = require(`./const`);
+} = require(`./service/const`);
 
 const getRandomInt = (min, max) => {
   const minInt = Math.ceil(min);
@@ -52,32 +52,34 @@ const getRandomUniqueElements = (array, count) => {
 };
 
 const getRandomBoolean = () => Math.random() > 0.5;
-const getRandomDate = (min, max) => new Date(getRandomInt(min.valueOf(), max.valueOf()));
+const getRandomDate = (min, max) => new Date(getRandomInt(min.valueOf(), max.valueOf())).valueOf();
 
 const generateDate = () => {
   const now = Date.now();
   const past = new Date(now - DURATION);
-  const [date, time] = getRandomDate(past, now).toLocaleString().split(`, `);
-
-  return `${date.split(`/`).reverse().join(`-`)}, ${time}`;
+  return getRandomDate(past, now);
 };
 
 
 const generatePost = ({sentences, titles, categories, comments}) => {
   const textSentences = getRandomElements(sentences, getRandomInt(MIN_SENTENCES_COUNT, MAX_SENTENCES_COUNT));
   const announceSentences = getRandomUniqueElements(textSentences, ANNOUNCE_SENTENCES_COUNT);
+  const createdDate = generateDate();
+  const now = Date.now();
 
   return {
     id: nanoid(ID_LENGTH),
     title: getRandomElement(titles),
-    createdDate: generateDate(),
+    createdDate,
     announce: announceSentences.join(`\n`),
     fullText: textSentences.join(`\n`),
     categories: getRandomUniqueElements(categories, getRandomInt(MIN_CATEGORY_COUNT, MAX_CATEGORY_COUNT)),
     comments: getRandomElements(comments, getRandomInt(MIN_COMMENT_COUNT, MAX_COMMENT_COUNT)).map((it) => ({
       id: nanoid(ID_LENGTH),
       text: it,
-    }))
+      date: getRandomDate(createdDate, now)
+    })),
+    picture: getRandomBoolean() ? `http://picsum.photos/460/240?r=${Math.random()}` : ``,
   };
 };
 
@@ -123,6 +125,34 @@ const generateCategories = async (filename) => {
   }));
 };
 
+const formatNumber = (number) => `${number < 10 ? `0` : ``}${number}`;
+
+const sortCommentsByDate = (comments) => comments.slice().sort((a, b) => b.date - a.date);
+const sortPostsByDate = (posts) => posts.slice().sort((a, b) => b.createdDate - a.createdDate);
+const sortPostsByPopular = (posts) => posts.slice().sort((a, b) => b.comments.length - a.comments.length);
+const collectComments = (posts) => posts.reduce((acc, cur) => {
+  const comments = cur.comments.map((it) => ({
+    ...it,
+    parentPost: cur
+  }));
+
+  return [...acc, ...comments];
+}, []);
+
+const formatDate = (date) => {
+  const days = formatNumber(date.getDate());
+  const month = formatNumber(date.getMonth() + 1);
+
+  return `${days}.${month}.${date.getFullYear()}`;
+};
+
+const formatDateTime = (date) => {
+  const minutes = formatNumber(date.getMinutes());
+  const hours = formatNumber(date.getHours());
+
+  return `${formatDate(date)}, ${hours}:${minutes}`;
+};
+
 module.exports = {
   getRandomInt,
   getRandomElement,
@@ -138,4 +168,11 @@ module.exports = {
   getMockPosts,
   getMockTitles,
   getTitleList,
+  formatNumber,
+  sortPostsByDate,
+  sortPostsByPopular,
+  sortCommentsByDate,
+  collectComments,
+  formatDateTime,
+  formatDate,
 };

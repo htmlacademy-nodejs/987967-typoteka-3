@@ -1,7 +1,7 @@
 'use strict';
 
 const {nanoid} = require(`nanoid`);
-const {ID_LENGTH, ANNOUNCE_LENGTH} = require(`../../const`);
+const {ID_LENGTH, ANNOUNCE_LENGTH} = require(`./const`);
 
 class DataService {
   constructor(data) {
@@ -9,12 +9,7 @@ class DataService {
   }
 
   getPosts() {
-    return this._data.map((it) => {
-      const smallPost = {...it};
-      delete smallPost.fullText;
-      delete smallPost.comments;
-      return smallPost;
-    });
+    return this._data;
   }
 
   getPost(id) {
@@ -43,11 +38,16 @@ class DataService {
       return null;
     }
 
+    const allCategories = this.getCategories();
+    const categories = allCategories.reduce((acc, cur) => {
+      return post.categories.find((it) => it.id === cur.id) ? [...acc, cur] : acc;
+    }, []);
+
     this._data[index] = {
       ...this._data[index],
       ...post,
       id,
-      categories: Array.isArray(post.categories) ? post.categories : [post.categories],
+      categories,
     };
 
     return this._data[index];

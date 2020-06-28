@@ -1,15 +1,15 @@
 'use strict';
 
-const {HttpStatusCode} = require(`../../const`);
+const {HttpStatusCode} = require(`../const`);
 const {logger} = require(`../../logger`);
 
-const requiredFields = [`title`, `createdDate`, `fullText`, `categories`, `announce`];
+const requiredFields = [`title`, `createdDate`, `categories`, `announce`];
 
 const validatePost = (req, res, next) => {
   const post = req.body;
 
   if (!post) {
-    const err = `Post is empty`;
+    const err = `Post should contain following fields: ${requiredFields.join(`, `)}, but post is empty`;
     logger.error(err);
     res.status(HttpStatusCode.BAD_REQUEST).send(err);
     return;

@@ -1,7 +1,7 @@
 'use strict';
 
 const {Cli} = require(`./cli`);
-const {ExitCode} = require(`../const`);
+const {ExitCode} = require(`./const`);
 
 const DEFAULT_COMMAND = `--help`;
 const USER_COMMAND_INDEX = 2;
