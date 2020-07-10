@@ -1,11 +1,11 @@
-DROP TABLE IF EXISTS passwords;
-DROP TABLE IF EXISTS avatars;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS pictures;
-DROP TABLE IF EXISTS posts;
-DROP TABLE IF EXISTS categories;
-DROP TABLE IF EXISTS posts_categories;
-DROP TABLE IF EXISTS comments;
+DROP TABLE IF EXISTS comments CASCADE;
+DROP TABLE IF EXISTS posts CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS passwords CASCADE;
+DROP TABLE IF EXISTS avatars CASCADE;
+DROP TABLE IF EXISTS pictures CASCADE;
+DROP TABLE IF EXISTS categories CASCADE;
+DROP TABLE IF EXISTS posts_categories CASCADE;
 
 CREATE TABLE passwords (
     id bigserial PRIMARY KEY,
@@ -48,7 +48,7 @@ CREATE TABLE posts (
 
 CREATE TABLE categories (
     id bigserial PRIMARY KEY,
-    name varchar(60) NOT NULL
+    name varchar(60) NOT NULL UNIQUE
 );
 
 CREATE TABLE posts_categories (

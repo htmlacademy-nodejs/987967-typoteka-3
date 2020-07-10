@@ -16,3 +16,7 @@ build/
 
 # Моки
 mocks.json
+
+# Папки с бинарниками
+avatars/
+post-images/

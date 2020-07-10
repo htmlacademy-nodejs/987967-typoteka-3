@@ -1,5 +1,8 @@
 'use strict';
 
+const MAX_POSTS_COUNT = 1000;
+const MAX_USER_COUNT = 10;
+
 module.exports = {
   ExitCode: {
     SUCCESS: 0,
@@ -16,6 +19,7 @@ module.exports = {
   MAX_CATEGORY_COUNT: 3,
   ANNOUNCE_SENTENCES_COUNT: 5,
   MOCK_FILE: `mocks.json`,
+  SQL_FILE: `sql/fill-db.sql`,
   ID_LENGTH: 6,
   DEFAULT_PORT: 3000,
 
@@ -36,4 +40,30 @@ module.exports = {
   ANNOUNCE_LENGTH: 400,
 
   TIMEOUT: 3000,
+
+  DEFAULT_POSTS_COUNT: 1,
+  DEFAULT_USER_COUNT: 1,
+
+  MAX_POSTS_COUNT,
+  MAX_USER_COUNT,
+
+  Message: {
+    WRONG_POSTS_COUNT: `No more than ${MAX_POSTS_COUNT} articles`,
+    WRONG_USER_COUNT: `No more than ${MAX_USER_COUNT} articles`,
+    FILE_ERROR: `Can't write data to file...`,
+    FILE_SUCCESS: `Operation success. File created.`,
+  },
+
+  DataFileName: {
+    TITLE: `titles.txt`,
+    DESCRIPTION: `sentences.txt`,
+    CATEGORY: `categories.txt`,
+    COMMENT: `comments.txt`,
+    NAME: `names.txt`,
+  },
+
+  AVATAR_MOCK_FOLDER: `data/avatars`,
+  PICTURE_MOCK_FOLDER: `data/post-images`,
+  AVATAR_FOLDER: `src/express/public/img/avatars`,
+  PICTURE_FOLDER: `src/express/public/img/post-images`,
 };
