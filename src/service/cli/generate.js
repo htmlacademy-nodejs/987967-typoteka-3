@@ -13,9 +13,10 @@ const {
   MAX_USER_COUNT,
   DataFileName,
   AVATAR_MOCK_FOLDER,
+  PICTURE_MOCK_FOLDER
 } = require(`../const`);
 
-const generatePosts = (count, data) => new Array(count).fill(``).map(() => generatePost(data));
+const generatePosts = (count, data, users, pictures) => new Array(count).fill(``).map(() => generatePost(data, users, pictures));
 
 const createMockFile = async (postCount, userCount) => {
   const data = {
@@ -27,8 +28,9 @@ const createMockFile = async (postCount, userCount) => {
   };
 
   const avatars = await fs.promises.readdir(AVATAR_MOCK_FOLDER);
+  const pictures = await fs.promises.readdir(PICTURE_MOCK_FOLDER);
   const users = generateUsers(userCount, data.names, avatars);
-  const posts = JSON.stringify(generatePosts(postCount, data, users));
+  const posts = JSON.stringify(generatePosts(postCount, data, users, pictures));
 
   try {
     await fs.promises.writeFile(MOCK_FILE, posts);
