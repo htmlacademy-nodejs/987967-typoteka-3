@@ -20,3 +20,6 @@ mocks.json
 # Папки с бинарниками
 avatars/
 post-images/
+
+# Переменные окружения
+.env
