@@ -1,32 +1,36 @@
 'use strict';
 
-const {generatePosts} = require(`../../utils`);
-const fs = require(`fs`);
 const chalk = require(`chalk`);
+const {generatePosts} = require(`../../utils`);
 const {
   ExitCode,
-  MOCK_FILE,
   Message,
   DEFAULT_POSTS_COUNT,
   DEFAULT_USER_COUNT,
   MAX_POSTS_COUNT,
   MAX_USER_COUNT,
 } = require(`../const`);
+const {DB} = require(`../db`);
 
-const createMockFile = async (postCount, userCount) => {
-  const mocks = await generatePosts(postCount, userCount);
+const createDB = async (postCount, userCount) => {
+  const db = new DB();
+  const {users, posts, categories} = generatePosts(postCount, userCount);
+
   try {
-    await fs.promises.writeFile(MOCK_FILE, JSON.stringify(mocks));
-    console.info(chalk.green(Message.FILE_SUCCESS));
+    db.authenticate();
+    db.createMockDB(posts, users, categories);
+    db.close();
+
+    console.info(chalk.green(Message.DB_SUCCESS));
     return ExitCode.SUCCESS;
   } catch (err) {
-    console.error(chalk.red(`${Message.FILE_ERROR}: ${err}`));
+    console.error(chalk.red(`${Message.DB_ERROR}: ${err}`));
     return ExitCode.ERROR;
   }
 };
 
 module.exports = {
-  name: `--generate`,
+  name: `--generate-db`,
   async run(arg) {
     let [postCount, userCount] = arg;
     postCount = parseInt(postCount, 10) || DEFAULT_POSTS_COUNT;
@@ -42,6 +46,6 @@ module.exports = {
       return ExitCode.ERROR;
     }
 
-    return await createMockFile(postCount, userCount);
+    return await createDB(postCount, userCount);
   }
 };

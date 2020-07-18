@@ -18,7 +18,8 @@ const {
   MIN_CATEGORY_COUNT,
   MAX_CATEGORY_COUNT,
   ANNOUNCE_SENTENCES_COUNT,
-  ID_LENGTH
+  ID_LENGTH,
+  DataFileName,
 } = require(`./service/const`);
 
 const getRandomInt = (min, max) => {
@@ -80,6 +81,7 @@ const generateUser = (names, avatars) => {
   const avatar = generateImage(path.resolve(AVATAR_MOCK_FOLDER, originalAvatar), AVATAR_FOLDER);
 
   return {
+    id: nanoid(6),
     firstname,
     lastname,
     email,
@@ -97,12 +99,12 @@ const generateDate = () => {
   return getRandomDate(past, now);
 };
 
-const generatePost = ({sentences, titles, categories, comments}, users, pictures) => {
+const generatePost = ({sentences, titles, categories, comments, users, pictureFiles}) => {
   const textSentences = getRandomElements(sentences, getRandomInt(MIN_SENTENCES_COUNT, MAX_SENTENCES_COUNT));
   const announceSentences = getRandomUniqueElements(textSentences, ANNOUNCE_SENTENCES_COUNT);
   const createdDate = generateDate();
   const now = Date.now();
-  const originalPicture = getRandomElement(pictures);
+  const originalPicture = getRandomElement(pictureFiles);
   const picture = getRandomBoolean() ? generateImage(path.resolve(PICTURE_MOCK_FOLDER, originalPicture), PICTURE_FOLDER) : ``;
 
   return {
@@ -119,9 +121,34 @@ const generatePost = ({sentences, titles, categories, comments}, users, pictures
       user: getRandomElement(users),
     })),
     picture,
-    originalPicture,
+    originalPicture: picture && originalPicture,
     user: getRandomElement(users),
   };
+};
+
+const generatePosts = async (postCount, userCount) => {
+  const [titles, sentences, categoryNames, comments, userNames, pictureFiles, avatarFiles] = await Promise.all([
+    readContent(`./data/${DataFileName.TITLE}`),
+    readContent(`./data/${DataFileName.DESCRIPTION}`),
+    readContent(`./data/${DataFileName.CATEGORY}`),
+    readContent(`./data/${DataFileName.COMMENT}`),
+    readContent(`./data/${DataFileName.NAME}`),
+    fs.promises.readdir(PICTURE_MOCK_FOLDER),
+    fs.promises.readdir(AVATAR_MOCK_FOLDER),
+  ]);
+
+  const users = generateUsers(userCount, userNames, avatarFiles);
+  const categories = generateCategories(categoryNames);
+  const posts = new Array(postCount).fill(``).map(() => generatePost({
+    sentences,
+    titles,
+    categories,
+    comments,
+    users,
+    pictureFiles
+  }));
+
+  return {posts, categories, users};
 };
 
 const readContent = async (filename) => {
@@ -158,9 +185,8 @@ const getMockPosts = async () => {
 const getMockTitles = async () => await getMockPosts().map((it) => it.title);
 const getTitleList = (titles) => `<ul>${titles.map((it) => `<li>${it}</li>`).join(`\n`)}</ul>`;
 
-const generateCategories = async (filename) => {
-  const categories = await readContent(filename);
-  return categories.map((it) => ({
+const generateCategories = (names) => {
+  return names.map((it) => ({
     id: nanoid(ID_LENGTH),
     name: it,
   }));
@@ -202,9 +228,7 @@ module.exports = {
   getRandomBoolean,
   getRandomDate,
   generateDate,
-  generateCategories,
-  generatePost,
-  generateUsers,
+  generatePosts,
   readContent,
   sendResponse,
   getMockPosts,
