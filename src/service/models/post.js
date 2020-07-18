@@ -2,83 +2,71 @@
 
 const {DataTypes, Model, Sequelize} = require(`sequelize`);
 
-module.exports = (sequelize) => {
-  class Post extends Model {
-    static associate({User, Picture, Comment, PostCategory, Category}) {
-      Post.belongsTo(Picture, {
-        foreignKey: `picture_id`,
-      });
+class Post extends Model {
+  static init(sequelize) {
+    return super.init({
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
+        primaryKey: true,
+      },
 
-      Post.belongsTo(User, {
-        foreignKey: `user_id`,
-      });
+      [`picture_id`]: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+        references: {
+          model: `pictures`,
+          key: `id`,
+        },
+        onDelete: `SET NULL`,
+        onUpdate: `CASCADE`
+      },
 
-      Post.hasMany(Comment, {
-        foreignKey: `post_id`,
-      });
+      date: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW,
+      },
 
-      Post.belongsToMany(Category, {
-        through: PostCategory,
-        foreignKey: `post_id`,
-        as: `Category`
-      });
-    }
+      title: {
+        type: DataTypes[`STRING`](250),
+        allowNull: false,
+      },
+
+      announce: {
+        type: DataTypes[`STRING`](250),
+        allowNull: false,
+      },
+
+      text: {
+        type: DataTypes[`STRING`](1000),
+        allowNull: true,
+      },
+
+    }, {
+      sequelize,
+      tableName: `posts`,
+    });
   }
 
-  Post.init({
-    id: {
-      type: DataTypes.BIGINT,
-      autoIncrement: true,
-      primaryKey: true,
-    },
+  static associate({Picture, Comment, PostCategory, Category}) {
+    Post.belongsTo(Picture, {
+      foreignKey: `picture_id`,
+    });
 
-    [`user_id`]: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      references: {
-        model: `Users`,
-        key: `id`,
-      },
-      onDelete: `CASCADE`,
-      onUpdate: `CASCADE`
-    },
+    Post.hasMany(Comment, {
+      foreignKey: `post_id`,
+    });
 
-    [`picture_id`]: {
-      type: DataTypes.BIGINT,
-      allowNull: true,
-      references: {
-        model: `Pictures`,
-        key: `id`,
-      },
-      onDelete: `SET NULL`,
-      onUpdate: `CASCADE`
-    },
+    Post.belongsToMany(Category, {
+      through: PostCategory,
+      foreignKey: `post_id`,
+    });
 
-    date: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: Sequelize.NOW,
-    },
+    Post.hasMany(PostCategory, {
+      foreignKey: `post_id`,
+    });
+  }
+}
 
-    title: {
-      type: DataTypes[`STRING`](250),
-      allowNull: false,
-    },
-
-    announce: {
-      type: DataTypes[`STRING`](250),
-      allowNull: false,
-    },
-
-    text: {
-      type: DataTypes[`STRING`](1000),
-      allowNull: true,
-    },
-
-  }, {
-    sequelize,
-    modelName: `Post`
-  });
-
-  return Post;
-};
+module.exports.Post = Post;

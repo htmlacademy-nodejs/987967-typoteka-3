@@ -2,65 +2,51 @@
 
 const {DataTypes, Model} = require(`sequelize`);
 
-module.exports = (sequelize) => {
-  class User extends Model {
-    static associate({Avatar, Post, Comment, Password}) {
-      User.hasOne(Password, {
-        foreignKey: `user_id`,
-      });
+class User extends Model {
+  static init(sequelize) {
+    return super.init({
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
+        primaryKey: true,
+      },
 
-      User.belongsTo(Avatar, {
-        foreignKey: `avatar_id`,
-      });
+      email: {
+        type: DataTypes[`STRING`](250),
+        allowNull: false,
+        unique: true,
+        isEmail: true,
+      },
 
-      User.hasMany(Post, {
-        foreignKey: `user_id`,
-      });
+      firstname: {
+        type: DataTypes[`STRING`](250),
+        allowNull: false,
+      },
 
-      User.hasMany(Comment, {
-        foreignKey: `user_id`,
-      });
-    }
+      lastname: {
+        type: DataTypes[`STRING`](250),
+        allowNull: false,
+      },
+
+    }, {
+      sequelize,
+      tableName: `users`,
+    });
   }
 
-  User.init({
-    id: {
-      type: DataTypes.BIGINT,
-      autoIncrement: true,
-      primaryKey: true,
-    },
+  static associate({Avatar, Comment, Password}) {
+    User.hasOne(Password, {
+      foreignKey: `user_id`,
+    });
 
-    email: {
-      type: DataTypes[`STRING`](250),
-      allowNull: false,
-      unique: true,
-      isEmail: true,
-    },
+    User.hasOne(Avatar, {
+      foreignKey: `user_id`,
+    });
 
-    [`avatar_id`]: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      references: {
-        model: `Avatars`,
-        key: `id`,
-      },
-      onDelete: `SET NULL`,
-      onUpdate: `CASCADE`
-    },
+    User.hasMany(Comment, {
+      foreignKey: `user_id`,
+    });
+  }
+}
 
-    firstname: {
-      type: DataTypes[`STRING`](250),
-      allowNull: false,
-    },
-
-    lastname: {
-      type: DataTypes[`STRING`](250),
-      allowNull: false,
-    },
-
-  }, {
-    sequelize
-  });
-
-  return User;
-};
+module.exports.User = User;

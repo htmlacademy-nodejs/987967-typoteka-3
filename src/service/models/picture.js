@@ -2,35 +2,36 @@
 
 const {DataTypes, Model} = require(`sequelize`);
 
-module.exports = (sequelize) => {
-  class Picture extends Model {
-    static associate({Post}) {
-      Picture.hasOne(Post, {
-        foreignKey: `picture_id`,
-      });
-    }
+class Picture extends Model {
+  static init(sequelize) {
+    return super.init({
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+
+      name: {
+        type: DataTypes[`STRING`](250),
+        allowNull: false,
+        unique: true,
+      },
+
+      originalName: {
+        type: DataTypes[`STRING`](100),
+        allowNull: false,
+      },
+    }, {
+      sequelize,
+      tableName: `pictures`,
+    });
   }
 
-  Picture.init({
-    id: {
-      type: DataTypes.BIGINT,
-      autoIncrement: true,
-      primaryKey: true,
-    },
+  static associate({Post}) {
+    Picture.hasOne(Post, {
+      foreignKey: `picture_id`,
+    });
+  }
+}
 
-    name: {
-      type: DataTypes[`STRING`](250),
-      allowNull: false,
-      unique: true,
-    },
-
-    originalName: {
-      type: DataTypes[`STRING`](100),
-      allowNull: false,
-    },
-  }, {
-    sequelize
-  });
-
-  return Picture;
-};
+module.exports.Picture = Picture;

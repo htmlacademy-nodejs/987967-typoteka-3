@@ -2,41 +2,41 @@
 
 const {DataTypes, Model} = require(`sequelize`);
 
-module.exports = (sequelize) => {
-  class Password extends Model {
-    static associate({User}) {
-      Password.belongsTo(User, {
-        foreignKey: `user_id`,
-      });
-    }
+class Password extends Model {
+  static init(sequelize) {
+    return super.init({
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+
+      password: {
+        type: DataTypes[`STRING`](50),
+        allowNull: false,
+      },
+
+      [`user_id`]: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+        references: {
+          model: `users`,
+          key: `id`,
+        },
+        onDelete: `RESTRICT`,
+        onUpdate: `CASCADE`,
+      }
+    }, {
+      sequelize,
+      tableName: `passwords`,
+    });
   }
 
-  Password.init({
-    id: {
-      type: DataTypes.BIGINT,
-      autoIncrement: true,
-      primaryKey: true,
-    },
+  static associate({User}) {
+    Password.belongsTo(User, {
+      foreignKey: `user_id`,
+    });
+  }
+}
 
-    password: {
-      type: DataTypes[`STRING`](50),
-      allowNull: false,
-    },
-
-    [`user_id`]: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      references: {
-        model: `Users`,
-        key: `id`,
-      },
-      onDelete: `RESTRICT`,
-      onUpdate: `CASCADE`,
-    }
-
-  }, {
-    sequelize,
-  });
-
-  return Password;
-};
+module.exports.Password = Password;

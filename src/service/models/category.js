@@ -2,35 +2,33 @@
 
 const {DataTypes, Model} = require(`sequelize`);
 
-module.exports = (sequelize) => {
-  class Category extends Model {
-    static associate({Post, PostCategory}) {
-      Category.belongsToMany(Post, {
-        through: PostCategory,
-        foreignKey: `category_id`,
-        as: `Post`
-      });
-    }
+class Category extends Model {
+  static init(sequelize) {
+    return super.init({
+      id: {
+        type: DataTypes.BIGINT,
+        autoIncrement: true,
+        primaryKey: true,
+      },
+
+      name: {
+        type: DataTypes[`STRING`](60),
+        allowNull: false,
+        unique: true,
+      },
+
+    }, {
+      sequelize,
+      tableName: `categories`,
+    });
   }
 
-  Category.init({
-    id: {
-      type: DataTypes.BIGINT,
-      autoIncrement: true,
-      primaryKey: true,
-    },
+  static associate({Post, PostCategory}) {
+    Category.belongsToMany(Post, {
+      through: PostCategory,
+      foreignKey: `category_id`,
+    });
+  }
+}
 
-    name: {
-      type: DataTypes[`STRING`](60),
-      allowNull: false,
-      unique: true,
-    },
-
-  }, {
-    sequelize,
-    freezeTableName: false,
-    tableName: `Categories`,
-  });
-
-  return Category;
-};
+module.exports.Category = Category;
