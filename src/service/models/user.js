@@ -34,17 +34,15 @@ class User extends Model {
     });
   }
 
-  static associate({Avatar, Comment, Password}) {
-    User.hasOne(Password, {
+  static associate({Avatar, Password}) {
+    this.Password = this.hasOne(Password, {
       foreignKey: `user_id`,
+      as: `password`
     });
 
-    User.hasOne(Avatar, {
+    this.Avatar = this.hasOne(Avatar, {
       foreignKey: `user_id`,
-    });
-
-    User.hasMany(Comment, {
-      foreignKey: `user_id`,
+      as: `avatar`
     });
   }
 }

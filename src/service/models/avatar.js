@@ -36,12 +36,6 @@ class Avatar extends Model {
       tableName: `avatars`,
     });
   }
-
-  static associate({User}) {
-    Avatar.belongsTo(User, {
-      foreignKey: `user_id`,
-    });
-  }
 }
 
 module.exports.Avatar = Avatar;

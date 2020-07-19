@@ -10,8 +10,8 @@ const prepareUserData = ({email, firstname, lastname, password, avatar, original
   const avatarData = {name: avatar, originalName: originalAvatar};
   const passwordData = {password};
 
-  userData.Avatar = avatarData;
-  userData.Password = passwordData;
+  userData.avatar = avatarData;
+  userData.password = passwordData;
 
   return userData;
 };
@@ -86,7 +86,7 @@ class DB {
     const userData = prepareUserData(data);
 
     return User.create(userData, {
-      include: [Avatar, Password]
+      include: [User.Avatar, User.Password]
     });
   }
 
@@ -94,7 +94,7 @@ class DB {
     const userData = data.map((it) => prepareUserData(it));
 
     return User.bulkCreate(userData, {
-      include: [Avatar, Password]
+      include: [User.Avatar, User.Password]
     });
   }
 
@@ -104,15 +104,15 @@ class DB {
       title,
       announce,
       text,
-      Picture: {
+      picture: {
         name: picture,
         originalName: originalPicture,
       },
-      PostCategories: categoryIds.map((it) => ({[`category_id`]: it}))
+      categories: categoryIds.map((it) => ({[`category_id`]: it}))
     };
 
     return Post.create(postData, {
-      include: [Picture, PostCategory]
+      include: [Post.Picture, Post.PostCategory]
     });
   }
 
@@ -121,16 +121,16 @@ class DB {
 
     const posts = preparedData.map((it) => ({
       ...it.post,
-      Picture: it.picture,
-      Comments: it.comments,
-      PostCategories: it.postCategories,
+      picture: it.picture,
+      comments: it.comments,
+      categories: it.postCategories,
     }));
 
     return Post.bulkCreate(posts, {
       include: [
-        Picture,
-        Comment,
-        PostCategory,
+        Post.Picture,
+        Post.Comment,
+        Post.PostCategory,
       ]
     });
   }
@@ -164,15 +164,15 @@ class DB {
         [this.sequelize.fn(`COUNT`, this.sequelize.col(`PostCategory.post_id`)), `count`]
       ],
       include: {
-        model: Category,
+        association: PostCategory.Category,
         attributes: [`name`, `id`],
       },
-      group: [`PostCategory.category_id`, `Category.name`, `Category.id`],
+      group: [`PostCategory.category_id`, `category.name`, `category.id`],
     });
 
     return categories.map((it) => {
       const category = it.get({plain: true});
-      return {count: category.count, ...category.Category};
+      return {count: category.count, ...category.category};
     });
   }
 

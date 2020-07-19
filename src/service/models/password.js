@@ -31,12 +31,6 @@ class Password extends Model {
       tableName: `passwords`,
     });
   }
-
-  static associate({User}) {
-    Password.belongsTo(User, {
-      foreignKey: `user_id`,
-    });
-  }
 }
 
 module.exports.Password = Password;

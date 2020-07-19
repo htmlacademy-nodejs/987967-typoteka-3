@@ -11,17 +11,6 @@ class Post extends Model {
         primaryKey: true,
       },
 
-      [`picture_id`]: {
-        type: DataTypes.BIGINT,
-        allowNull: true,
-        references: {
-          model: `pictures`,
-          key: `id`,
-        },
-        onDelete: `SET NULL`,
-        onUpdate: `CASCADE`
-      },
-
       date: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -49,22 +38,20 @@ class Post extends Model {
     });
   }
 
-  static associate({Picture, Comment, PostCategory, Category}) {
-    Post.belongsTo(Picture, {
-      foreignKey: `picture_id`,
+  static associate({Picture, Comment, PostCategory}) {
+    this.Picture = this.hasOne(Picture, {
+      foreignKey: `post_id`,
+      as: `picture`
     });
 
-    Post.hasMany(Comment, {
+    this.Comment = this.hasMany(Comment, {
       foreignKey: `post_id`,
+      as: `comments`
     });
 
-    Post.belongsToMany(Category, {
-      through: PostCategory,
+    this.PostCategory = this.hasMany(PostCategory, {
       foreignKey: `post_id`,
-    });
-
-    Post.hasMany(PostCategory, {
-      foreignKey: `post_id`,
+      as: `categories`
     });
   }
 }

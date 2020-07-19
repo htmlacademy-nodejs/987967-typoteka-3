@@ -21,15 +21,21 @@ class Picture extends Model {
         type: DataTypes[`STRING`](100),
         allowNull: false,
       },
+
+      [`post_id`]: {
+        type: DataTypes.BIGINT,
+        allowNull: false,
+        unique: true,
+        references: {
+          model: `posts`,
+          key: `id`,
+        },
+        onDelete: `CASCADE`,
+        onUpdate: `CASCADE`
+      }
     }, {
       sequelize,
       tableName: `pictures`,
-    });
-  }
-
-  static associate({Post}) {
-    Picture.hasOne(Post, {
-      foreignKey: `picture_id`,
     });
   }
 }
