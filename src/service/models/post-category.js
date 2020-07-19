@@ -35,9 +35,13 @@ class PostCategory extends Model {
     });
   }
 
-  static associate({Post}) {
+  static associate({Post, Category}) {
     PostCategory.belongsTo(Post, {
       foreignKey: `post_id`
+    });
+
+    PostCategory.belongsTo(Category, {
+      foreignKey: `category_id`,
     });
   }
 }

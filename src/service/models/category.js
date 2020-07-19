@@ -28,6 +28,10 @@ class Category extends Model {
       through: PostCategory,
       foreignKey: `category_id`,
     });
+
+    // Category.hasMany(PostCategory, {
+    //   foreignKey: `category_id`
+    // });
   }
 }
 

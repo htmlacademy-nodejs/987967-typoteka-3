@@ -5,12 +5,11 @@ const express = require(`express`);
 const {createAPI} = require(`../api`);
 const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo} = require(`../const`);
 const {getLogger, LogMessage, LoggerName, logger} = require(`../../logger`);
-const {getMockPosts} = require(`../../utils`);
-const {sequelize} = require(`../db`);
+const {DB} = require(`../db`);
 
 const serverLogger = getLogger(LoggerName.DATA_SERVER);
 
-const createServer = (rawData) => {
+const createServer = (db) => {
   const app = express();
 
   app.use(express.json());
@@ -19,7 +18,7 @@ const createServer = (rawData) => {
     next();
   });
 
-  app.use(`/api`, createAPI(rawData));
+  app.use(`/api`, createAPI(db));
 
   app.use((req, res) => {
     logger.error(LogMessage.getUnknownRoute(req.url));
@@ -38,8 +37,10 @@ const createServer = (rawData) => {
 module.exports = {
   name: `--server`,
   async run(arg) {
+    const db = new DB();
+
     try {
-      await sequelize.authenticate();
+      await db.authenticate();
       serverLogger.info(`Connection to database succsessfully`);
     } catch (err) {
       const errorMessage = `Error connecting to database: ${err}`;
@@ -51,8 +52,7 @@ module.exports = {
 
     const [customPort] = arg;
     const port = parseInt(customPort, 10) || DEFAULT_PORT;
-    const mockData = await getMockPosts();
-    const app = await createServer(mockData);
+    const app = createServer(db);
 
     try {
       app.listen(port);

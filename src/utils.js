@@ -102,7 +102,7 @@ const generateDate = () => {
 const generatePost = ({sentences, titles, categories, comments, users, pictureFiles}) => {
   const textSentences = getRandomElements(sentences, getRandomInt(MIN_SENTENCES_COUNT, MAX_SENTENCES_COUNT));
   const announceSentences = getRandomUniqueElements(textSentences, ANNOUNCE_SENTENCES_COUNT);
-  const createdDate = generateDate();
+  const date = generateDate();
   const now = Date.now();
   const originalPicture = getRandomElement(pictureFiles);
   const picture = getRandomBoolean() ? generateImage(path.resolve(PICTURE_MOCK_FOLDER, originalPicture), PICTURE_FOLDER) : ``;
@@ -110,14 +110,14 @@ const generatePost = ({sentences, titles, categories, comments, users, pictureFi
   return {
     id: nanoid(ID_LENGTH),
     title: getRandomElement(titles).slice(0, 250),
-    createdDate,
+    date,
     announce: announceSentences.join(`\n`).slice(0, 250),
-    fullText: textSentences.join(`\n`).slice(0, 1000),
+    text: textSentences.join(`\n`).slice(0, 1000),
     categories: getRandomUniqueElements(categories, getRandomInt(MIN_CATEGORY_COUNT, MAX_CATEGORY_COUNT)),
     comments: getRandomElements(comments, getRandomInt(MIN_COMMENT_COUNT, MAX_COMMENT_COUNT)).map((it) => ({
       id: nanoid(ID_LENGTH),
       text: it.slice(0, 250),
-      date: getRandomDate(createdDate, now),
+      date: getRandomDate(date, now),
       user: getRandomElement(users),
     })),
     picture,
@@ -195,7 +195,7 @@ const generateCategories = (names) => {
 const formatNumber = (number) => `${number < 10 ? `0` : ``}${number}`;
 
 const sortCommentsByDate = (comments) => comments.slice().sort((a, b) => b.date - a.date);
-const sortPostsByDate = (posts) => posts.slice().sort((a, b) => b.createdDate - a.createdDate);
+const sortPostsByDate = (posts) => posts.slice().sort((a, b) => b.date - a.date);
 const sortPostsByPopular = (posts) => posts.slice().sort((a, b) => b.comments.length - a.comments.length);
 const collectComments = (posts) => posts.reduce((acc, cur) => {
   const comments = cur.comments.map((it) => ({

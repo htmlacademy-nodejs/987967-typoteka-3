@@ -13,13 +13,13 @@ const {
 const {DB} = require(`../db`);
 
 const createDB = async (postCount, userCount) => {
-  const db = new DB();
-  const {users, posts, categories} = generatePosts(postCount, userCount);
+  const {users, posts, categories} = await generatePosts(postCount, userCount);
 
+  const db = new DB();
   try {
-    db.authenticate();
-    db.createMockDB(posts, users, categories);
-    db.close();
+    await db.authenticate();
+    await db.createMockDB(posts, users, categories);
+    await db.close();
 
     console.info(chalk.green(Message.DB_SUCCESS));
     return ExitCode.SUCCESS;
@@ -46,6 +46,6 @@ module.exports = {
       return ExitCode.ERROR;
     }
 
-    return await createDB(postCount, userCount);
+    return createDB(postCount, userCount);
   }
 };
