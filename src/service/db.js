@@ -3,7 +3,22 @@
 const {Sequelize} = require(`sequelize`);
 const {DBNAME, ADMIN, PSW, HOST} = require(`./config`);
 const models = require(`./models`);
+const {CategorySortType} = require(`./db-const`);
 const {User, Avatar, Password, PostCategory, Category, Comment, Post, Picture} = require(`./models`);
+
+const addPagination = (query, limit, offset) => {
+  const result = {...query};
+
+  if (limit) {
+    result.limit = limit;
+  }
+
+  if (offset) {
+    result.offset = offset;
+  }
+
+  return result;
+};
 
 const prepareUserData = ({email, firstname, lastname, password, avatar, originalAvatar}) => {
   const userData = {email, firstname, lastname};
@@ -158,8 +173,20 @@ class DB {
     return this.createPosts(posts, dbUsers, dbCategories);
   }
 
-  async getCategories() {
-    const categories = await PostCategory.findAll({
+  async getCategories(sortType, limit, offset) {
+    let sortProperty;
+
+    switch (sortType) {
+      case CategorySortType.BY_POST_COUNT:
+        sortProperty = [`count`, `DESC`];
+        break;
+
+      case CategorySortType.BY_NAME:
+      default:
+        sortProperty = [PostCategory.Category, `name`, `ASC`];
+    }
+
+    const query = {
       attributes: [
         [this.sequelize.fn(`COUNT`, this.sequelize.col(`PostCategory.post_id`)), `count`]
       ],
@@ -168,7 +195,10 @@ class DB {
         attributes: [`name`, `id`],
       },
       group: [`PostCategory.category_id`, `category.name`, `category.id`],
-    });
+      order: [sortProperty],
+    };
+
+    const categories = await PostCategory.findAll(addPagination(query, limit, offset));
 
     return categories.map((it) => {
       const category = it.get({plain: true});
