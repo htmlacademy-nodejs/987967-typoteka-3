@@ -3,9 +3,9 @@
 const {HttpStatusCode} = require(`../const`);
 const {logger, LogMessage} = require(`../../logger`);
 
-const createPostFinder = (service) => (req, res, next) => {
+const createPostFinder = (service) => async (req, res, next) => {
   const id = req.params.articleId;
-  const post = service.getPost(id);
+  const post = await service.getPost(id);
 
   if (!post) {
     const message = LogMessage.getWrongObjectID(`Post`, id);

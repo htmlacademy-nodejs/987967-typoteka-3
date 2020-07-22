@@ -7,6 +7,17 @@ const {logger, LogMessage} = require(`../../logger`);
 const createCategoryRouter = (service) => {
   const router = new Router();
 
+  router.get(`/:categoryId`, async (req, res) => {
+    const {limit, offset, sorting: sortType} = req.query;
+    const categoryId = req.params.categoryId;
+
+    const category = await service.getCategory(categoryId, sortType, limit, offset);
+
+    logger.info(LogMessage.getEndRequest(req.url, HttpStatusCode.OK));
+    logger.debug(category);
+    res.status(HttpStatusCode.OK).json(category);
+  });
+
   router.get(`/`, async (req, res) => {
     const {limit, offset, sorting: sortType} = req.query;
     const categories = await service.getCategories(sortType, limit, offset);

@@ -10,9 +10,11 @@ const createPostRouter = (service) => {
   const findComment = createCommentFinder(service);
   const router = new Router();
 
-  router.get(`/`, (req, res) => {
+  router.get(`/`, async (req, res) => {
+    const {limit, offset, sorting: sortType} = req.query;
+
     logger.info(LogMessage.getEndRequest(req.url, HttpStatusCode.OK));
-    res.status(HttpStatusCode.OK).json(service.getPosts());
+    res.status(HttpStatusCode.OK).json(await service.getPosts(sortType, limit, offset));
   });
 
   router.post(`/`, validatePost, (req, res) => {
