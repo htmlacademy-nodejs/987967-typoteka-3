@@ -38,7 +38,7 @@ class Post extends Model {
     });
   }
 
-  static associate({Picture, Comment, PostCategory}) {
+  static associate({Picture, Comment, PostCategory, Category}) {
     this.Picture = this.hasOne(Picture, {
       foreignKey: `post_id`,
       as: `picture`
@@ -51,7 +51,13 @@ class Post extends Model {
 
     this.PostCategory = this.hasMany(PostCategory, {
       foreignKey: `post_id`,
-      as: `categories`
+      as: `postCategories`
+    });
+
+    this.Category = this.belongsToMany(Category, {
+      through: PostCategory,
+      foreignKey: `post_id`,
+      as: `category`
     });
   }
 }

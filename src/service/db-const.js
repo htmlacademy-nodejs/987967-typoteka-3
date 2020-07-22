@@ -5,6 +5,12 @@ const CategorySortType = {
   BY_POST_COUNT: `count`,
 };
 
+const PostSortType = {
+  BY_DATE: `date`,
+  BY_POPULARITY: `popularity`,
+};
+
 module.exports = {
   CategorySortType,
+  PostSortType,
 };

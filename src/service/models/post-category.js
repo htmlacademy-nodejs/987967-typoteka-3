@@ -36,10 +36,10 @@ class PostCategory extends Model {
   }
 
   static associate({Post, Category}) {
-    this.Post = this.belongsTo(Post, {
-      foreignKey: `post_id`,
-      as: `post`
-    });
+    // this.Post = this.belongsTo(Post, {
+    //   foreignKey: `post_id`,
+    //   as: `post`
+    // });
 
     this.Category = this.belongsTo(Category, {
       foreignKey: `category_id`,

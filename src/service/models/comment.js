@@ -49,6 +49,18 @@ class Comment extends Model {
       tableName: `comments`,
     });
   }
+
+  static associate({User, Post}) {
+    this.User = this.belongsTo(User, {
+      foreignKey: `user_id`,
+      as: `comment_autor`
+    });
+
+    this.Post = this.belongsTo(Post, {
+      foreignKey: `post_id`,
+      as: `post`,
+    });
+  }
 }
 
 module.exports.Comment = Comment;

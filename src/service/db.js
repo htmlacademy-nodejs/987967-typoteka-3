@@ -1,9 +1,9 @@
 'use strict';
 
-const {Sequelize} = require(`sequelize`);
+const {Sequelize, Op} = require(`sequelize`);
 const {DBNAME, ADMIN, PSW, HOST} = require(`./config`);
 const models = require(`./models`);
-const {CategorySortType} = require(`./db-const`);
+const {CategorySortType, PostSortType} = require(`./db-const`);
 const {User, Avatar, Password, PostCategory, Category, Comment, Post, Picture} = require(`./models`);
 
 const addPagination = (query, limit, offset) => {
@@ -138,7 +138,7 @@ class DB {
       ...it.post,
       picture: it.picture,
       comments: it.comments,
-      categories: it.postCategories,
+      postCategories: it.postCategories,
     }));
 
     return Post.bulkCreate(posts, {
@@ -173,6 +173,30 @@ class DB {
     return this.createPosts(posts, dbUsers, dbCategories);
   }
 
+  async getCategory(categoryId, sortType, limit, offset) {
+    const query = {
+      attributes: [],
+      include: [{
+        association: PostCategory.Post,
+        attributes: [`id`, `title`, `date`, `announce`],
+        include: [{
+          association: Post.Comment,
+          attributes: [`id`]
+        }],
+      },
+      {
+        association: PostCategory.Category,
+        attributes: [`id`, `name`]
+      },
+      ],
+      where: {
+        [`category_id`]: categoryId
+      },
+    };
+
+    return PostCategory.findAll(query, addPagination(query, limit, offset));
+  }
+
   async getCategories(sortType, limit, offset) {
     let sortProperty;
 
@@ -204,6 +228,93 @@ class DB {
       const category = it.get({plain: true});
       return {count: category.count, ...category.category};
     });
+  }
+
+  async getPost(id) {
+    const query = {
+      attributes: [
+        `id`,
+        `title`,
+        `date`,
+        `announce`,
+        `text`
+      ],
+      include: [{
+        association: Post.Category,
+        attributes: [`id`, `name`],
+        through: {
+          attributes: []
+        },
+      }, {
+        association: Post.Comment,
+        include: [Comment.User],
+      }, {
+        association: Post.Picture,
+        attributes: [`name`]
+      }],
+      where: {id},
+      order: [[Post.Comment, `date`, `ASC`]]
+    };
+
+    return Post.findAll(query);
+  }
+
+  async getPosts(sortType, limit, offset) {
+    let order;
+
+    switch (sortType) {
+      case PostSortType.BY_DATE:
+        order = [[`date`, `DESC`]];
+        break;
+
+      case PostSortType.BY_POPULARITY:
+      default:
+        order = [[this.sequelize.fn(`COUNT`, this.sequelize.col(`"comments.id"`)), `DESC`]];
+    }
+
+    const countComments = () => this.sequelize.fn(`COUNT`, this.sequelize.col(`comments.id`));
+    const query = {
+      attributes: [
+        `id`,
+        [countComments(), `comment_count`],
+        `title`,
+        `date`,
+        `announce`
+      ],
+      include: [{
+        association: Post.Category,
+        attributes: [`id`, `name`],
+        through: {
+          attributes: []
+        },
+      }, {
+        association: Post.Comment,
+        attributes: []
+      }, {
+        association: Post.Picture,
+        attributes: [`name`],
+      }],
+      group: [`Post.id`, `category.id`, `picture.id`],
+      order,
+      // raw: true
+    };
+
+    return Post.findAll(addPagination(query, limit, offset));
+  }
+
+  async getComments(limit, offset) {
+    const query = {
+      attributes: [`date`, `text`],
+      include: [{
+        association: Comment.User,
+      }, {
+        association: Comment.Post,
+        attributes: [`id`, `title`]
+      }],
+      order: [[`date`, `DESC`]]
+    };
+
+    return Comment.findAll(addPagination(query, limit, offset));
   }
 
   async close() {
