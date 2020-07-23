@@ -11,4 +11,9 @@ module.exports = {
   COMMENT_PREVIEW_LENGTH: 100,
   NEW_POST_TITLE: `Новая публикация`,
   EDIT_POST_TITLE: `Редактирование публикации`,
+
+  PostSortType: {
+    POPULARITY: `popularity`,
+    DATE: `date`,
+  },
 };

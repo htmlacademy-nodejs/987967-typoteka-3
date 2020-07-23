@@ -41,9 +41,17 @@ class DataServer {
     return this._request(`/categories`);
   }
 
-  async getPostPreviews() {
-    const posts = await this._request(`/articles`);
-    return posts.map((it) => ServiceToExpressAdapter.getPostPreview(it));
+  async getComments(limit, offset) {
+    return this._request(`/comments?${QueryString.encode({limit, offset})}`);
+  }
+
+  async getPostPreviews(sortType, limit, offset) {
+    const {total, posts} = await this._request(`/articles?${QueryString.encode({sorting: sortType, limit, offset})}`);
+
+    return {
+      postCount: total,
+      posts: posts.map((it) => ServiceToExpressAdapter.getPostPreview(it))
+    };
   }
 
   async getUserPosts() {

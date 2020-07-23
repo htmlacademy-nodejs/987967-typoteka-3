@@ -5,7 +5,8 @@ li.preview__item(class=`${post.picture ? `` : `preview__item--noimage`}`)
         a.preview__breadcrumbs-link(href=`/categories/${category.id}`) #{category.name}
   if post.picture
     .preview__background
-      img.preview__background-image(src=post.picture width='460' height='240' srcset=`${post.picture} 1x, ${post.picture} 2x` alt='Фотография моря')
+      -var postPicture = `img/post-images/${post.picture.name}`
+      img.preview__background-image(src=postPicture width='460' height='240' srcset=`${postPicture} 1x, ${postPicture} 2x` alt='Фотография')
   time.preview__time(datetime=post.dateTime) #{post.dateTimeLocalized}
   h3.preview__name
     a.preview__name-link(href=`/articles/${post.id}`) #{post.title}
@@ -14,4 +15,4 @@ li.preview__item(class=`${post.picture ? `` : `preview__item--noimage`}`)
     | &Kcy;&ocy;&mcy;&mcy;&iecy;&ncy;&tcy;&acy;&rcy;&icy;&icy; 
     span.preview__cloud
     | 
-    b.preview__comment-count #{post.comments.length}
+    b.preview__comment-count #{post.comment_count}

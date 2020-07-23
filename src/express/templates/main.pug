@@ -26,7 +26,7 @@ block content
               each hotPost in popularPosts
                 li.hot__list-item
                   a.hot__list-link(href=`/articles/${hotPost.id}`) #{hotPost.announce}
-                    sup.hot__link-sup #{hotPost.comments.length}
+                    sup.hot__link-sup #{hotPost.comment_count}
           else
             p.hot__empty &Zcy;&dcy;&iecy;&scy;&softcy; &pcy;&ocy;&kcy;&acy; &ncy;&icy;&chcy;&iecy;&gcy;&ocy; &ncy;&iecy;&tcy;...
 
@@ -38,9 +38,9 @@ block content
             ul.last__list
               each comment in comments
                 li.last__list-item
-                  img.last__list-image(src='img/avatar-small-1.png' width='20' height='20' alt='Аватар пользователя')
-                  b.last__list-name &Acy;&ncy;&ncy;&acy; &Acy;&rcy;&tcy;&acy;&mcy;&ocy;&ncy;&ocy;&vcy;&acy;
-                  a.last__list-link(href=`/articles/${comment.parentPost.id}`) #{comment.text}
+                  img.last__list-image(src=`img/avatars/${comment.author.avatar.name}` width='20' height='20' alt='Аватар пользователя')
+                  b.last__list-name #{`${comment.author.firstname} ${comment.author.lastname}`}
+                  a.last__list-link(href=`/articles/${comment.post.id}`) #{comment.text}
           else
             p.last__empty &Zcy;&dcy;&iecy;&scy;&softcy; &pcy;&ocy;&kcy;&acy; &ncy;&icy;&chcy;&iecy;&gcy;&ocy; &ncy;&iecy;&tcy;...
       section.main-page__list.preview

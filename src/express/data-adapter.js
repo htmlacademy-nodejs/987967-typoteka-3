@@ -16,7 +16,7 @@ const ServiceToExpressAdapter = {
   },
 
   getPostPreview(rawPost) {
-    const date = new Date(rawPost.createdDate);
+    const date = new Date(rawPost.date);
 
     return {
       ...rawPost,
