@@ -57,7 +57,7 @@ class Post extends Model {
     this.Category = this.belongsToMany(Category, {
       through: PostCategory,
       foreignKey: `post_id`,
-      as: `category`
+      as: `categories`
     });
   }
 }

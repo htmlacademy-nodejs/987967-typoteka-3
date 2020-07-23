@@ -4,17 +4,18 @@ const {Sequelize, Op} = require(`sequelize`);
 const {DBNAME, ADMIN, PSW, HOST} = require(`./config`);
 const models = require(`./models`);
 const {CategorySortType, PostSortType} = require(`./db-const`);
+const {getPostsSortedByDate, getPostsSortedByPopularity} = require(`./queries`);
 const {User, Avatar, Password, PostCategory, Category, Comment, Post, Picture} = require(`./models`);
 
 const addPagination = (query, limit, offset) => {
   const result = {...query};
 
   if (limit) {
-    result.limit = limit;
+    result.limit = Number(limit);
   }
 
   if (offset) {
-    result.offset = offset;
+    result.offset = Number(offset);
   }
 
   return result;
@@ -119,10 +120,10 @@ class DB {
       title,
       announce,
       text,
-      picture: {
+      picture: picture ? {
         name: picture,
         originalName: originalPicture,
-      },
+      } : null,
       categories: categoryIds.map((it) => ({[`category_id`]: it}))
     };
 
@@ -260,46 +261,24 @@ class DB {
   }
 
   async getPosts(sortType, limit, offset) {
-    let order;
+    let queryPromise;
 
     switch (sortType) {
       case PostSortType.BY_DATE:
-        order = [[`date`, `DESC`]];
+        queryPromise = getPostsSortedByDate(this.sequelize, limit, offset);
         break;
 
       case PostSortType.BY_POPULARITY:
       default:
-        order = [[this.sequelize.fn(`COUNT`, this.sequelize.col(`"comments.id"`)), `DESC`]];
+        queryPromise = getPostsSortedByPopularity(this.sequelize, limit, offset);
     }
 
-    const countComments = () => this.sequelize.fn(`COUNT`, this.sequelize.col(`comments.id`));
-    const query = {
-      attributes: [
-        `id`,
-        [countComments(), `comment_count`],
-        `title`,
-        `date`,
-        `announce`
-      ],
-      include: [{
-        association: Post.Category,
-        attributes: [`id`, `name`],
-        through: {
-          attributes: []
-        },
-      }, {
-        association: Post.Comment,
-        attributes: []
-      }, {
-        association: Post.Picture,
-        attributes: [`name`],
-      }],
-      group: [`Post.id`, `category.id`, `picture.id`],
-      order,
-      // raw: true
-    };
+    const [posts, total] = await Promise.all([queryPromise, Post.count()]);
 
-    return Post.findAll(addPagination(query, limit, offset));
+    return {
+      posts,
+      total
+    };
   }
 
   async getComments(limit, offset) {
@@ -307,6 +286,10 @@ class DB {
       attributes: [`date`, `text`],
       include: [{
         association: Comment.User,
+        include: [{
+          association: User.Avatar,
+          attributes: [`name`]
+        }]
       }, {
         association: Comment.Post,
         attributes: [`id`, `title`]

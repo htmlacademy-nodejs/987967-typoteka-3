@@ -53,7 +53,7 @@ class Comment extends Model {
   static associate({User, Post}) {
     this.User = this.belongsTo(User, {
       foreignKey: `user_id`,
-      as: `comment_autor`
+      as: `author`
     });
 
     this.Post = this.belongsTo(Post, {
