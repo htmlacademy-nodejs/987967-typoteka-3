@@ -15,7 +15,9 @@ block content
     p
       | &Ecy;&tcy;&ocy; &pcy;&rcy;&icy;&vcy;&iecy;&tcy;&scy;&tcy;&vcy;&iecy;&ncy;&ncy;&ycy;&jcy; &tcy;&iecy;&kcy;&scy;&tcy;, &kcy;&ocy;&tcy;&ocy;&rcy;&ycy;&jcy; &vcy;&lcy;&acy;&dcy;&iecy;&lcy;&iecy;&tscy; &bcy;&lcy;&ocy;&gcy;&acy; &mcy;&ocy;&zhcy;&iecy;&tcy; &vcy;&ycy;&bcy;&rcy;&acy;&tcy;&softcy;, &chcy;&tcy;&ocy;&bcy;&ycy; &ocy;&pcy;&icy;&scy;&acy;&tcy;&softcy; &scy;&iecy;&bcy;&yacy; &#x1F44F;
     if posts.length  
-      include includes/categories.pug
+      section.main-page__theme-list
+        h2.visually-hidden &Scy;&pcy;&icy;&scy;&ocy;&kcy; &tcy;&iecy;&mcy;
+        include includes/categories.pug
       .main-page__section-flex(class=`${popularPosts.length > 0 && comments.length > 0 ? `` : `main-page__section-flex--short`}`)
         section.main-page__hot.hot
           h2.hot__name

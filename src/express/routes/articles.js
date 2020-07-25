@@ -3,10 +3,11 @@
 const {Router} = require(`express`);
 const multer = require(`multer`);
 const {DataServer} = require(`../data-server`);
-const {NEW_POST_TITLE, EDIT_POST_TITLE} = require(`../const`);
-const {formatDate} = require(`../../utils`);
-const {getLogger, LoggerName} = require(`../../logger`);
+const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT} = require(`../const`);
+const {formatDate} = require(`../../utils/common`);
+const {getLogger, LoggerName, LogMessage} = require(`../../logger`);
 const {ExpressToServiceAdapter, ServiceToExpressAdapter} = require(`../data-adapter`);
+const {getPagination} = require(`../utils`);
 
 const articleRouter = new Router();
 const dataServer = new DataServer();
@@ -66,8 +67,36 @@ articleRouter.get(`/:id`, async (req, res) => {
   res.render(`post`, {post});
 });
 
-articleRouter.get(`/category/:id`, (req, res) => {
-  res.render(`articles-by-category`);
+articleRouter.get(`/category/:id`, async (req, res, next) => {
+  const page = Number(req.query.page) || 1;
+  const {id} = req.params;
+
+  let categories;
+  let categoryName;
+  let posts;
+  let postCount;
+
+  try {
+    [categories, {posts, postCount, categoryName}] = await Promise.all([
+      dataServer.getCategories(),
+      dataServer.getCategoryPostPreviews(id, POST_PREVIEW_COUNT, (page - 1) * POST_PREVIEW_COUNT),
+    ]);
+  } catch (err) {
+    logger.error(LogMessage.getEndRequest(req.url));
+    next(err);
+    return;
+  }
+
+  const pageCount = Math.ceil(Number(postCount) / POST_PREVIEW_COUNT);
+
+  res.render(`articles-by-category`, {
+    categories,
+    categoryName,
+    posts,
+    pagination: getPagination(page, pageCount, req.originalUrl.replace(/\?.+/, ``)),
+  });
+
+  logger.info(LogMessage.getEndRequest(req.url));
 });
 
 articleRouter.get(`/edit/:id`, async (req, res) => {
