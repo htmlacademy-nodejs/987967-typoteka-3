@@ -1,7 +1,8 @@
 'use strict';
 
-const {Post, PostCategory, User, Picture, Comment, Category} = require(`../models`);
 const {Op} = require(`sequelize`);
+const {Post, PostCategory, User, Picture, Comment, Category} = require(`../models`);
+const {addPagination} = require(`../../utils`);
 
 const queryPostsByIds = (sequelize, ids) =>({
   attributes: [
@@ -37,10 +38,23 @@ const getPostsSortedByPopularity = async (sequelize, limit, offset) => {
     }],
     group: `Post.id`,
     order: [[sequelize.fn(`COUNT`, sequelize.col(`comments.id`)), `DESC`]],
-    limit,
-    offset,
+    ...addPagination(limit, offset),
     subQuery: false,
     raw: true
+  })).map((it) => Number(it.id));
+
+  const query = queryPostsByIds(sequelize, postIds);
+  query.order = [[sequelize.fn(`COUNT`, sequelize.col(`comments.id`)), `DESC`], [`id`, `ASC`]];
+
+  return Post.findAll(query);
+};
+
+const getCategoryPosts = async (sequelize, categoryId, limit, offset) => {
+  const postIds = (await PostCategory.findAll({
+    attributes: [[`post_id`, `id`]],
+    where: {[`category_id`]: categoryId},
+    raw: true,
+    ...addPagination(limit, offset),
   })).map((it) => Number(it.id));
 
   const query = queryPostsByIds(sequelize, postIds);
@@ -53,8 +67,7 @@ const getPostsSortedByDate = async (sequelize, limit, offset) => {
   const postIds = (await Post.findAll({
     attributes: [`id`, `date`],
     order: [[`date`, `DESC`]],
-    limit,
-    offset,
+    ...addPagination(limit, offset),
     raw: true
   })).map((it) => Number(it.id));
 
@@ -67,4 +80,5 @@ const getPostsSortedByDate = async (sequelize, limit, offset) => {
 module.exports = {
   getPostsSortedByDate,
   getPostsSortedByPopularity,
+  getCategoryPosts,
 };

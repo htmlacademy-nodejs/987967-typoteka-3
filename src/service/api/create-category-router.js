@@ -8,14 +8,14 @@ const createCategoryRouter = (service) => {
   const router = new Router();
 
   router.get(`/:categoryId`, async (req, res) => {
-    const {limit, offset, sorting: sortType} = req.query;
+    const {limit, offset} = req.query;
     const categoryId = req.params.categoryId;
 
-    const category = await service.getCategory(categoryId, sortType, limit, offset);
+    const posts = await service.getCategoryPosts(categoryId, limit, offset);
 
     logger.info(LogMessage.getEndRequest(req.url, HttpStatusCode.OK));
-    logger.debug(category);
-    res.status(HttpStatusCode.OK).json(category);
+    logger.debug(posts);
+    res.status(HttpStatusCode.OK).json(posts);
   });
 
   router.get(`/`, async (req, res) => {

@@ -4,22 +4,9 @@ const {Sequelize, Op} = require(`sequelize`);
 const {DBNAME, ADMIN, PSW, HOST} = require(`./config`);
 const models = require(`./models`);
 const {CategorySortType, PostSortType} = require(`./db-const`);
-const {getPostsSortedByDate, getPostsSortedByPopularity} = require(`./queries`);
+const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts} = require(`./queries`);
 const {User, Avatar, Password, PostCategory, Category, Comment, Post, Picture} = require(`./models`);
-
-const addPagination = (query, limit, offset) => {
-  const result = {...query};
-
-  if (limit) {
-    result.limit = Number(limit);
-  }
-
-  if (offset) {
-    result.offset = Number(offset);
-  }
-
-  return result;
-};
+const {addPagination} = require(`../utils`);
 
 const prepareUserData = ({email, firstname, lastname, password, avatar, originalAvatar}) => {
   const userData = {email, firstname, lastname};
@@ -174,28 +161,32 @@ class DB {
     return this.createPosts(posts, dbUsers, dbCategories);
   }
 
-  async getCategory(categoryId, sortType, limit, offset) {
-    const query = {
-      attributes: [],
-      include: [{
-        association: PostCategory.Post,
-        attributes: [`id`, `title`, `date`, `announce`],
+  async getCategoryPosts(categoryId, limit, offset) {
+    const [countResponse, posts] = await Promise.all([
+      PostCategory.findAll({
+        attributes: [this.sequelize.fn(`COUNT`, this.sequelize.col(`post_id`))],
         include: [{
-          association: Post.Comment,
-          attributes: [`id`]
+          association: PostCategory.Category,
+          attributes: [`name`]
         }],
-      },
-      {
-        association: PostCategory.Category,
-        attributes: [`id`, `name`]
-      },
-      ],
-      where: {
-        [`category_id`]: categoryId
-      },
-    };
+        group: [`category_id`, `category.name`],
+        where: {
+          [`category_id`]: categoryId,
+        },
+        raw: true,
+      }),
+      getCategoryPosts(this.sequelize, categoryId, limit, offset),
+    ]);
 
-    return PostCategory.findAll(query, addPagination(query, limit, offset));
+    if (countResponse.length !== 1) {
+      throw new Error(`Category ID: "${categoryId}" must exist and be unique`);
+    }
+
+    return {
+      [`category_name`]: countResponse[0][`category.name`],
+      total: countResponse[0].count,
+      posts
+    };
   }
 
   async getCategories(sortType, limit, offset) {
@@ -221,9 +212,10 @@ class DB {
       },
       group: [`PostCategory.category_id`, `category.name`, `category.id`],
       order: [sortProperty],
+      ...addPagination(limit, offset)
     };
 
-    const categories = await PostCategory.findAll(addPagination(query, limit, offset));
+    const categories = await PostCategory.findAll(query);
 
     return categories.map((it) => {
       const category = it.get({plain: true});
@@ -248,7 +240,13 @@ class DB {
         },
       }, {
         association: Post.Comment,
-        include: [Comment.User],
+        include: {
+          association: Comment.User,
+          include: {
+            association: User.Avatar,
+            attributes: [`name`]
+          }
+        },
       }, {
         association: Post.Picture,
         attributes: [`name`]
@@ -257,7 +255,8 @@ class DB {
       order: [[Post.Comment, `date`, `ASC`]]
     };
 
-    return Post.findAll(query);
+    const posts = await Post.findAll(query);
+    return posts.length ? posts[0] : null;
   }
 
   async getPosts(sortType, limit, offset) {
@@ -294,10 +293,11 @@ class DB {
         association: Comment.Post,
         attributes: [`id`, `title`]
       }],
-      order: [[`date`, `DESC`]]
+      order: [[`date`, `DESC`]],
+      ...addPagination(limit, offset)
     };
 
-    return Comment.findAll(addPagination(query, limit, offset));
+    return Comment.findAll(query);
   }
 
   async close() {

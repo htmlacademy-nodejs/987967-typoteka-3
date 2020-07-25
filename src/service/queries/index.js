@@ -1,8 +1,9 @@
 'use strict';
 
-const {getPostsSortedByDate, getPostsSortedByPopularity} = require(`./posts`);
+const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts} = require(`./posts`);
 
 module.exports = {
   getPostsSortedByDate,
   getPostsSortedByPopularity,
+  getCategoryPosts,
 };
