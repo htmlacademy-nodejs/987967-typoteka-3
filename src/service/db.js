@@ -280,9 +280,13 @@ class DB {
     };
   }
 
+  async getComment(id) {
+    return Comment.findByPk(id);
+  }
+
   async getComments(limit, offset) {
     const query = {
-      attributes: [`date`, `text`],
+      attributes: [`id`, `date`, `text`],
       include: [{
         association: Comment.User,
         include: [{
@@ -302,6 +306,18 @@ class DB {
 
   async close() {
     return this.sequelize.close();
+  }
+
+  async deletePost(id) {
+    return Post.destroy({
+      where: {id}
+    });
+  }
+
+  async deleteComment(id) {
+    return Comment.destroy({
+      where: {id}
+    });
   }
 }
 

@@ -1,12 +1,12 @@
 'use strict';
 
 const {DB} = require(`./db`);
-const {getPostsByCategory} = require(`./queries`);
+const {Comment} = require(`./models`);
 
 (async () => {
   const db = new DB();
 
-  await getPostsByCategory(db.sequelize, `1`, 10, 0);
+  console.log(await Comment.findByPk(`198098098`));
 
   db.close();
 })();
