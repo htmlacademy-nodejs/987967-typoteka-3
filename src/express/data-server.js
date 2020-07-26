@@ -42,7 +42,8 @@ class DataServer {
   }
 
   async getComments(limit, offset) {
-    return this._request(`/comments?${QueryString.encode({limit, offset})}`);
+    const comments = await this._request(`/comments?${QueryString.encode({limit, offset})}`);
+    return comments.map((it) => ServiceToExpressAdapter.getComment(it));
   }
 
   async getPostPreviews(sortType, limit, offset) {
@@ -64,17 +65,6 @@ class DataServer {
     };
   }
 
-  async getUserPosts() {
-    const posts = await this._request(`/articles`);
-    return posts.map((it) => ServiceToExpressAdapter.getPostPreview(it));
-  }
-
-  async getUserComments() {
-    const posts = await this._request(`/articles`);
-    const comments = collectComments(posts).map((it) => ServiceToExpressAdapter.getComment(it));
-    return comments;
-  }
-
   async getPost(id) {
     const post = ServiceToExpressAdapter.getPost(await this._request(`/articles/${id}`));
     return post;
@@ -91,6 +81,14 @@ class DataServer {
   async search(query) {
     const queryString = QueryString.encode({query});
     return (await this._request(`/search?${queryString}`)).map((it) => ServiceToExpressAdapter.getPost(it));
+  }
+
+  async deletePost(id) {
+    return this._request(`/articles/${id}`, `delete`);
+  }
+
+  async deleteComment(postId, commentId) {
+    return this._request(`/articles/${postId}/comments/${commentId}`, `delete`);
   }
 
   async _request(url, method = `get`, data) {

@@ -2,7 +2,7 @@ li.preview__item(class=`${post.picture ? `` : `preview__item--noimage`}`)
   ul.preview__breadcrumbs
     each category in post.categories
       li.preview__breadcrumbs-item
-        a.preview__breadcrumbs-link(href=`/categories/${category.id}`) #{category.name}
+        a.preview__breadcrumbs-link(href=`/articles/category/${category.id}`) #{category.name}
   if post.picture
     .preview__background
       -var postPicture = `img/post-images/${post.picture.name}`

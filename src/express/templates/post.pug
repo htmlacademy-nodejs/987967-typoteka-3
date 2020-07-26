@@ -28,12 +28,12 @@ block content
             ul.post__themes.themes
               each category in post.categories
                 li.themes__item
-                  a.themes__item-link(href=`/categories/${category.id}`) #{category.name}
+                  a.themes__item-link(href=`/articles/category/${category.id}`) #{category.name}
                     sup #{category.count}
                   button.themes__remove-btn(type='button') &Ucy;&dcy;&acy;&lcy;&icy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
           if post.picture
             .post__picture
-              img(src=post.picture alt='Фото поста')
+              img(src=`img/post-images/${post.picture.name}` alt='Фото поста')
           .post__text
             h3 #{post.title}
             p #{post.announce}
