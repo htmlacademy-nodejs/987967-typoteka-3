@@ -37,8 +37,8 @@ class DataServer {
     this._api = createAPI();
   }
 
-  async getCategories() {
-    return this._request(`/categories`);
+  async getCategories(excludeEmpty) {
+    return this._request(`/categories?${QueryString.encode({excludeEmpty})}`);
   }
 
   async getComments(limit, offset) {
@@ -74,8 +74,16 @@ class DataServer {
     return this._request(`/articles/${post.id}`, `put`, post);
   }
 
+  async updateCategory(id, name) {
+    return this._request(`/categories/${id}`, `put`, {name});
+  }
+
   async createPost(post) {
     return this._request(`/articles`, `post`, post);
+  }
+
+  async createCategory(name) {
+    return this._request(`/categories`, `post`, {name});
   }
 
   async search(query) {
@@ -89,6 +97,10 @@ class DataServer {
 
   async deleteComment(postId, commentId) {
     return this._request(`/articles/${postId}/comments/${commentId}`, `delete`);
+  }
+
+  async deleteCategory(id) {
+    return this._request(`/categories/${id}`, `delete`);
   }
 
   async _request(url, method = `get`, data) {

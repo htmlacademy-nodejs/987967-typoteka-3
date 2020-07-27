@@ -1,12 +1,12 @@
 'use strict';
 
 const {DB} = require(`./db`);
-const {Comment} = require(`./models`);
+const {getCategories} = require(`./queries`);
 
 (async () => {
   const db = new DB();
 
-  console.log(await Comment.findByPk(`198098098`));
+  console.log(await db.createCategory(`С рюмочкой`));
 
   db.close();
 })();

@@ -1,8 +1,9 @@
 'use strict';
 
-const {Op} = require(`sequelize`);
-const {Post, PostCategory, User, Picture, Comment, Category} = require(`../models`);
+const {Op, or} = require(`sequelize`);
+const {Post, PostCategory} = require(`../models`);
 const {addPagination} = require(`../../utils`);
+const {PostSortType} = require(`../db-const`);
 
 const queryPostsByIds = (sequelize, ids) =>({
   attributes: [
@@ -49,7 +50,7 @@ const getPostsSortedByPopularity = async (sequelize, limit, offset) => {
   return Post.findAll(query);
 };
 
-const getCategoryPosts = async (sequelize, categoryId, limit, offset) => {
+const getCategoryPosts = async (sequelize, categoryId, limit, offset, sortType) => {
   const postIds = (await PostCategory.findAll({
     attributes: [[`post_id`, `id`]],
     where: {[`category_id`]: categoryId},
@@ -58,9 +59,20 @@ const getCategoryPosts = async (sequelize, categoryId, limit, offset) => {
   })).map((it) => Number(it.id));
 
   const query = queryPostsByIds(sequelize, postIds);
-  query.order = [[sequelize.fn(`COUNT`, sequelize.col(`comments.id`)), `DESC`], [`id`, `ASC`]];
 
-  return Post.findAll(query);
+  let order;
+
+  switch (sortType) {
+    case PostSortType.BY_DATE:
+      order = [[`date`, `DESC`], [`title`, `ASC`]];
+      break;
+
+    case PostSortType.BY_POPULARITY:
+    default:
+      order = [[sequelize.fn(`COUNT`, sequelize.col(`comments.id`)), `DESC`], [`title`, `ASC`]];
+  }
+
+  return Post.findAll({...query, order});
 };
 
 const getPostsSortedByDate = async (sequelize, limit, offset) => {

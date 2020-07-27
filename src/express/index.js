@@ -25,6 +25,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(express.urlencoded({extended: false}));
+
 app.use(`/`, mainRouter);
 app.use(`/articles`, articleRouter);
 app.use(`/categories`, categoryRouter);

@@ -3,18 +3,10 @@
 const {HttpStatusCode} = require(`../const`);
 const {logger, LogMessage} = require(`../../logger`);
 
-const createCommentFinder = (service) => (req, res, next) => {
-  const {articleId, commentId} = req.params;
+const createCommentFinder = (service) => async (req, res, next) => {
+  const {commentId} = req.params;
 
-  const post = service.getPost(articleId);
-  if (!post) {
-    const message = LogMessage.getWrongObjectID(`Post`, articleId);
-    logger.error(message);
-    res.status(HttpStatusCode.BAD_REQUEST).send(message);
-    return;
-  }
-
-  const comment = service.getComment(articleId, commentId);
+  const comment = await service.getComment(commentId);
   if (!comment) {
     const message = LogMessage.getWrongObjectID(`Comment`, commentId);
     logger.error(message);

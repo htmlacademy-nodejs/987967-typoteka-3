@@ -4,7 +4,7 @@ const {Sequelize, Op} = require(`sequelize`);
 const {DBNAME, ADMIN, PSW, HOST} = require(`./config`);
 const models = require(`./models`);
 const {CategorySortType, PostSortType} = require(`./db-const`);
-const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts} = require(`./queries`);
+const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts, getCategories} = require(`./queries`);
 const {User, Avatar, Password, PostCategory, Category, Comment, Post, Picture} = require(`./models`);
 const {addPagination} = require(`../utils`);
 
@@ -138,12 +138,12 @@ class DB {
     });
   }
 
-  async createCategories(categories) {
-    return Category.bulkCreate(categories.map((it) => ({name: it.name})));
+  async createCategory(name) {
+    return (await Category.create({name})).get({plain: true});
   }
 
-  async createCategory(name) {
-    return Category.create({name});
+  async createCategories(categories) {
+    return Category.bulkCreate(categories.map((it) => ({name: it.name})));
   }
 
   async createComment({text, date, userId, postId}) {
@@ -175,7 +175,7 @@ class DB {
         },
         raw: true,
       }),
-      getCategoryPosts(this.sequelize, categoryId, limit, offset),
+      getCategoryPosts(this.sequelize, categoryId, limit, offset, PostSortType.BY_DATE),
     ]);
 
     if (countResponse.length !== 1) {
@@ -189,38 +189,12 @@ class DB {
     };
   }
 
-  async getCategories(sortType, limit, offset) {
-    let sortProperty;
+  async getCategories(excludeNoPost) {
+    return getCategories(this.sequelize, excludeNoPost);
+  }
 
-    switch (sortType) {
-      case CategorySortType.BY_POST_COUNT:
-        sortProperty = [`count`, `DESC`];
-        break;
-
-      case CategorySortType.BY_NAME:
-      default:
-        sortProperty = [PostCategory.Category, `name`, `ASC`];
-    }
-
-    const query = {
-      attributes: [
-        [this.sequelize.fn(`COUNT`, this.sequelize.col(`PostCategory.post_id`)), `count`]
-      ],
-      include: {
-        association: PostCategory.Category,
-        attributes: [`name`, `id`],
-      },
-      group: [`PostCategory.category_id`, `category.name`, `category.id`],
-      order: [sortProperty],
-      ...addPagination(limit, offset)
-    };
-
-    const categories = await PostCategory.findAll(query);
-
-    return categories.map((it) => {
-      const category = it.get({plain: true});
-      return {count: category.count, ...category.category};
-    });
+  async getCategory(id) {
+    return Category.findByPk(id);
   }
 
   async getPost(id) {
@@ -316,6 +290,18 @@ class DB {
 
   async deleteComment(id) {
     return Comment.destroy({
+      where: {id}
+    });
+  }
+
+  async deleteCategory(id) {
+    return Category.destroy({
+      where: {id}
+    });
+  }
+
+  async updateCategory(id, name) {
+    return Category.update({name}, {
       where: {id}
     });
   }

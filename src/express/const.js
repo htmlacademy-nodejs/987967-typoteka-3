@@ -16,4 +16,9 @@ module.exports = {
     POPULARITY: `popularity`,
     DATE: `date`,
   },
+
+  CategoryLength: {
+    MIN: 5,
+    MAX: 30,
+  }
 };

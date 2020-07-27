@@ -31,7 +31,7 @@ mainRouter.get(`/`, async (req, res, next) => {
 
   try {
     [categories, {posts: popularPosts}, {posts, postCount}, comments] = await Promise.all([
-      dataServer.getCategories(),
+      dataServer.getCategories(true),
       dataServer.getPostPreviews(PostSortType.POPULARITY, POPULAR_POST_COUNT, 0),
       dataServer.getPostPreviews(PostSortType.DATE, POST_PREVIEW_COUNT, (page - 1) * POST_PREVIEW_COUNT),
       dataServer.getComments(LASTST_COMMENT_COUNT, 0),

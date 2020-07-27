@@ -29,9 +29,10 @@ class Category extends Model {
       foreignKey: `category_id`,
     });
 
-    // Category.hasMany(PostCategory, {
-    //   foreignKey: `category_id`
-    // });
+    this.PostCategory = this.hasMany(PostCategory, {
+      foreignKey: `category_id`,
+      as: `posts`
+    });
   }
 }
 

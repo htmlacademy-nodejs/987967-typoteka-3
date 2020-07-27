@@ -50,7 +50,7 @@ const createPostRouter = (service) => {
   });
 
   router.delete(`/:articleId/comments/:commentId`, [findPost, findComment], (req, res) => {
-    const {articleId, commentId} = req.params;
+    const {commentId} = req.params;
     logger.info(LogMessage.getEndRequest(req.url, HttpStatusCode.OK));
     res.status(HttpStatusCode.OK).json(service.deleteComment(commentId));
   });

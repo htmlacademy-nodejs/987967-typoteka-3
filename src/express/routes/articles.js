@@ -44,7 +44,7 @@ const checkCategories = (post, categories) => categories.map((category) => ({
 const addCategoryCount = (postCategories, categories) => categories.filter((category) => postCategories.find((it) => it.id === category.id));
 
 articleRouter.get(`/add`, async (req, res) => {
-  const categories = await dataServer.getCategories();
+  const categories = await dataServer.getCategories(false);
   const date = new Date();
   const post = {
     dateLocalized: formatDate(date),
@@ -78,7 +78,7 @@ articleRouter.get(`/category/:id`, async (req, res, next) => {
 
   try {
     [categories, {posts, postCount, categoryName}] = await Promise.all([
-      dataServer.getCategories(),
+      dataServer.getCategories(true),
       dataServer.getCategoryPostPreviews(id, POST_PREVIEW_COUNT, (page - 1) * POST_PREVIEW_COUNT),
     ]);
   } catch (err) {
@@ -101,7 +101,7 @@ articleRouter.get(`/category/:id`, async (req, res, next) => {
 
 articleRouter.get(`/edit/:id`, async (req, res) => {
   const id = req.params.id;
-  const [categories, post] = await Promise.all([dataServer.getCategories(), dataServer.getPost(id)]);
+  const [categories, post] = await Promise.all([dataServer.getCategories(false), dataServer.getPost(id)]);
 
   res.render(`new-post`, {
     title: EDIT_POST_TITLE,
@@ -125,7 +125,7 @@ articleRouter.post(`/edit/:id`, upload.single(`picture`), async (req, res) => {
     validatePost(servicePost);
     dataServer.updatePost(servicePost);
   } catch (err) {
-    const categories = await dataServer.getCategories();
+    const categories = await dataServer.getCategories(false);
     const post = ServiceToExpressAdapter.getPost(servicePost);
 
     res.render(`new-post`, {
@@ -156,7 +156,7 @@ articleRouter.post(`/add`, upload.single(`picture`), async (req, res) => {
     validatePost(servicePost);
     dataServer.createPost(servicePost);
   } catch (err) {
-    const categories = await dataServer.getCategories();
+    const categories = await dataServer.getCategories(false);
     const post = ServiceToExpressAdapter.getPost(servicePost);
 
     res.render(`new-post`, {
