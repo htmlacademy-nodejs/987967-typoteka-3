@@ -11,7 +11,7 @@ const getCategories = async (sequelize, excludeNoPost) => {
       attributes: []
     }],
     group: [`id`],
-    order: [[`count`, `DESC`], [`name`, `ASC`]],
+    order: [[`name`, `ASC`]],
     raw: true
   };
 

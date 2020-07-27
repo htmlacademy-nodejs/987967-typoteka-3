@@ -42,18 +42,20 @@ const ExpressToServiceAdapter = {
   getPost(postData) {
     const regexp = RegExp(`${CATEGORY_ID_PREFIX}(.+)`);
 
-    const categories = Object.keys(postData).reduce((acc, cur) => {
+    const categoryIds = Object.keys(postData).reduce((acc, cur) => {
       const matches = cur.match(regexp);
-      return matches ? [...acc, {id: matches[1]}] : acc;
+      return matches ? [...acc, matches[1]] : acc;
     }, []);
 
-    const [date, month, year] = postData.date.split(`.`).map((it) => parseInt(it, 10));
-    const createdDate = (new Date(year, month - 1, date)).valueOf();
+    const categories = categoryIds.map((it) => ({id: it}));
+
+    const date = (new Date(postData.date)).toISOString();
 
     return {
       ...postData,
+      categoryIds,
       categories,
-      createdDate,
+      date,
     };
   }
 };

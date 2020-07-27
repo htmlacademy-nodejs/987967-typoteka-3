@@ -28,10 +28,10 @@ const validatePost = (post) => {
     case post.announce.length < MIN_ANNOUNCE_LENGTH || post.announce.length > MAX_ANNOUNCE_LENGTH:
       throw new Error(`Announce length must be between ${MIN_ANNOUNCE_LENGTH} and ${MAX_ANNOUNCE_LENGTH}`);
 
-    case post.categories.length === 0:
+    case post.categoryIds.length === 0:
       throw new Error(`One category must be present`);
 
-    case post.fullText.length > MAX_TEXT_LENGTH:
+    case post.text.length > MAX_TEXT_LENGTH:
       throw new Error(`Text length must be less then ${MAX_TEXT_LENGTH}`);
   }
 };
@@ -148,16 +148,17 @@ articleRouter.post(`/add`, upload.single(`picture`), async (req, res) => {
   const postData = {
     ...req.body,
     picture: req.file ? req.file.filename : req.body[`picture-preview`],
+    date: Date.now()
   };
-
   const servicePost = ExpressToServiceAdapter.getPost(postData);
 
   try {
     validatePost(servicePost);
-    dataServer.createPost(servicePost);
+    await dataServer.createPost(servicePost);
   } catch (err) {
     const categories = await dataServer.getCategories(false);
     const post = ServiceToExpressAdapter.getPost(servicePost);
+    console.log(post);
 
     res.render(`new-post`, {
       title: NEW_POST_TITLE,

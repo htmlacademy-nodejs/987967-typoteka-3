@@ -54,7 +54,7 @@ const preparePostData = ({title, date, announce, text, picture: pictureData, ori
     text
   };
 
-  return {post, comments, postCategories, picture};
+  return {post, comments, categories: postCategories, picture};
 };
 
 class DB {
@@ -111,7 +111,7 @@ class DB {
         name: picture,
         originalName: originalPicture,
       } : null,
-      categories: categoryIds.map((it) => ({[`category_id`]: it}))
+      postCategories: categoryIds.map((it) => ({[`category_id`]: it}))
     };
 
     return Post.create(postData, {
@@ -124,9 +124,7 @@ class DB {
 
     const posts = preparedData.map((it) => ({
       ...it.post,
-      picture: it.picture,
-      comments: it.comments,
-      postCategories: it.postCategories,
+      postCategories: it.categories,
     }));
 
     return Post.bulkCreate(posts, {
@@ -204,7 +202,7 @@ class DB {
         `title`,
         `date`,
         `announce`,
-        `text`
+        `text`,
       ],
       include: [{
         association: Post.Category,

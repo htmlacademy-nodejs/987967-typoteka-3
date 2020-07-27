@@ -3,7 +3,7 @@
 const {HttpStatusCode} = require(`../const`);
 const {logger} = require(`../../logger`);
 
-const requiredFields = [`title`, `createdDate`, `categories`, `announce`];
+const requiredFields = [`title`, `date`, `categories`, `announce`];
 
 const validatePost = (req, res, next) => {
   const post = req.body;
