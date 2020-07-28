@@ -1,12 +1,13 @@
 'use strict';
 
 const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts} = require(`./posts`);
-const {getCategories, testGetPostsWithCommentCount} = require(`./category`);
+const {getCategories} = require(`./category`);
+const {updatePicture} = require(`./picture`);
 
 module.exports = {
   getPostsSortedByDate,
   getPostsSortedByPopularity,
   getCategoryPosts,
   getCategories,
-  testGetPostsWithCommentCount
+  updatePicture,
 };

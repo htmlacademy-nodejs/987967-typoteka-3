@@ -13,6 +13,7 @@ block prepend body
 block append body
   script(src="js/vendor.js")
   script(src="js/main.js")
+  script(src="js/new-post.js")
 
 block prepend header
   -var headerType="NEW_POST"
@@ -30,7 +31,7 @@ block content
                 .new-publication__date-form-division
                   .new-publication__date-block
                     label(for='new-publication-date' aria-label='Календарь')
-                    input#new-publication-date(type='text' name='date' placeholder=post.dateLocalized value=post.dateTime)
+                    input#new-publication-date(type='text' name='date' value=post.dateTime)
               button.new-publication__button.button.button--colored(type='submit') &Ocy;&pcy;&ucy;&bcy;&lcy;&icy;&kcy;&ocy;&vcy;&acy;&tcy;&softcy;
             a.popup__button.button.button--popup-close(href='/my' aria-label='Закрыть окно')
               | &Zcy;&acy;&kcy;&rcy;&ycy;&tcy;&softcy;
@@ -42,12 +43,12 @@ block content
                     input(type='text' placeholder='Заголовок' required='' name='title' value=post.title)
                 .form__field.form__field--post-image
                   label
-                    input#image-name-field(type='text' placeholder='Фотография' readonly='' name='picture-preview' value=post.picture)
+                    input#image-name-field(type='text' placeholder='Фотография' readonly='' name='picture-preview' value=`${post.picture ? post.picture.originalName : ``}`)
                   .form__image-loader.form__image-loader--publication
                     label
                       input.visually-hidden(type='file' name='picture')
                       | &Ocy;&bcy;&zcy;&ocy;&rcy;
-                  button.button--transparent Удалить
+                  button.button--transparent(type='button') Удалить
                 .new-publication__checkbox.new-publication__checkbox--auto
                   each category in categories
                     input(id=`category-${category.id}` type='checkbox' name=`category-id-${category.id}` checked=category.checked)

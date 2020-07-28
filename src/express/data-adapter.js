@@ -33,7 +33,7 @@ const ServiceToExpressAdapter = {
       dateTime: date,
       dateLocalized: formatDate(date),
       dateTimeLocalized: formatDateTime(date),
-      comments: rawPost.comments && rawPost.comments.map((it) => this.getComment(it))
+      comments: rawPost.comments && rawPost.comments.map((it) => this.getComment(it)),
     };
   }
 };
@@ -42,18 +42,16 @@ const ExpressToServiceAdapter = {
   getPost(postData) {
     const regexp = RegExp(`${CATEGORY_ID_PREFIX}(.+)`);
 
-    const categoryIds = Object.keys(postData).reduce((acc, cur) => {
+    const categories = Object.keys(postData).reduce((acc, cur) => {
       const matches = cur.match(regexp);
-      return matches ? [...acc, matches[1]] : acc;
+      return matches ? [...acc, {id: matches[1]}] : acc;
     }, []);
 
-    const categories = categoryIds.map((it) => ({id: it}));
-
-    const date = (new Date(postData.date)).toISOString();
+    const [day, month, year, hour, minute] = postData.date.replace(/[, :]+/g, `.`).split(`.`).map((it) => Number(it));
+    const date = new Date(year, month - 1, day, hour, minute).toISOString();
 
     return {
       ...postData,
-      categoryIds,
       categories,
       date,
     };

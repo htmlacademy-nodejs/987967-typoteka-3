@@ -1,11 +1,11 @@
 'use strict';
 
-const {Sequelize, Op} = require(`sequelize`);
+const {Sequelize} = require(`sequelize`);
 const {DBNAME, ADMIN, PSW, HOST} = require(`./config`);
 const models = require(`./models`);
-const {CategorySortType, PostSortType} = require(`./db-const`);
-const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts, getCategories} = require(`./queries`);
-const {User, Avatar, Password, PostCategory, Category, Comment, Post, Picture} = require(`./models`);
+const {PostSortType} = require(`./db-const`);
+const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts, getCategories, updatePicture} = require(`./queries`);
+const {User, PostCategory, Category, Comment, Post} = require(`./models`);
 const {addPagination} = require(`../utils`);
 
 const prepareUserData = ({email, firstname, lastname, password, avatar, originalAvatar}) => {
@@ -101,7 +101,7 @@ class DB {
     });
   }
 
-  async createPost({date, title, announce, text, picture, originalPicture, categoryIds}) {
+  async createPost({date, title, announce, text, picture, originalPicture, categories}) {
     const postData = {
       date,
       title,
@@ -111,7 +111,7 @@ class DB {
         name: picture,
         originalName: originalPicture,
       } : null,
-      postCategories: categoryIds.map((it) => ({[`category_id`]: it}))
+      postCategories: categories.map((it) => ({[`category_id`]: it.id}))
     };
 
     return Post.create(postData, {
@@ -221,7 +221,7 @@ class DB {
         },
       }, {
         association: Post.Picture,
-        attributes: [`name`]
+        attributes: [`name`, `originalName`]
       }],
       where: {id},
       order: [[Post.Comment, `date`, `ASC`]]
@@ -302,6 +302,33 @@ class DB {
     return Category.update({name}, {
       where: {id}
     });
+  }
+
+  async updatePost(id, post) {
+    const transaction = await this.sequelize.transaction();
+
+    try {
+      await Post.update(post, {
+        where: {id},
+        transaction
+      });
+
+      await updatePicture(id, post.picture, transaction);
+
+      await PostCategory.destroy({
+        where: {[`post_id`]: id},
+        transaction
+      });
+
+      await PostCategory.bulkCreate(post.categories.map((it) => ({
+        [`category_id`]: it.id,
+        [`post_id`]: id,
+      })), {transaction});
+
+      await transaction.commit();
+    } catch (err) {
+      await transaction.rollback();
+    }
   }
 }
 

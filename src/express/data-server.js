@@ -70,8 +70,8 @@ class DataServer {
     return post;
   }
 
-  async updatePost(post) {
-    return this._request(`/articles/${post.id}`, `put`, post);
+  async updatePost(id, post) {
+    return this._request(`/articles/${id}`, `put`, post);
   }
 
   async updateCategory(id, name) {
