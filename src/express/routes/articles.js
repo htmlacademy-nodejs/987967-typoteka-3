@@ -149,8 +149,10 @@ articleRouter.post(`/edit/:id`, upload.single(`picture`), async (req, res) => {
 articleRouter.post(`/add`, upload.single(`picture`), async (req, res) => {
   const postData = {
     ...req.body,
-    picture: req.file ? req.file.filename : req.body[`picture-preview`],
-    date: Date.now()
+    picture: req.file ? {
+      name: req.file.filename,
+      originalName: req.body[`picture-preview`]
+    } : undefined,
   };
   const servicePost = ExpressToServiceAdapter.getPost(postData);
 

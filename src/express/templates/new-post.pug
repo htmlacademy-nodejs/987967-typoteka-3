@@ -46,7 +46,7 @@ block content
                     input#image-name-field(type='text' placeholder='Фотография' readonly='' name='picture-preview' value=`${post.picture ? post.picture.originalName : ``}`)
                   .form__image-loader.form__image-loader--publication
                     label
-                      input.visually-hidden(type='file' name='picture')
+                      input.visually-hidden(type='file' name='picture' value=`${post.picture ? post.picture.name: ``}`)
                       | &Ocy;&bcy;&zcy;&ocy;&rcy;
                   button.button--transparent(type='button') Удалить
                 .new-publication__checkbox.new-publication__checkbox--auto

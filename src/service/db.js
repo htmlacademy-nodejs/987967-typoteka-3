@@ -101,17 +101,11 @@ class DB {
     });
   }
 
-  async createPost({date, title, announce, text, picture, originalPicture, categories}) {
+  async createPost(post) {
+    console.log(post);
     const postData = {
-      date,
-      title,
-      announce,
-      text,
-      picture: picture ? {
-        name: picture,
-        originalName: originalPicture,
-      } : null,
-      postCategories: categories.map((it) => ({[`category_id`]: it.id}))
+      ...post,
+      postCategories: post.categories.map((it) => ({[`category_id`]: it.id}))
     };
 
     return Post.create(postData, {
