@@ -59,8 +59,8 @@ const LoggerName = {
 const logger = pino({
   name: LoggerName.DATA_SERVER_API,
   level: process.env.LOG_LEVEL || `info`,
-  prettyPrint: {colorize: false},
-}, logFile);
+  // prettyPrint: {colorize: false},
+});
 
 module.exports = {
   LoggerName,

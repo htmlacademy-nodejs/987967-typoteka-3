@@ -2,6 +2,7 @@
 
 const chalk = require(`chalk`);
 const express = require(`express`);
+const pino = require(`express-pino-logger`)();
 const {createAPI} = require(`../api`);
 const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo} = require(`../const`);
 const {getLogger, LogMessage, LoggerName, logger} = require(`../../logger`);
@@ -13,10 +14,7 @@ const createServer = (db) => {
   const app = express();
 
   app.use(express.json());
-  app.use((req, res, next) => {
-    logger.info(LogMessage.getStartRequest(req.url));
-    next();
-  });
+  app.use(pino);
 
   app.use(`/api`, createAPI(db));
 

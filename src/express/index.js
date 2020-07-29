@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require(`express`);
+const pino = require(`express-pino-logger`)();
 const path = require(`path`);
 const {DEFAULT_PORT} = require(`./const`);
 const {getLogger, LogMessage, LoggerName} = require(`../logger`);
@@ -20,11 +21,7 @@ app.set(`views`, path.resolve(__dirname, `templates`));
 app.set(`view engine`, `pug`);
 
 app.use(express.static(path.resolve(__dirname, `public`)));
-app.use((req, res, next) => {
-  loggerAPI.info(LogMessage.getStartRequest(req.url));
-  next();
-});
-
+app.use(pino);
 app.use(express.urlencoded({extended: false}));
 
 app.use(`/`, mainRouter);
