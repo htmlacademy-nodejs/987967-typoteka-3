@@ -5,7 +5,6 @@ const axios = require(`axios`).default;
 const {TIMEOUT, DATA_SERVER_PORT} = require(`./const`);
 const {ServiceToExpressAdapter} = require(`./data-adapter`);
 const {getLogger, LoggerName, LogMessage} = require(`../logger`);
-const {collectComments} = require(`../utils/common`);
 
 const logger = getLogger(LoggerName.FRONT_SERVER_DATA);
 
@@ -56,7 +55,7 @@ class DataServer {
   }
 
   async getCategoryPostPreviews(categoryId, limit, offset) {
-    const {total, posts, category_name: categoryName} = await this._request(`/categories/${categoryId}${limit ? `?${QueryString.encode({limit, offset})}` : ``}`);
+    const {total, posts, categoryName} = await this._request(`/categories/${categoryId}${limit ? `?${QueryString.encode({limit, offset})}` : ``}`);
 
     return {
       postCount: total,

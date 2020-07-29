@@ -102,7 +102,6 @@ class DB {
   }
 
   async createPost(post) {
-    console.log(post);
     const postData = {
       ...post,
       postCategories: post.categories.map((it) => ({[`category_id`]: it.id}))
@@ -154,30 +153,15 @@ class DB {
   }
 
   async getCategoryPosts(categoryId, limit, offset) {
-    const [countResponse, posts] = await Promise.all([
-      PostCategory.findAll({
-        attributes: [this.sequelize.fn(`COUNT`, this.sequelize.col(`post_id`))],
-        include: [{
-          association: PostCategory.Category,
-          attributes: [`name`]
-        }],
-        group: [`category_id`, `category.name`],
-        where: {
-          [`category_id`]: categoryId,
-        },
-        raw: true,
-      }),
+    const [postResponse, categoryNameResponse] = await Promise.all([
       getCategoryPosts(this.sequelize, categoryId, limit, offset, PostSortType.BY_DATE),
+      Category.findByPk(categoryId),
     ]);
 
-    if (countResponse.length !== 1) {
-      throw new Error(`Category ID: "${categoryId}" must exist and be unique`);
-    }
-
     return {
-      [`category_name`]: countResponse[0][`category.name`],
-      total: countResponse[0].count,
-      posts
+      categoryName: categoryNameResponse.name,
+      total: postResponse.total,
+      posts: postResponse.posts,
     };
   }
 
@@ -221,29 +205,18 @@ class DB {
       order: [[Post.Comment, `date`, `ASC`]]
     };
 
-    const posts = await Post.findAll(query);
-    return posts.length ? posts[0] : null;
+    return await Post.findOne(query);
   }
 
   async getPosts(sortType, limit, offset) {
-    let queryPromise;
-
     switch (sortType) {
       case PostSortType.BY_DATE:
-        queryPromise = getPostsSortedByDate(this.sequelize, limit, offset);
-        break;
+        return getPostsSortedByDate(this.sequelize, limit, offset);
 
       case PostSortType.BY_POPULARITY:
       default:
-        queryPromise = getPostsSortedByPopularity(this.sequelize, limit, offset);
+        return getPostsSortedByPopularity(this.sequelize, limit, offset);
     }
-
-    const [posts, total] = await Promise.all([queryPromise, Post.count()]);
-
-    return {
-      posts,
-      total
-    };
   }
 
   async getComment(id) {
