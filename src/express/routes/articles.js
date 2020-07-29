@@ -3,36 +3,29 @@
 const {Router} = require(`express`);
 const multer = require(`multer`);
 const {DataServer} = require(`../data-server`);
-const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT} = require(`../const`);
-const {formatDate} = require(`../../utils/common`);
+const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT, TitleLength, AnnounceLength, TextLength} = require(`../const`);
 const {getLogger, LoggerName, LogMessage} = require(`../../logger`);
 const {ExpressToServiceAdapter, ServiceToExpressAdapter} = require(`../data-adapter`);
-const {getPagination} = require(`../utils`);
+const {getPagination, formatDate} = require(`../utils`);
 
 const articleRouter = new Router();
 const dataServer = new DataServer();
 const logger = getLogger(LoggerName.FRONT_SERVER_API);
 const upload = multer({dest: `src/express/public/img/post-images`});
 
-const MIN_TITLE_LENGTH = 30;
-const MAX_TITLE_LENGTH = 250;
-const MIN_ANNOUNCE_LENGTH = 30;
-const MAX_ANNOUNCE_LENGTH = 250;
-const MAX_TEXT_LENGTH = 1000;
-
 const validatePost = (post) => {
   switch (true) {
-    case post.title.length < MIN_TITLE_LENGTH || post.title.length > MAX_TITLE_LENGTH:
-      throw new Error(`Title length must be between ${MIN_TITLE_LENGTH} and ${MAX_TITLE_LENGTH}`);
+    case post.title.length < TitleLength.MIN || post.title.length > TitleLength.MAX:
+      throw new Error(`Title length must be between ${TitleLength.MIN} and ${TitleLength.MAX}`);
 
-    case post.announce.length < MIN_ANNOUNCE_LENGTH || post.announce.length > MAX_ANNOUNCE_LENGTH:
-      throw new Error(`Announce length must be between ${MIN_ANNOUNCE_LENGTH} and ${MAX_ANNOUNCE_LENGTH}`);
+    case post.announce.length < AnnounceLength.MIN || post.announce.length > AnnounceLength.MAX:
+      throw new Error(`Announce length must be between ${AnnounceLength.MIN} and ${AnnounceLength.MAX}`);
 
     case post.categories.length === 0:
       throw new Error(`One category must be present`);
 
-    case post.text.length > MAX_TEXT_LENGTH:
-      throw new Error(`Text length must be less then ${MAX_TEXT_LENGTH}`);
+    case post.text.length > TextLength.MAX:
+      throw new Error(`Text length must be less then ${TextLength.MAX}`);
   }
 };
 

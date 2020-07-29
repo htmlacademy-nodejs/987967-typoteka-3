@@ -1,6 +1,6 @@
 'use strict';
 
-const {generatePosts} = require(`../../utils`);
+const {generatePosts} = require(`../utils`);
 const {createUsers, createCategories, createPosts} = require(`../fill-database`);
 const fs = require(`fs`);
 const chalk = require(`chalk`);

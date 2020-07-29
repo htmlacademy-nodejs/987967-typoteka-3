@@ -1,6 +1,6 @@
 'use strict';
 
-const {formatDateTime, formatDate} = require(`../utils`);
+const {formatDateTime, formatDate} = require(`./utils`);
 
 const CATEGORY_ID_PREFIX = `category-id-`;
 

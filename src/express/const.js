@@ -20,5 +20,20 @@ module.exports = {
   CategoryLength: {
     MIN: 5,
     MAX: 30,
-  }
+  },
+
+  TitleLength: {
+    MIN: 30,
+    MAX: 250,
+  },
+
+  AnnounceLength: {
+    MIN: 30,
+    MAX: 250,
+  },
+
+  TextLength: {
+    MIN: 0,
+    MAX: 1000,
+  },
 };

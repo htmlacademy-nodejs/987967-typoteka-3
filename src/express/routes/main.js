@@ -3,6 +3,7 @@
 const {Router} = require(`express`);
 const {DataServer} = require(`../data-server`);
 const {getLogger, LogMessage, LoggerName} = require(`../../logger`);
+const {getPagination} = require(`../utils`);
 const {
   POST_PREVIEW_COUNT,
   LASTST_COMMENT_COUNT,
@@ -11,7 +12,6 @@ const {
   COMMENT_PREVIEW_LENGTH,
   PostSortType,
 } = require(`../const`);
-const {getPagination} = require(`./../utils`);
 
 const reduceText = (text, length) => {
   return text.length > length ? `${text.slice(0, length)}...` : text;

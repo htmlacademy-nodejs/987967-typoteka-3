@@ -1,7 +1,7 @@
 'use strict';
 
 const chalk = require(`chalk`);
-const {generatePosts} = require(`../../utils`);
+const {generatePosts} = require(`../utils`);
 const {
   ExitCode,
   Message,

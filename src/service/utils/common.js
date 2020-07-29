@@ -11,16 +11,13 @@ const {
   PICTURE_MOCK_FOLDER,
   PICTURE_FOLDER,
   DURATION,
-  MIN_SENTENCES_COUNT,
-  MAX_SENTENCES_COUNT,
-  MIN_COMMENT_COUNT,
-  MAX_COMMENT_COUNT,
-  MIN_CATEGORY_COUNT,
-  MAX_CATEGORY_COUNT,
   ANNOUNCE_SENTENCES_COUNT,
   ID_LENGTH,
   DataFileName,
-} = require(`../service/const`);
+  SentenceCount,
+  CategoryCount,
+  CommentCount,
+} = require(`../const`);
 
 const getRandomInt = (min, max) => {
   const minInt = Math.ceil(min);
@@ -100,7 +97,7 @@ const generateDate = () => {
 };
 
 const generatePost = ({sentences, titles, categories, comments, users, pictureFiles}) => {
-  const textSentences = getRandomElements(sentences, getRandomInt(MIN_SENTENCES_COUNT, MAX_SENTENCES_COUNT));
+  const textSentences = getRandomElements(sentences, getRandomInt(SentenceCount.MIN, SentenceCount.MAX));
   const announceSentences = getRandomUniqueElements(textSentences, ANNOUNCE_SENTENCES_COUNT);
   const date = generateDate();
   const now = Date.now();
@@ -113,8 +110,8 @@ const generatePost = ({sentences, titles, categories, comments, users, pictureFi
     date,
     announce: announceSentences.join(`\n`).slice(0, 250),
     text: textSentences.join(`\n`).slice(0, 1000),
-    categories: getRandomUniqueElements(categories, getRandomInt(MIN_CATEGORY_COUNT, MAX_CATEGORY_COUNT)),
-    comments: getRandomElements(comments, getRandomInt(MIN_COMMENT_COUNT, MAX_COMMENT_COUNT)).map((it) => ({
+    categories: getRandomUniqueElements(categories, getRandomInt(CategoryCount.MIN, CategoryCount.MAX)),
+    comments: getRandomElements(comments, getRandomInt(CommentCount.MIN, CommentCount.MAX)).map((it) => ({
       id: nanoid(ID_LENGTH),
       text: it.slice(0, 250),
       date: getRandomDate(date, now),
@@ -161,23 +158,6 @@ const readContent = async (filename) => {
   }
 };
 
-const sendResponse = (status, message, res) => {
-  const template = `
-    <!Doctype html>
-      <html lang="ru">
-      <head>
-        <title>987967-typoteka-3</title>
-      </head>
-      <body>${message}</body>
-    </html>`.trim();
-
-  res.statusCode = status;
-  res.writeHead(status, {
-    "content-type": `text/html; charset=utf-8`
-  });
-  res.end(template);
-};
-
 const getMockPosts = async () => {
   const mockFile = path.resolve(process.cwd(), MOCK_FILE);
   return JSON.parse(await fs.promises.readFile(mockFile, `utf-8`));
@@ -192,22 +172,6 @@ const generateCategories = (names) => {
   }));
 };
 
-const formatNumber = (number) => `${number < 10 ? `0` : ``}${number}`;
-
-const formatDate = (date) => {
-  const days = formatNumber(date.getDate());
-  const month = formatNumber(date.getMonth() + 1);
-
-  return `${days}.${month}.${date.getFullYear()}`;
-};
-
-const formatDateTime = (date) => {
-  const minutes = formatNumber(date.getMinutes());
-  const hours = formatNumber(date.getHours());
-
-  return `${formatDate(date)}, ${hours}:${minutes}`;
-};
-
 module.exports = {
   getRandomInt,
   getRandomElement,
@@ -217,12 +181,7 @@ module.exports = {
   getRandomDate,
   generateDate,
   generatePosts,
-  readContent,
-  sendResponse,
   getMockPosts,
   getMockTitles,
   getTitleList,
-  formatNumber,
-  formatDateTime,
-  formatDate,
 };

@@ -6,7 +6,7 @@ const models = require(`./models`);
 const {PostSortType} = require(`./db-const`);
 const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts, getCategories, updatePicture} = require(`./queries`);
 const {User, PostCategory, Category, Comment, Post} = require(`./models`);
-const {addPagination} = require(`../utils`);
+const {addPagination} = require(`./utils`);
 
 const prepareUserData = ({email, firstname, lastname, password, avatar, originalAvatar}) => {
   const userData = {email, firstname, lastname};
