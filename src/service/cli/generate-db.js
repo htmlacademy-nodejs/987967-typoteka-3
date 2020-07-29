@@ -1,6 +1,7 @@
 'use strict';
 
 const chalk = require(`chalk`);
+const fs = require(`fs`);
 const {generatePosts} = require(`../utils`);
 const {
   ExitCode,
@@ -9,11 +10,13 @@ const {
   DEFAULT_USER_COUNT,
   MAX_POSTS_COUNT,
   MAX_USER_COUNT,
+  MOCK_FILE,
 } = require(`../const`);
 const {DB} = require(`../db`);
 
 const createDB = async (postCount, userCount) => {
   const {users, posts, categories} = await generatePosts(postCount, userCount);
+  fs.promises.writeFile(MOCK_FILE, JSON.stringify({categories, users, posts}));
 
   const db = new DB();
   try {

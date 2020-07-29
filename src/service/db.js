@@ -54,7 +54,7 @@ const preparePostData = ({title, date, announce, text, picture: pictureData, ori
     text
   };
 
-  return {post, comments, categories: postCategories, picture};
+  return {...post, comments, postCategories, picture};
 };
 
 class DB {
@@ -113,12 +113,7 @@ class DB {
   }
 
   async createPosts(postData, users, categories) {
-    const preparedData = postData.map((it) => preparePostData(it, users, categories));
-
-    const posts = preparedData.map((it) => ({
-      ...it.post,
-      postCategories: it.categories,
-    }));
+    const posts = postData.map((it) => preparePostData(it, users, categories));
 
     return Post.bulkCreate(posts, {
       include: [
