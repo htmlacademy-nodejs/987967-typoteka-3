@@ -2,7 +2,6 @@
 
 const {Router} = require(`express`);
 const {DataServer} = require(`../data-server`);
-const {getLogger, LogMessage, LoggerName} = require(`../../logger`);
 const {getPagination} = require(`../utils`);
 const {
   POST_PREVIEW_COUNT,
@@ -19,7 +18,6 @@ const reduceText = (text, length) => {
 
 const mainRouter = new Router();
 const dataServer = new DataServer();
-const logger = getLogger(LoggerName.FRONT_SERVER_API);
 
 mainRouter.get(`/`, async (req, res, next) => {
   let categories;
@@ -37,7 +35,6 @@ mainRouter.get(`/`, async (req, res, next) => {
       dataServer.getComments(LASTST_COMMENT_COUNT, 0),
     ]);
   } catch (err) {
-    logger.error(LogMessage.getEndRequest(req.url));
     next(err);
     return;
   }
@@ -59,8 +56,6 @@ mainRouter.get(`/`, async (req, res, next) => {
 
     pagination: getPagination(page, pageCount, req.path),
   });
-
-  logger.info(LogMessage.getEndRequest(req.url));
 });
 
 module.exports = {

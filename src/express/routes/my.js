@@ -17,10 +17,14 @@ myRouter.get(`/`, async (req, res, next) => {
       next(err);
     }
   } else {
-    const {posts} = await dataServer.getPostPreviews(PostSortType.DATE);
-    res.render(`my`, {
-      posts
-    });
+    try {
+      const {posts} = await dataServer.getPostPreviews(PostSortType.DATE);
+      res.render(`my`, {
+        posts
+      });
+    } catch (err) {
+      next(err);
+    }
   }
 });
 
@@ -34,12 +38,15 @@ myRouter.get(`/comments`, async (req, res, next) => {
       next(err);
     }
   } else {
-    const comments = await dataServer.getComments();
-    res.render(`comments`, {
-      comments,
-    });
+    try {
+      const comments = await dataServer.getComments();
+      res.render(`comments`, {
+        comments,
+      });
+    } catch (err) {
+      next(err);
+    }
   }
-
 });
 
 module.exports = {

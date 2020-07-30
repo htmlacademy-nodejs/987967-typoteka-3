@@ -1,10 +1,10 @@
 'use strict';
 
 const express = require(`express`);
-const pino = require(`express-pino-logger`)();
+const expressPinoLogger = require(`express-pino-logger`);
 const path = require(`path`);
 const {DEFAULT_PORT} = require(`./const`);
-const {getLogger, LogMessage, LoggerName} = require(`../logger`);
+const {getLogger} = require(`../logger`);
 const {articleRouter} = require(`./routes/articles`);
 const {mainRouter} = require(`./routes/main`);
 const {categoryRouter} = require(`./routes/categories`);
@@ -13,9 +13,19 @@ const {myRouter} = require(`./routes/my`);
 const {registerRouter} = require(`./routes/register`);
 const {searchRouter} = require(`./routes/search`);
 
+const pino = expressPinoLogger({
+  req: (req) => ({
+    method: req.method,
+    url: req.url,
+  }),
+
+  res: (res) => ({
+    status: res.statusCode
+  })
+});
+
 const app = express();
-const loggerAPI = getLogger(LoggerName.FRONT_SERVER_API);
-const loggerServer = getLogger(LoggerName.FRONT_SERVER);
+const loggerApp = getLogger(`app`);
 
 app.set(`views`, path.resolve(__dirname, `templates`));
 app.set(`view engine`, `pug`);
@@ -33,20 +43,19 @@ app.use(`/register`, registerRouter);
 app.use(`/search`, searchRouter);
 
 app.use((req, res) => {
-  loggerAPI.error(LogMessage.getUnknownRoute(req.url));
   res.status(404).render(`400.pug`);
 });
 
 app.use((err, req, res, next) => {
   const errorMessage = err.msg ? `${err.msg}: ${err.filename}, line: ${err.line}` : err;
-  loggerAPI.error(errorMessage);
+  loggerApp.error(errorMessage);
   res.status(500).render(`500.pug`);
   next();
 });
 
 try {
   app.listen(DEFAULT_PORT);
-  loggerServer.info(LogMessage.getSuccessCreatingServer(DEFAULT_PORT));
+  loggerApp.info(`Listenint port ${DEFAULT_PORT}...`);
 } catch (err) {
-  loggerServer.error(LogMessage.getErrorCreatingServer(err));
+  loggerApp.error(`Can't start server: ${err}`);
 }

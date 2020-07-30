@@ -4,13 +4,11 @@ const {Router} = require(`express`);
 const multer = require(`multer`);
 const {DataServer} = require(`../data-server`);
 const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT, TitleLength, AnnounceLength, TextLength} = require(`../const`);
-const {getLogger, LoggerName, LogMessage} = require(`../../logger`);
 const {ExpressToServiceAdapter, ServiceToExpressAdapter} = require(`../data-adapter`);
 const {getPagination, formatDate} = require(`../utils`);
 
 const articleRouter = new Router();
 const dataServer = new DataServer();
-const logger = getLogger(LoggerName.FRONT_SERVER_API);
 const upload = multer({dest: `src/express/public/img/post-images`});
 
 const validatePost = (post) => {
@@ -36,28 +34,36 @@ const checkCategories = (post, categories) => categories.map((category) => ({
 
 const addCategoryCount = (postCategories, categories) => categories.filter((category) => postCategories.find((it) => it.id === category.id));
 
-articleRouter.get(`/add`, async (req, res) => {
-  const categories = await dataServer.getCategories(false);
-  const date = new Date();
-  const post = {
-    dateLocalized: formatDate(date),
-    dateTime: date,
-  };
+articleRouter.get(`/add`, async (req, res, next) => {
+  try {
+    const categories = await dataServer.getCategories(false);
+    const date = new Date();
+    const post = {
+      dateLocalized: formatDate(date),
+      dateTime: date,
+    };
 
-  res.render(`new-post`, {
-    title: NEW_POST_TITLE,
-    post,
-    categories,
-    action: `/articles/add`
-  });
+    res.render(`new-post`, {
+      title: NEW_POST_TITLE,
+      post,
+      categories,
+      action: `/articles/add`
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
-articleRouter.get(`/:id`, async (req, res) => {
-  const id = req.params.id;
-  const [categories, post] = await Promise.all([dataServer.getCategories(), dataServer.getPost(id)]);
+articleRouter.get(`/:id`, async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const [categories, post] = await Promise.all([dataServer.getCategories(), dataServer.getPost(id)]);
 
-  post.categories = addCategoryCount(post.categories, categories);
-  res.render(`post`, {post});
+    post.categories = addCategoryCount(post.categories, categories);
+    res.render(`post`, {post});
+  } catch (err) {
+    next(err);
+  }
 });
 
 articleRouter.get(`/category/:id`, async (req, res, next) => {
@@ -75,7 +81,6 @@ articleRouter.get(`/category/:id`, async (req, res, next) => {
       dataServer.getCategoryPostPreviews(id, POST_PREVIEW_COUNT, (page - 1) * POST_PREVIEW_COUNT),
     ]);
   } catch (err) {
-    logger.error(LogMessage.getEndRequest(req.url));
     next(err);
     return;
   }
@@ -88,23 +93,25 @@ articleRouter.get(`/category/:id`, async (req, res, next) => {
     posts,
     pagination: getPagination(page, pageCount, req.originalUrl.replace(/\?.+/, ``)),
   });
-
-  logger.info(LogMessage.getEndRequest(req.url));
 });
 
-articleRouter.get(`/edit/:id`, async (req, res) => {
-  const id = req.params.id;
-  const [categories, post] = await Promise.all([dataServer.getCategories(false), dataServer.getPost(id)]);
+articleRouter.get(`/edit/:id`, async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const [categories, post] = await Promise.all([dataServer.getCategories(false), dataServer.getPost(id)]);
 
-  res.render(`new-post`, {
-    title: EDIT_POST_TITLE,
-    post,
-    categories: checkCategories(post, categories),
-    action: `/articles/edit/${id}`
-  });
+    res.render(`new-post`, {
+      title: EDIT_POST_TITLE,
+      post,
+      categories: checkCategories(post, categories),
+      action: `/articles/edit/${id}`
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
-articleRouter.post(`/edit/:id`, upload.single(`picture`), async (req, res) => {
+articleRouter.post(`/edit/:id`, upload.single(`picture`), async (req, res, next) => {
   const id = req.params.id;
   const postData = {
     ...req.body,
@@ -131,7 +138,7 @@ articleRouter.post(`/edit/:id`, upload.single(`picture`), async (req, res) => {
       errorMessage: err,
     });
 
-    logger.error(`Invalid post data: ${err}`);
+    next(err);
 
     return;
   }
@@ -139,7 +146,7 @@ articleRouter.post(`/edit/:id`, upload.single(`picture`), async (req, res) => {
   res.redirect(`/my`);
 });
 
-articleRouter.post(`/add`, upload.single(`picture`), async (req, res) => {
+articleRouter.post(`/add`, upload.single(`picture`), async (req, res, next) => {
   const postData = {
     ...req.body,
     picture: req.file ? {
@@ -164,7 +171,7 @@ articleRouter.post(`/add`, upload.single(`picture`), async (req, res) => {
       errorMessage: err,
     });
 
-    logger.error(`Invalid post data: ${err}`);
+    next(err);
 
     return;
   }

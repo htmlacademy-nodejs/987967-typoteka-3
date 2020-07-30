@@ -4,9 +4,7 @@ const QueryString = require(`querystring`);
 const axios = require(`axios`).default;
 const {TIMEOUT, DATA_SERVER_PORT} = require(`./const`);
 const {ServiceToExpressAdapter} = require(`./data-adapter`);
-const {getLogger, LoggerName, LogMessage} = require(`../logger`);
-
-const logger = getLogger(LoggerName.FRONT_SERVER_DATA);
+const logger = require(`../logger`).getLogger(`axios`);
 
 const createAPI = () => {
   const api = axios.create({
@@ -16,15 +14,18 @@ const createAPI = () => {
   });
 
   api.interceptors.request.use((req) => {
-    logger.debug(LogMessage.getStartRequest(`${req.baseURL}${req.url}`));
+    logger.debug(`Start request at ${req.baseURL}`);
     return req;
+  }, (err) => {
+    logger.error(err);
+    return Promise.reject(err);
   });
 
   api.interceptors.response.use((res) => {
-    logger.debug(LogMessage.getEndRequest(`${res.config.baseURL}${res.config.url}`, res.status));
+    logger.debug(`End request at ${res.config.baseURL} with status ${res.status}`);
     return res;
   }, (err) => {
-    logger.error(LogMessage.getError(err));
+    logger.error(err);
     return Promise.reject(err);
   });
 
