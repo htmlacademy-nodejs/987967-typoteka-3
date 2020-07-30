@@ -1,6 +1,6 @@
 'use strict';
 
-const {Sequelize} = require(`sequelize`);
+const {Sequelize, Op} = require(`sequelize`);
 const {DBNAME, ADMIN, PSW, HOST} = require(`./config`);
 const models = require(`./models`);
 const {PostSortType} = require(`./db-const`);
@@ -282,6 +282,16 @@ class DB {
     } catch (err) {
       await transaction.rollback();
     }
+  }
+
+  async search(query) {
+    return Post.findAll({
+      where: {
+        title: {
+          [Op.regexp]: query
+        }
+      }
+    });
   }
 }
 
