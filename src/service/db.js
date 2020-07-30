@@ -148,16 +148,7 @@ class DB {
   }
 
   async getCategoryPosts(categoryId, limit, offset) {
-    const [postResponse, categoryNameResponse] = await Promise.all([
-      getCategoryPosts(this.sequelize, categoryId, limit, offset, PostSortType.BY_DATE),
-      Category.findByPk(categoryId),
-    ]);
-
-    return {
-      categoryName: categoryNameResponse.name,
-      total: postResponse.total,
-      posts: postResponse.posts,
-    };
+    return getCategoryPosts(this.sequelize, categoryId, limit, offset, PostSortType.BY_DATE);
   }
 
   async getCategories(excludeNoPost) {

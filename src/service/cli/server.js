@@ -2,13 +2,26 @@
 
 const chalk = require(`chalk`);
 const express = require(`express`);
-const pino = require(`express-pino-logger`)();
+const expressPinoLogger = require(`express-pino-logger`);
 const {createAPI} = require(`../api`);
 const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo} = require(`../const`);
-const {getLogger, LogMessage, LoggerName, logger} = require(`../../logger`);
+const {getLogger} = require(`../../logger`);
 const {DB} = require(`../db`);
 
-const serverLogger = getLogger(LoggerName.DATA_SERVER);
+const pino = expressPinoLogger({
+  serializers: {
+    req: (req) => ({
+      method: req.method,
+      url: req.url,
+    }),
+
+    res: (res) => ({
+      status: res.statusCode
+    })
+  },
+});
+
+const appLogger = getLogger(`app`);
 
 const createServer = (db) => {
   const app = express();
@@ -19,14 +32,14 @@ const createServer = (db) => {
   app.use(`/api`, createAPI(db));
 
   app.use((req, res) => {
-    logger.error(LogMessage.getUnknownRoute(req.url));
+    req.log.error(`Wrong path: ${req.originalUrl}`);
     res.status(HttpStatusCode.NOT_FOUND).send(HttpStatusInfo.NOT_FOUND);
   });
 
   app.use((err, req, res, next) => {
-    logger.error(LogMessage.getError(err));
+    appLogger.error(`Application error: ${err}`);
     res.status(HttpStatusCode.SERVER_ERROR).send(`Server error: ${err}`);
-    next();
+    // next();
   });
 
   return app;
@@ -39,10 +52,10 @@ module.exports = {
 
     try {
       await db.authenticate();
-      serverLogger.info(`Connection to database succsessfully`);
+      appLogger.info(`Connection to database succsessfully`);
     } catch (err) {
       const errorMessage = `Error connecting to database: ${err}`;
-      serverLogger.error(errorMessage);
+      appLogger.error(errorMessage);
       console.error(chalk.red(errorMessage));
 
       process.exit(ExitCode.ERROR);
@@ -54,9 +67,9 @@ module.exports = {
 
     try {
       app.listen(port);
-      serverLogger.info(LogMessage.getSuccessCreatingServer(port));
+      appLogger.info(`Server listens at port ${port}...`);
     } catch (err) {
-      serverLogger.error(LogMessage.getErrorCreatingServer(err));
+      appLogger.error(`Error starting server at port ${port}: ${err}`);
       process.exit(ExitCode.ERROR);
     }
 
