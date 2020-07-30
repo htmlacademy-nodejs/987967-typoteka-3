@@ -11,8 +11,7 @@ const createPostFinder = (service) => async (req, res, next) => {
     if (!post) {
       const message = `Can't find post with ID='${id}'`;
       appLogger.error(message);
-      res.status(HttpStatusCode.BAD_REQUEST).send(message);
-      return;
+      throw new Error(message);
     }
 
     res.locals.post = post;

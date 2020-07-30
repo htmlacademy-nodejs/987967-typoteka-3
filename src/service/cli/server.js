@@ -38,8 +38,8 @@ const createServer = (db) => {
 
   app.use((err, req, res, next) => {
     appLogger.error(`Application error: ${err}`);
-    res.status(HttpStatusCode.SERVER_ERROR).send(`Server error: ${err}`);
-    // next();
+    res.status(HttpStatusCode.SERVER_ERROR).send(`Server error`);
+    next();
   });
 
   return app;

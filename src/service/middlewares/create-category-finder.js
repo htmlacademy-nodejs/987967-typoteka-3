@@ -1,31 +1,23 @@
 'use strict';
 
-const {HttpStatusCode} = require(`../const`);
 const appLogger = require(`../../logger`).getLogger(`app`);
 
 const createCategoryFinder = (service) => async (req, res, next) => {
-  const {categoryId} = req.params;
-  let category;
-  let message;
-
   try {
-    category = await service.getCategory(categoryId);
+    const {categoryId} = req.params;
+    const category = await service.getCategory(categoryId);
+
+    if (!category) {
+      const message = `Can't find category with ID='${categoryId}'`;
+      appLogger.error(message);
+      throw new Error(message);
+    }
+
+    res.locals.category = category;
+    next();
   } catch (err) {
-    message = `Bad database request`;
-    appLogger.error(`${message}: ${err}`);
-    res.status(HttpStatusCode.BAD_REQUEST).send(message);
-    return;
+    next(err);
   }
-
-  if (!category) {
-    message = `Can't find category with ID='${categoryId}'`;
-    appLogger.error(message);
-    res.status(HttpStatusCode.BAD_REQUEST).send(message);
-    return;
-  }
-
-  res.locals.category = category;
-  next();
 };
 
 module.exports = {
