@@ -1,6 +1,5 @@
 'use strict';
 
-const {HttpStatusCode} = require(`../const`);
 const appLogger = require(`../../logger`).getLogger(`app`);
 
 const createPostFinder = (service) => async (req, res, next) => {
