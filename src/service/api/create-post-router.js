@@ -53,29 +53,21 @@ const createPostRouter = (service) => {
   });
 
   router.put(`/:articleId`, [findPost, validatePost], async (req, res, next) => {
-    let result;
-
     try {
-      result = await service.updatePost(req.params.articleId, req.body);
+      res.status(HttpStatusCode.OK).json(await service.updatePost(req.params.articleId, req.body));
     } catch (err) {
       next(err);
       return;
     }
-
-    res.status(HttpStatusCode.OK).json(result);
   });
 
   router.get(`/:articleId/comments`, findPost, async (req, res, next) => {
-    let comments;
-
     try {
-      comments = await service.getComments(req.params.articleId);
+      res.status(HttpStatusCode.OK).json(await service.getComments(req.params.articleId));
     } catch (err) {
       next(err);
       return;
     }
-
-    res.status(HttpStatusCode.OK).json(comments);
   });
 
   router.post(`/:articleId/comments`, [findPost, validateComment], async (req, res, next) => {
