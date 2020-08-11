@@ -3,14 +3,14 @@
 const {Router} = require(`express`);
 const {HttpStatusCode} = require(`../const`);
 
-const createSearchRouter = (service) => {
+const createCommentRouter = (service) => {
   const router = new Router();
 
   router.get(`/`, async (req, res, next) => {
     try {
-      const query = req.query.query;
-      const foundPosts = await service.search(query);
-      res.status(HttpStatusCode.OK).json(foundPosts);
+      const {limit, offset} = req.query;
+      const comments = await service.getComments(limit, offset);
+      res.status(HttpStatusCode.OK).json(comments);
     } catch (err) {
       next(err);
     }
@@ -20,5 +20,5 @@ const createSearchRouter = (service) => {
 };
 
 module.exports = {
-  createSearchRouter
+  createCommentRouter
 };

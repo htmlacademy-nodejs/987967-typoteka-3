@@ -1,6 +1,6 @@
 'use strict';
 
-const {generatePost, readContent, generateCategories, generateUsers} = require(`../../utils`);
+const {generatePosts} = require(`../utils`);
 const {createUsers, createCategories, createPosts} = require(`../fill-database`);
 const fs = require(`fs`);
 const chalk = require(`chalk`);
@@ -12,30 +12,13 @@ const {
   DEFAULT_USER_COUNT,
   MAX_POSTS_COUNT,
   MAX_USER_COUNT,
-  DataFileName,
-  AVATAR_MOCK_FOLDER,
-  PICTURE_MOCK_FOLDER,
 } = require(`../const`);
 
-const generatePosts = (count, data, users, pictures) => new Array(count).fill(``).map(() => generatePost(data, users, pictures));
-
 const createSQLFile = async (postCount, userCount) => {
-  const data = {
-    titles: await readContent(`./data/${DataFileName.TITLE}`),
-    sentences: await readContent(`./data/${DataFileName.DESCRIPTION}`),
-    categories: await generateCategories(`./data/${DataFileName.CATEGORY}`),
-    comments: await readContent(`./data/${DataFileName.COMMENT}`),
-    names: await readContent(`./data/${DataFileName.NAME}`),
-  };
-
-  const pictures = await fs.promises.readdir(PICTURE_MOCK_FOLDER);
-  const avatars = await fs.promises.readdir(AVATAR_MOCK_FOLDER);
-
-  const users = generateUsers(userCount, data.names, avatars);
-  const posts = generatePosts(postCount, data, users, pictures);
+  const {users, posts, categories} = generatePosts(postCount, userCount);
 
   const userSQL = createUsers(users);
-  const categorySQL = createCategories(data.categories);
+  const categorySQL = createCategories(categories);
   const postSQL = createPosts(posts);
 
   const content = [userSQL, categorySQL, postSQL].join(`\n`);
@@ -51,7 +34,7 @@ const createSQLFile = async (postCount, userCount) => {
 };
 
 module.exports = {
-  name: `--fill`,
+  name: `--generate-sql`,
   async run(arg) {
     let [postCount, userCount] = arg;
     postCount = parseInt(postCount, 10) || DEFAULT_POSTS_COUNT;

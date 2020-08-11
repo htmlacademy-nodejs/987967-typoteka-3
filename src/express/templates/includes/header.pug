@@ -1,5 +1,5 @@
 header.header(class=headerClasses)
-  a.header__logo.logo(class=logoClasses href="#")
+  a.header__logo.logo(class=logoClasses href="/")
     img.logo__image(src="img/icons/logo-image-only.svg" alt="логотип Тайпотеки")
     span.logo__name Типотека
 
@@ -34,7 +34,7 @@ header.header(class=headerClasses)
       a.header__search.button.button--search(href="#" aria-label="поиск по сайту")
 
     when "NEW_POST"
-      button.button.button--colored.header__button-new Новая запись
+      a.button.button--colored.header__button-new(href="/articles/add") Новая запись
       div.header__dropdown 
         a.button.button--burger.header__burger(href="#") Открыть меню
         ul.navigation.header__navigation 

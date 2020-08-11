@@ -4,10 +4,7 @@ const QueryString = require(`querystring`);
 const axios = require(`axios`).default;
 const {TIMEOUT, DATA_SERVER_PORT} = require(`./const`);
 const {ServiceToExpressAdapter} = require(`./data-adapter`);
-const {getLogger, LoggerName, LogMessage} = require(`../logger`);
-const {collectComments} = require(`../utils`);
-
-const logger = getLogger(LoggerName.FRONT_SERVER_DATA);
+const logger = require(`../logger`).getLogger(`axios`);
 
 const createAPI = () => {
   const api = axios.create({
@@ -17,15 +14,18 @@ const createAPI = () => {
   });
 
   api.interceptors.request.use((req) => {
-    logger.debug(LogMessage.getStartRequest(`${req.baseURL}${req.url}`));
+    logger.debug(`Start request at ${req.baseURL}`);
     return req;
+  }, (err) => {
+    logger.error(err);
+    return Promise.reject(err);
   });
 
   api.interceptors.response.use((res) => {
-    logger.debug(LogMessage.getEndRequest(`${res.config.baseURL}${res.config.url}`, res.status));
+    logger.debug(`End request at ${res.config.baseURL} with status ${res.status}`);
     return res;
   }, (err) => {
-    logger.error(LogMessage.getError(err));
+    logger.error(err);
     return Promise.reject(err);
   });
 
@@ -37,24 +37,32 @@ class DataServer {
     this._api = createAPI();
   }
 
-  async getCategories() {
-    return this._request(`/categories`);
+  async getCategories(excludeEmpty) {
+    return this._request(`/categories?${QueryString.encode({excludeEmpty})}`);
   }
 
-  async getPostPreviews() {
-    const posts = await this._request(`/articles`);
-    return posts.map((it) => ServiceToExpressAdapter.getPostPreview(it));
+  async getComments(limit, offset) {
+    const comments = await this._request(`/comments?${QueryString.encode({limit, offset})}`);
+    return comments.map((it) => ServiceToExpressAdapter.getComment(it));
   }
 
-  async getUserPosts() {
-    const posts = await this._request(`/articles`);
-    return posts.map((it) => ServiceToExpressAdapter.getPostPreview(it));
+  async getPostPreviews(sortType, limit, offset) {
+    const {total, posts} = await this._request(`/articles?${QueryString.encode({sorting: sortType, limit, offset})}`);
+
+    return {
+      postCount: total,
+      posts: posts.map((it) => ServiceToExpressAdapter.getPostPreview(it))
+    };
   }
 
-  async getUserComments() {
-    const posts = await this._request(`/articles`);
-    const comments = collectComments(posts).map((it) => ServiceToExpressAdapter.getComment(it));
-    return comments;
+  async getCategoryPostPreviews(categoryId, limit, offset) {
+    const {total, posts, categoryName} = await this._request(`/categories/${categoryId}${limit ? `?${QueryString.encode({limit, offset})}` : ``}`);
+
+    return {
+      postCount: total,
+      categoryName,
+      posts: posts.map((it) => ServiceToExpressAdapter.getPostPreview(it))
+    };
   }
 
   async getPost(id) {
@@ -62,17 +70,37 @@ class DataServer {
     return post;
   }
 
-  async updatePost(post) {
-    return this._request(`/articles/${post.id}`, `put`, post);
+  async updatePost(id, post) {
+    return this._request(`/articles/${id}`, `put`, post);
+  }
+
+  async updateCategory(id, name) {
+    return this._request(`/categories/${id}`, `put`, {name});
   }
 
   async createPost(post) {
     return this._request(`/articles`, `post`, post);
   }
 
+  async createCategory(name) {
+    return this._request(`/categories`, `post`, {name});
+  }
+
   async search(query) {
     const queryString = QueryString.encode({query});
     return (await this._request(`/search?${queryString}`)).map((it) => ServiceToExpressAdapter.getPost(it));
+  }
+
+  async deletePost(id) {
+    return this._request(`/articles/${id}`, `delete`);
+  }
+
+  async deleteComment(postId, commentId) {
+    return this._request(`/articles/${postId}/comments/${commentId}`, `delete`);
+  }
+
+  async deleteCategory(id) {
+    return this._request(`/categories/${id}`, `delete`);
   }
 
   async _request(url, method = `get`, data) {

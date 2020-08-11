@@ -3,35 +3,27 @@
 const {Router} = require(`express`);
 const multer = require(`multer`);
 const {DataServer} = require(`../data-server`);
-const {NEW_POST_TITLE, EDIT_POST_TITLE} = require(`../const`);
-const {formatDate} = require(`../../utils`);
-const {getLogger, LoggerName} = require(`../../logger`);
+const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT, TitleLength, AnnounceLength, TextLength} = require(`../const`);
 const {ExpressToServiceAdapter, ServiceToExpressAdapter} = require(`../data-adapter`);
+const {getPagination, formatDate} = require(`../utils`);
 
 const articleRouter = new Router();
 const dataServer = new DataServer();
-const logger = getLogger(LoggerName.FRONT_SERVER_API);
 const upload = multer({dest: `src/express/public/img/post-images`});
-
-const MIN_TITLE_LENGTH = 30;
-const MAX_TITLE_LENGTH = 250;
-const MIN_ANNOUNCE_LENGTH = 30;
-const MAX_ANNOUNCE_LENGTH = 250;
-const MAX_TEXT_LENGTH = 1000;
 
 const validatePost = (post) => {
   switch (true) {
-    case post.title.length < MIN_TITLE_LENGTH || post.title.length > MAX_TITLE_LENGTH:
-      throw new Error(`Title length must be between ${MIN_TITLE_LENGTH} and ${MAX_TITLE_LENGTH}`);
+    case post.title.length < TitleLength.MIN || post.title.length > TitleLength.MAX:
+      throw new Error(`Title length must be between ${TitleLength.MIN} and ${TitleLength.MAX}`);
 
-    case post.announce.length < MIN_ANNOUNCE_LENGTH || post.announce.length > MAX_ANNOUNCE_LENGTH:
-      throw new Error(`Announce length must be between ${MIN_ANNOUNCE_LENGTH} and ${MAX_ANNOUNCE_LENGTH}`);
+    case post.announce.length < AnnounceLength.MIN || post.announce.length > AnnounceLength.MAX:
+      throw new Error(`Announce length must be between ${AnnounceLength.MIN} and ${AnnounceLength.MAX}`);
 
     case post.categories.length === 0:
       throw new Error(`One category must be present`);
 
-    case post.fullText.length > MAX_TEXT_LENGTH:
-      throw new Error(`Text length must be less then ${MAX_TEXT_LENGTH}`);
+    case post.text.length > TextLength.MAX:
+      throw new Error(`Text length must be less then ${TextLength.MAX}`);
   }
 };
 
@@ -42,61 +34,100 @@ const checkCategories = (post, categories) => categories.map((category) => ({
 
 const addCategoryCount = (postCategories, categories) => categories.filter((category) => postCategories.find((it) => it.id === category.id));
 
-articleRouter.get(`/add`, async (req, res) => {
-  const categories = await dataServer.getCategories();
-  const date = new Date();
-  const post = {
-    dateLocalized: formatDate(date),
-    dateTime: date,
-  };
+articleRouter.get(`/add`, async (req, res, next) => {
+  try {
+    const categories = await dataServer.getCategories(false);
+    const date = new Date();
+    const post = {
+      dateLocalized: formatDate(date),
+      dateTime: date,
+    };
 
-  res.render(`new-post`, {
-    title: NEW_POST_TITLE,
-    post,
+    res.render(`new-post`, {
+      title: NEW_POST_TITLE,
+      post,
+      categories,
+      action: `/articles/add`
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+articleRouter.get(`/:id`, async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const [categories, post] = await Promise.all([dataServer.getCategories(), dataServer.getPost(id)]);
+
+    post.categories = addCategoryCount(post.categories, categories);
+    res.render(`post`, {post});
+  } catch (err) {
+    next(err);
+  }
+});
+
+articleRouter.get(`/category/:id`, async (req, res, next) => {
+  const page = Number(req.query.page) || 1;
+  const {id} = req.params;
+
+  let categories;
+  let categoryName;
+  let posts;
+  let postCount;
+
+  try {
+    [categories, {posts, postCount, categoryName}] = await Promise.all([
+      dataServer.getCategories(true),
+      dataServer.getCategoryPostPreviews(id, POST_PREVIEW_COUNT, (page - 1) * POST_PREVIEW_COUNT),
+    ]);
+  } catch (err) {
+    next(err);
+    return;
+  }
+
+  const pageCount = Math.ceil(Number(postCount) / POST_PREVIEW_COUNT);
+
+  res.render(`articles-by-category`, {
     categories,
-    action: `/articles/add`
+    categoryName,
+    posts,
+    pagination: getPagination(page, pageCount, req.originalUrl.replace(/\?.+/, ``)),
   });
 });
 
-articleRouter.get(`/:id`, async (req, res) => {
-  const id = req.params.id;
-  const [categories, post] = await Promise.all([dataServer.getCategories(), dataServer.getPost(id)]);
+articleRouter.get(`/edit/:id`, async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const [categories, post] = await Promise.all([dataServer.getCategories(false), dataServer.getPost(id)]);
 
-  post.categories = addCategoryCount(post.categories, categories);
-  res.render(`post`, {post});
+    res.render(`new-post`, {
+      title: EDIT_POST_TITLE,
+      post,
+      categories: checkCategories(post, categories),
+      action: `/articles/edit/${id}`
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
-articleRouter.get(`/category/:id`, (req, res) => {
-  res.render(`articles-by-category`);
-});
-
-articleRouter.get(`/edit/:id`, async (req, res) => {
-  const id = req.params.id;
-  const [categories, post] = await Promise.all([dataServer.getCategories(), dataServer.getPost(id)]);
-
-  res.render(`new-post`, {
-    title: EDIT_POST_TITLE,
-    post,
-    categories: checkCategories(post, categories),
-    action: `/articles/edit/${id}`
-  });
-});
-
-articleRouter.post(`/edit/:id`, upload.single(`picture`), async (req, res) => {
+articleRouter.post(`/edit/:id`, upload.single(`picture`), async (req, res, next) => {
   const id = req.params.id;
   const postData = {
     ...req.body,
-    picture: req.file ? req.file.filename : req.body[`picture-preview`],
-    id,
+    picture: req.file ? {
+      name: req.file.filename,
+      originalName: req.body[`picture-preview`]
+    } : undefined,
   };
 
   const servicePost = ExpressToServiceAdapter.getPost(postData);
 
   try {
     validatePost(servicePost);
-    dataServer.updatePost(servicePost);
+    await dataServer.updatePost(id, servicePost);
   } catch (err) {
-    const categories = await dataServer.getCategories();
+    const categories = await dataServer.getCategories(false);
     const post = ServiceToExpressAdapter.getPost(servicePost);
 
     res.render(`new-post`, {
@@ -107,7 +138,7 @@ articleRouter.post(`/edit/:id`, upload.single(`picture`), async (req, res) => {
       errorMessage: err,
     });
 
-    logger.error(`Invalid post data: ${err}`);
+    next(err);
 
     return;
   }
@@ -115,19 +146,21 @@ articleRouter.post(`/edit/:id`, upload.single(`picture`), async (req, res) => {
   res.redirect(`/my`);
 });
 
-articleRouter.post(`/add`, upload.single(`picture`), async (req, res) => {
+articleRouter.post(`/add`, upload.single(`picture`), async (req, res, next) => {
   const postData = {
     ...req.body,
-    picture: req.file ? req.file.filename : req.body[`picture-preview`],
+    picture: req.file ? {
+      name: req.file.filename,
+      originalName: req.body[`picture-preview`]
+    } : undefined,
   };
-
   const servicePost = ExpressToServiceAdapter.getPost(postData);
 
   try {
     validatePost(servicePost);
-    dataServer.createPost(servicePost);
+    await dataServer.createPost(servicePost);
   } catch (err) {
-    const categories = await dataServer.getCategories();
+    const categories = await dataServer.getCategories(false);
     const post = ServiceToExpressAdapter.getPost(servicePost);
 
     res.render(`new-post`, {
@@ -138,7 +171,7 @@ articleRouter.post(`/add`, upload.single(`picture`), async (req, res) => {
       errorMessage: err,
     });
 
-    logger.error(`Invalid post data: ${err}`);
+    next(err);
 
     return;
   }

@@ -2,33 +2,43 @@
 
 const chalk = require(`chalk`);
 const express = require(`express`);
+const expressPinoLogger = require(`express-pino-logger`);
 const {createAPI} = require(`../api`);
 const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo} = require(`../const`);
-const {getLogger, LogMessage, LoggerName, logger} = require(`../../logger`);
-const {getMockPosts} = require(`../../utils`);
-const {sequelize} = require(`../db`);
+const {getLogger} = require(`../../logger`);
+const {DB} = require(`../db`);
 
-const serverLogger = getLogger(LoggerName.DATA_SERVER);
+const pino = expressPinoLogger({
+  serializers: {
+    req: (req) => ({
+      method: req.method,
+      url: req.url,
+    }),
 
-const createServer = (rawData) => {
+    res: (res) => ({
+      status: res.statusCode
+    })
+  },
+});
+
+const appLogger = getLogger(`app`);
+
+const createServer = (db) => {
   const app = express();
 
   app.use(express.json());
-  app.use((req, res, next) => {
-    logger.info(LogMessage.getStartRequest(req.url));
-    next();
-  });
+  app.use(pino);
 
-  app.use(`/api`, createAPI(rawData));
+  app.use(`/api`, createAPI(db));
 
   app.use((req, res) => {
-    logger.error(LogMessage.getUnknownRoute(req.url));
+    req.log.error(`Wrong path: ${req.originalUrl}`);
     res.status(HttpStatusCode.NOT_FOUND).send(HttpStatusInfo.NOT_FOUND);
   });
 
   app.use((err, req, res, next) => {
-    logger.error(LogMessage.getError(err));
-    res.status(HttpStatusCode.SERVER_ERROR).send(`Server error: ${err}`);
+    appLogger.error(`Application error: ${err}`);
+    res.status(HttpStatusCode.SERVER_ERROR).send(`Server error`);
     next();
   });
 
@@ -38,12 +48,14 @@ const createServer = (rawData) => {
 module.exports = {
   name: `--server`,
   async run(arg) {
+    const db = new DB();
+
     try {
-      await sequelize.authenticate();
-      serverLogger.info(`Connection to database succsessfully`);
+      await db.authenticate();
+      appLogger.info(`Connection to database succsessfully`);
     } catch (err) {
       const errorMessage = `Error connecting to database: ${err}`;
-      serverLogger.error(errorMessage);
+      appLogger.error(errorMessage);
       console.error(chalk.red(errorMessage));
 
       process.exit(ExitCode.ERROR);
@@ -51,14 +63,13 @@ module.exports = {
 
     const [customPort] = arg;
     const port = parseInt(customPort, 10) || DEFAULT_PORT;
-    const mockData = await getMockPosts();
-    const app = await createServer(mockData);
+    const app = createServer(db);
 
     try {
       app.listen(port);
-      serverLogger.info(LogMessage.getSuccessCreatingServer(port));
+      appLogger.info(`Server listens at port ${port}...`);
     } catch (err) {
-      serverLogger.error(LogMessage.getErrorCreatingServer(err));
+      appLogger.error(`Error starting server at port ${port}: ${err}`);
       process.exit(ExitCode.ERROR);
     }
 

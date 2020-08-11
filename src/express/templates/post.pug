@@ -28,16 +28,16 @@ block content
             ul.post__themes.themes
               each category in post.categories
                 li.themes__item
-                  a.themes__item-link(href='#') #{category.name}
+                  a.themes__item-link(href=`/articles/category/${category.id}`) #{category.name}
                     sup #{category.count}
                   button.themes__remove-btn(type='button') &Ucy;&dcy;&acy;&lcy;&icy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
           if post.picture
             .post__picture
-              img(src=post.picture alt='Фото поста')
+              img(src=`img/post-images/${post.picture.name}` alt='Фото поста')
           .post__text
             h3 #{post.title}
             p #{post.announce}
-            p #{post.fullText}
+            p #{post.text}
       .post__wrapper.post__wrapper--comments
         section.post__comments.comments
           h2.comments__title.title.title--middle &Kcy;&ocy;&mcy;&mcy;&iecy;&ncy;&tcy;&acy;&rcy;&icy;&icy;
@@ -45,10 +45,10 @@ block content
             each comment in post.comments
               li.comments__comment
                 .comments__avatar.avatar
-                  img(src='img/avatar-1.png' alt='аватар пользователя')
+                  img(src=`img/avatars/${comment.author.avatar.name}` alt='аватар пользователя')
                 .comments__text
                   .comments__head
-                    p &IEcy;&vcy;&gcy;&iecy;&ncy;&icy;&jcy; &Pcy;&iecy;&tcy;&rcy;&ocy;&vcy; &bull;
+                    p #{comment.author.firstname} #{comment.author.lastname} &bull;
                     time.comments__date(datetime=comment.dateTime) #{comment.dateTimeLocalized}
                   p.comments__message #{comment.text}
           .comments__footer.comments__footer--user

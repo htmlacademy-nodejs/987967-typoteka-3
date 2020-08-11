@@ -2,6 +2,7 @@ extends layout.pug
 
 block prepend head
   meta(name="Description" content="Личный блог Типотека")
+  base(href="/")
 
 block prepend body
   -var wrapperClasses=["wrapper", "wrapper--nobackground"]
@@ -14,44 +15,34 @@ block content
     section.main-page__category.category
       h1.category__title &Kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&icy;
       .category__add-form
-        form(action='#' method='POST')
-          input#add-form-add-category(type='text' name='category' placeholder='Новая категория')
+        form(action='/categories' method='POST')
+          input#add-form-add-category(value=`${categories.newItem || ``}` type='text' name='category-new' placeholder='Новая категория')
           label(for='add-form-add-category')
             span.visually-hidden &Dcy;&ocy;&bcy;&acy;&vcy;&icy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
-          button.category__button.button.button--category(type='submit') &Dcy;&ocy;&bcy;&acy;&vcy;&icy;&tcy;&softcy;
+          button.category__button.button.button--category(type='submit' name='action' value='new') &Dcy;&ocy;&bcy;&acy;&vcy;&icy;&tcy;&softcy;
+        if (categories.newItemError)
+          p(style={
+            color: 'red',
+            ['font-size']: '0.7rem',
+            ['min-height']: '10px',
+            ['padding-top']: 0,
+          }) #{categories.newItemError}
+
       ul.category__list
-        li.category__list-item
-          form(action='#' method='POST')
-            input#modify-form-category-1(type='text' name='category' value='Жизнь и путешествия')
-            label(for='modify-form-category-1')
-              span.visually-hidden &Rcy;&iecy;&dcy;&acy;&kcy;&tcy;&icy;&rcy;&ocy;&vcy;&acy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
-            button.category__button.button.button--category(type='submit') &Scy;&ocy;&khcy;&rcy;&acy;&ncy;&icy;&tcy;&softcy;
-            button.category__button.button.button--category(type='button') &Ucy;&dcy;&acy;&lcy;&icy;&tcy;&softcy;
-        li.category__list-item
-          form(action='#' method='POST')
-            input#modify-form-category-2(type='text' name='category' value='Путешествия')
-            label(for='modify-form-category-2')
-              span.visually-hidden &Rcy;&iecy;&dcy;&acy;&kcy;&tcy;&icy;&rcy;&ocy;&vcy;&acy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
-            button.category__button.button.button--category(type='submit') &Scy;&ocy;&khcy;&rcy;&acy;&ncy;&icy;&tcy;&softcy;
-            button.category__button.button.button--category(type='button') &Ucy;&dcy;&acy;&lcy;&icy;&tcy;&softcy;
-        li.category__list-item
-          form(action='#' method='POST')
-            input#modify-form-category-3(type='text' name='category' value='Дизайн и программирование')
-            label(for='modify-form-category-3')
-              span.visually-hidden &Rcy;&iecy;&dcy;&acy;&kcy;&tcy;&icy;&rcy;&ocy;&vcy;&acy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
-            button.category__button.button.button--category(type='submit') &Scy;&ocy;&khcy;&rcy;&acy;&ncy;&icy;&tcy;&softcy;
-            button.category__button.button.button--category(type='button') &Ucy;&dcy;&acy;&lcy;&icy;&tcy;&softcy;
-        li.category__list-item
-          form(action='#' method='POST')
-            input#modify-form-category-4(type='text' name='category' value='Другое')
-            label(for='modify-form-category-4')
-              span.visually-hidden &Rcy;&iecy;&dcy;&acy;&kcy;&tcy;&icy;&rcy;&ocy;&vcy;&acy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
-            button.category__button.button.button--category(type='submit') &Scy;&ocy;&khcy;&rcy;&acy;&ncy;&icy;&tcy;&softcy;
-            button.category__button.button.button--category(type='button') &Ucy;&dcy;&acy;&lcy;&icy;&tcy;&softcy;
-        li.category__list-item.category__list-item--last
-          form(action='#' method='POST')
-            input#modify-form-category-5(type='text' name='category' value='Личное')
-            label(for='modify-form-category-5')
-              span.visually-hidden &Rcy;&iecy;&dcy;&acy;&kcy;&tcy;&icy;&rcy;&ocy;&vcy;&acy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
-            button.category__button.button.button--category(type='submit') &Scy;&ocy;&khcy;&rcy;&acy;&ncy;&icy;&tcy;&softcy;
-            button.category__button.button.button--category(type='button') &Ucy;&dcy;&acy;&lcy;&icy;&tcy;&softcy;
+        each category, index in categories
+          li.category__list-item
+            form(action='/categories' method='POST')
+              input(id=`modify-form-category-${index}` type='text' name=`category-${category.id}` value=category.name)
+              label(for=`modify-form-category-${index}`)
+                span.visually-hidden &Rcy;&iecy;&dcy;&acy;&kcy;&tcy;&icy;&rcy;&ocy;&vcy;&acy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
+              button.category__button.button.button--category(type='submit' name='action' value='update') &Scy;&ocy;&khcy;&rcy;&acy;&ncy;&icy;&tcy;&softcy;
+              button.category__button.button.button--category(type='submit' name='action' value='delete') &Ucy;&dcy;&acy;&lcy;&icy;&tcy;&softcy;
+          if (category.error)
+            li.category__list-item(style={
+              color: 'red',
+              ['font-size']: '0.7rem',
+              ['min-height']: '10px',
+              ['padding-top']: 0,
+              ['margin-top']: '-20px',
+            }) #{category.error}
+

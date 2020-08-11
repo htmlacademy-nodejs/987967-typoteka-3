@@ -3,54 +3,96 @@
 const {Router} = require(`express`);
 const {HttpStatusCode} = require(`../const`);
 const {createPostFinder, validatePost, validateComment, createCommentFinder} = require(`../middlewares`);
-const {logger, LogMessage} = require(`../../logger`);
 
 const createPostRouter = (service) => {
   const findPost = createPostFinder(service);
   const findComment = createCommentFinder(service);
   const router = new Router();
 
-  router.get(`/`, (req, res) => {
-    logger.info(LogMessage.getEndRequest(req.url, HttpStatusCode.OK));
-    res.status(HttpStatusCode.OK).json(service.getPosts());
+  router.get(`/`, async (req, res, next) => {
+    const {limit, offset, sorting: sortType} = req.query;
+    let posts;
+
+    try {
+      posts = await service.getPosts(sortType, limit, offset);
+    } catch (err) {
+      next(err);
+      return;
+    }
+
+    res.status(HttpStatusCode.OK).json(posts);
   });
 
-  router.post(`/`, validatePost, (req, res) => {
-    logger.info(LogMessage.getEndRequest(req.url, HttpStatusCode.CREATE));
-    res.status(HttpStatusCode.CREATE).json(service.createPost(req.body));
+  router.post(`/`, validatePost, async (req, res, next) => {
+    let post;
+
+    try {
+      post = await service.createPost(req.body);
+    } catch (err) {
+      next(err);
+      return;
+    }
+
+    res.status(HttpStatusCode.CREATE).json(post);
   });
 
-  router.delete(`/:articleId`, [findPost], (req, res) => {
+  router.delete(`/:articleId`, [findPost], async (req, res, next) => {
     const post = res.locals.post;
-    service.deletePost(post.id);
-    logger.info(LogMessage.getEndRequest(req.url, HttpStatusCode.OK));
+
+    try {
+      await service.deletePost(post.id);
+    } catch (err) {
+      next(err);
+      return;
+    }
     res.status(HttpStatusCode.OK).json(post);
   });
 
-  router.get(`/:articleId`, [findPost], (req, res) => {
-    logger.info(LogMessage.getEndRequest(req.url, HttpStatusCode.OK));
+  router.get(`/:articleId`, findPost, (req, res) => {
     res.status(HttpStatusCode.OK).json(res.locals.post);
   });
 
-  router.put(`/:articleId`, [findPost, validatePost], (req, res) => {
-    logger.info(LogMessage.getEndRequest(req.url, HttpStatusCode.OK));
-    res.status(HttpStatusCode.OK).json(service.updatePost(req.params.articleId, req.body));
+  router.put(`/:articleId`, [findPost, validatePost], async (req, res, next) => {
+    try {
+      res.status(HttpStatusCode.OK).json(await service.updatePost(req.params.articleId, req.body));
+    } catch (err) {
+      next(err);
+      return;
+    }
   });
 
-  router.get(`/:articleId/comments`, [findPost], (req, res) => {
-    logger.info(LogMessage.getEndRequest(req.url, HttpStatusCode.OK));
-    res.status(HttpStatusCode.OK).json(service.getComments(req.params.articleId));
+  router.get(`/:articleId/comments`, findPost, async (req, res, next) => {
+    try {
+      res.status(HttpStatusCode.OK).json(await service.getComments(req.params.articleId));
+    } catch (err) {
+      next(err);
+      return;
+    }
   });
 
-  router.post(`/:articleId/comments`, [findPost, validateComment], (req, res) => {
-    logger.info(LogMessage.getEndRequest(req.url, HttpStatusCode.CREATE));
-    res.status(HttpStatusCode.CREATE).json(service.createComment(req.params.articleId, req.body));
+  router.post(`/:articleId/comments`, [findPost, validateComment], async (req, res, next) => {
+    let comment;
+    try {
+      comment = await service.createComment(req.params.articleId, req.body);
+    } catch (err) {
+      next(err);
+      return;
+    }
+
+    res.status(HttpStatusCode.CREATE).json(comment);
   });
 
-  router.delete(`/:articleId/comments/:commentId`, [findPost, findComment], (req, res) => {
-    const {articleId, commentId} = req.params;
-    logger.info(LogMessage.getEndRequest(req.url, HttpStatusCode.OK));
-    res.status(HttpStatusCode.OK).json(service.deleteComment(articleId, commentId));
+  router.delete(`/:articleId/comments/:commentId`, [findPost, findComment], async (req, res, next) => {
+    const {commentId} = req.params;
+
+    try {
+      await service.deleteComment(commentId);
+    } catch (err) {
+      next(err);
+      return;
+    }
+
+    res.status(HttpStatusCode.OK).json(commentId);
   });
 
   return router;

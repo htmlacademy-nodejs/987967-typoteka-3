@@ -11,15 +11,13 @@ const {
   PICTURE_MOCK_FOLDER,
   PICTURE_FOLDER,
   DURATION,
-  MIN_SENTENCES_COUNT,
-  MAX_SENTENCES_COUNT,
-  MIN_COMMENT_COUNT,
-  MAX_COMMENT_COUNT,
-  MIN_CATEGORY_COUNT,
-  MAX_CATEGORY_COUNT,
   ANNOUNCE_SENTENCES_COUNT,
-  ID_LENGTH
-} = require(`./service/const`);
+  ID_LENGTH,
+  DataFileName,
+  SentenceCount,
+  CategoryCount,
+  CommentCount,
+} = require(`../const`);
 
 const getRandomInt = (min, max) => {
   const minInt = Math.ceil(min);
@@ -80,6 +78,7 @@ const generateUser = (names, avatars) => {
   const avatar = generateImage(path.resolve(AVATAR_MOCK_FOLDER, originalAvatar), AVATAR_FOLDER);
 
   return {
+    id: nanoid(6),
     firstname,
     lastname,
     email,
@@ -97,31 +96,56 @@ const generateDate = () => {
   return getRandomDate(past, now);
 };
 
-const generatePost = ({sentences, titles, categories, comments}, users, pictures) => {
-  const textSentences = getRandomElements(sentences, getRandomInt(MIN_SENTENCES_COUNT, MAX_SENTENCES_COUNT));
+const generatePost = ({sentences, titles, categories, comments, users, pictureFiles}) => {
+  const textSentences = getRandomElements(sentences, getRandomInt(SentenceCount.MIN, SentenceCount.MAX));
   const announceSentences = getRandomUniqueElements(textSentences, ANNOUNCE_SENTENCES_COUNT);
-  const createdDate = generateDate();
+  const date = generateDate();
   const now = Date.now();
-  const originalPicture = getRandomElement(pictures);
+  const originalPicture = getRandomElement(pictureFiles);
   const picture = getRandomBoolean() ? generateImage(path.resolve(PICTURE_MOCK_FOLDER, originalPicture), PICTURE_FOLDER) : ``;
 
   return {
     id: nanoid(ID_LENGTH),
     title: getRandomElement(titles).slice(0, 250),
-    createdDate,
+    date,
     announce: announceSentences.join(`\n`).slice(0, 250),
-    fullText: textSentences.join(`\n`).slice(0, 1000),
-    categories: getRandomUniqueElements(categories, getRandomInt(MIN_CATEGORY_COUNT, MAX_CATEGORY_COUNT)),
-    comments: getRandomElements(comments, getRandomInt(MIN_COMMENT_COUNT, MAX_COMMENT_COUNT)).map((it) => ({
+    text: textSentences.join(`\n`).slice(0, 1000),
+    categories: getRandomUniqueElements(categories, getRandomInt(CategoryCount.MIN, CategoryCount.MAX)),
+    comments: getRandomElements(comments, getRandomInt(CommentCount.MIN, CommentCount.MAX)).map((it) => ({
       id: nanoid(ID_LENGTH),
       text: it.slice(0, 250),
-      date: getRandomDate(createdDate, now),
+      date: getRandomDate(date, now),
       user: getRandomElement(users),
     })),
     picture,
-    originalPicture,
+    originalPicture: picture && originalPicture,
     user: getRandomElement(users),
   };
+};
+
+const generatePosts = async (postCount, userCount) => {
+  const [titles, sentences, categoryNames, comments, userNames, pictureFiles, avatarFiles] = await Promise.all([
+    readContent(`./data/${DataFileName.TITLE}`),
+    readContent(`./data/${DataFileName.DESCRIPTION}`),
+    readContent(`./data/${DataFileName.CATEGORY}`),
+    readContent(`./data/${DataFileName.COMMENT}`),
+    readContent(`./data/${DataFileName.NAME}`),
+    fs.promises.readdir(PICTURE_MOCK_FOLDER),
+    fs.promises.readdir(AVATAR_MOCK_FOLDER),
+  ]);
+
+  const users = generateUsers(userCount, userNames, avatarFiles);
+  const categories = generateCategories(categoryNames);
+  const posts = new Array(postCount).fill(``).map(() => generatePost({
+    sentences,
+    titles,
+    categories,
+    comments,
+    users,
+    pictureFiles
+  }));
+
+  return {posts, categories, users};
 };
 
 const readContent = async (filename) => {
@@ -134,23 +158,6 @@ const readContent = async (filename) => {
   }
 };
 
-const sendResponse = (status, message, res) => {
-  const template = `
-    <!Doctype html>
-      <html lang="ru">
-      <head>
-        <title>987967-typoteka-3</title>
-      </head>
-      <body>${message}</body>
-    </html>`.trim();
-
-  res.statusCode = status;
-  res.writeHead(status, {
-    "content-type": `text/html; charset=utf-8`
-  });
-  res.end(template);
-};
-
 const getMockPosts = async () => {
   const mockFile = path.resolve(process.cwd(), MOCK_FILE);
   return JSON.parse(await fs.promises.readFile(mockFile, `utf-8`));
@@ -158,40 +165,11 @@ const getMockPosts = async () => {
 const getMockTitles = async () => await getMockPosts().map((it) => it.title);
 const getTitleList = (titles) => `<ul>${titles.map((it) => `<li>${it}</li>`).join(`\n`)}</ul>`;
 
-const generateCategories = async (filename) => {
-  const categories = await readContent(filename);
-  return categories.map((it) => ({
+const generateCategories = (names) => {
+  return names.map((it) => ({
     id: nanoid(ID_LENGTH),
     name: it,
   }));
-};
-
-const formatNumber = (number) => `${number < 10 ? `0` : ``}${number}`;
-
-const sortCommentsByDate = (comments) => comments.slice().sort((a, b) => b.date - a.date);
-const sortPostsByDate = (posts) => posts.slice().sort((a, b) => b.createdDate - a.createdDate);
-const sortPostsByPopular = (posts) => posts.slice().sort((a, b) => b.comments.length - a.comments.length);
-const collectComments = (posts) => posts.reduce((acc, cur) => {
-  const comments = cur.comments.map((it) => ({
-    ...it,
-    parentPost: cur
-  }));
-
-  return [...acc, ...comments];
-}, []);
-
-const formatDate = (date) => {
-  const days = formatNumber(date.getDate());
-  const month = formatNumber(date.getMonth() + 1);
-
-  return `${days}.${month}.${date.getFullYear()}`;
-};
-
-const formatDateTime = (date) => {
-  const minutes = formatNumber(date.getMinutes());
-  const hours = formatNumber(date.getHours());
-
-  return `${formatDate(date)}, ${hours}:${minutes}`;
 };
 
 module.exports = {
@@ -202,19 +180,8 @@ module.exports = {
   getRandomBoolean,
   getRandomDate,
   generateDate,
-  generateCategories,
-  generatePost,
-  generateUsers,
-  readContent,
-  sendResponse,
+  generatePosts,
   getMockPosts,
   getMockTitles,
   getTitleList,
-  formatNumber,
-  sortPostsByDate,
-  sortPostsByPopular,
-  sortCommentsByDate,
-  collectComments,
-  formatDateTime,
-  formatDate,
 };

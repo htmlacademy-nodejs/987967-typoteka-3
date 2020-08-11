@@ -11,14 +11,25 @@ module.exports = {
   },
 
   DURATION: 1000 * 60 * 60 * 24 * 90,
-  MIN_SENTENCES_COUNT: 5,
-  MAX_SENTENCES_COUNT: 50,
-  MIN_COMMENT_COUNT: 0,
-  MAX_COMMENT_COUNT: 25,
-  MIN_CATEGORY_COUNT: 1,
-  MAX_CATEGORY_COUNT: 3,
+
+  SentenceCount: {
+    MIN: 5,
+    MAX: 50
+  },
+
+  CommentCount: {
+    MIN: 0,
+    MAX: 25
+  },
+
+  CategoryCount: {
+    MIN: 1,
+    MAX: 3
+  },
+
   ANNOUNCE_SENTENCES_COUNT: 5,
-  MOCK_FILE: `mocks.json`,
+
+  MOCK_FILE: `data/mocks.json`,
   SQL_FILE: `sql/fill-db.sql`,
   ID_LENGTH: 6,
   DEFAULT_PORT: 3000,
@@ -51,7 +62,9 @@ module.exports = {
     WRONG_POSTS_COUNT: `No more than ${MAX_POSTS_COUNT} articles`,
     WRONG_USER_COUNT: `No more than ${MAX_USER_COUNT} articles`,
     FILE_ERROR: `Can't write data to file...`,
-    FILE_SUCCESS: `Operation success. File created.`,
+    FILE_SUCCESS: `Operation success. File was created.`,
+    DB_ERROR: `Can't create the mock data base...`,
+    DB_SUCCESS: `Operation success. The mock data base was created.`,
   },
 
   DataFileName: {
