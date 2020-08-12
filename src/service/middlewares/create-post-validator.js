@@ -2,18 +2,18 @@
 
 const {HttpStatusCode} = require(`../const`);
 const {getDifference} = require(`../utils`);
+const {postSchema} = require(`../joi-schemas`);
 
 const getException = (messages) => ({
   details: messages.map((it) => ({message: it}))
 });
 
-const createPostValidator = (schema, service) => async (req, res, next) => {
+const createPostValidator = (service) => async (req, res, next) => {
   try {
-    await schema.validateAsync(req.body, {abortEarly: false});
+    await postSchema.validateAsync(req.body, {abortEarly: false});
 
     const existingCategories = await service.getAllCategories();
 
-    console.log(existingCategories);
     const missingCategories = getDifference(req.body.categories, existingCategories);
     if (missingCategories.length) {
       throw getException(missingCategories.map((it) => `Category "${it}" is not exists`));

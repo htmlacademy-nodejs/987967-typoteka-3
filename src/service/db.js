@@ -211,6 +211,10 @@ class DB {
     }
   }
 
+  async getUser(id) {
+    return User.findByPk(id);
+  }
+
   async getComment(id) {
     return Comment.findByPk(id);
   }
