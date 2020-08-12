@@ -2,11 +2,14 @@
 
 const {Router} = require(`express`);
 const {HttpStatusCode} = require(`../const`);
-const {createPostFinder, validatePost, validateComment, createCommentFinder} = require(`../middlewares`);
+const {createPostFinder, createValidator, createCommentFinder} = require(`../middlewares`);
+const {postSchema, commentSchema} = require(`../joi-schemas`);
 
 const createPostRouter = (service) => {
   const findPost = createPostFinder(service);
   const findComment = createCommentFinder(service);
+  const validatePost = createValidator(postSchema);
+  const validateComment = createValidator(commentSchema);
   const router = new Router();
 
   router.get(`/`, async (req, res, next) => {
