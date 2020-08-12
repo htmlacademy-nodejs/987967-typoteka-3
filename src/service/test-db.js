@@ -7,9 +7,14 @@ const {Post} = require(`./models`);
 (async () => {
   const db = new DB();
 
-  await db.updatePost(14, {
-    title: `Updated title Updated title Updated title Updated title Updated title`,
-    categories: [{id: 7}]
+  await db.createPost({
+    title: `Some title had a length equals at least 30 chars`,
+    announce: `Announce Announce Announce Announce`,
+    categories: [1],
+    // picture: {
+    //   name: `123`,
+    //   originalName: `321`
+    // }
   });
 
   // console.log((await db.updatePost(41, {

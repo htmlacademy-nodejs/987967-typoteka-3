@@ -104,7 +104,7 @@ class DB {
   async createPost(post) {
     const postData = {
       ...post,
-      postCategories: post.categories.map((it) => ({[`category_id`]: it.id}))
+      postCategories: post.categories.map((it) => ({[`category_id`]: it}))
     };
 
     return Post.create(postData, {
@@ -153,6 +153,12 @@ class DB {
 
   async getCategories(excludeNoPost) {
     return getCategories(this.sequelize, excludeNoPost);
+  }
+
+  async getAllCategories() {
+    return (await Category.findAll({
+      attributes: [`id`]
+    })).map((it) => it.id);
   }
 
   async getCategory(id) {

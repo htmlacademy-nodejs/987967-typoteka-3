@@ -18,6 +18,7 @@ const {
   CategoryCount,
   CommentCount,
 } = require(`../const`);
+const {array} = require(`joi`);
 
 const getRandomInt = (min, max) => {
   const minInt = Math.ceil(min);
@@ -172,6 +173,8 @@ const generateCategories = (names) => {
   }));
 };
 
+const getDifference = (arrayA, arrayB) => arrayA.reduce((acc, cur) => arrayB.find((it) => it === cur) ? [...acc] : [cur, ...acc], []);
+
 module.exports = {
   getRandomInt,
   getRandomElement,
@@ -184,4 +187,5 @@ module.exports = {
   getMockPosts,
   getMockTitles,
   getTitleList,
+  getDifference,
 };
