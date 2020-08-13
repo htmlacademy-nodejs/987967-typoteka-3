@@ -2,6 +2,7 @@
 
 const {Router} = require(`express`);
 const {HttpStatusCode} = require(`../const`);
+const {postLimitSchema, commentSchema} = require(`../joi-schemas`);
 const {createPostFinder, createPostValidator, createCommentValidator, createCommentFinder} = require(`../middlewares`);
 
 const createPostRouter = (service) => {
@@ -12,30 +13,26 @@ const createPostRouter = (service) => {
   const router = new Router();
 
   router.get(`/`, async (req, res, next) => {
-    const {limit, offset, sorting: sortType} = req.query;
-    let posts;
-
     try {
-      posts = await service.getPosts(sortType, limit, offset);
+      await postLimitSchema.validateAsync(req.query);
+
+      const {limit, offset, sorting: sortType} = req.query;
+      const posts = await service.getPosts(sortType, limit, offset);
+      res.status(HttpStatusCode.OK).json(posts);
     } catch (err) {
       next(err);
       return;
     }
-
-    res.status(HttpStatusCode.OK).json(posts);
   });
 
   router.post(`/`, validatePost, async (req, res, next) => {
-    let post;
-
     try {
-      post = await service.createPost(req.body);
+      const post = await service.createPost(req.body);
+      res.status(HttpStatusCode.CREATE).json(post);
     } catch (err) {
       next(err);
       return;
     }
-
-    res.status(HttpStatusCode.CREATE).json(post);
   });
 
   router.delete(`/:articleId`, [findPost], async (req, res, next) => {
@@ -43,11 +40,11 @@ const createPostRouter = (service) => {
 
     try {
       await service.deletePost(post.id);
+      res.status(HttpStatusCode.OK).json(post);
     } catch (err) {
       next(err);
       return;
     }
-    res.status(HttpStatusCode.OK).json(post);
   });
 
   router.get(`/:articleId`, findPost, (req, res) => {
@@ -74,6 +71,8 @@ const createPostRouter = (service) => {
 
   router.post(`/:articleId/comments`, [findPost, validateComment], async (req, res, next) => {
     try {
+      await commentSchema.validateAsync(req.body);
+
       const {text, userId, date} = req.body;
       const commentData = {
         postId: req.params.articleId,
@@ -95,12 +94,11 @@ const createPostRouter = (service) => {
 
     try {
       await service.deleteComment(commentId);
+      res.status(HttpStatusCode.OK).json(commentId);
     } catch (err) {
       next(err);
       return;
     }
-
-    res.status(HttpStatusCode.OK).json(commentId);
   });
 
   return router;

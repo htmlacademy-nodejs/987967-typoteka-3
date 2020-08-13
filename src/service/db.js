@@ -3,7 +3,7 @@
 const {Sequelize, Op} = require(`sequelize`);
 const {DBNAME, ADMIN, PSW, HOST} = require(`./config`);
 const models = require(`./models`);
-const {PostSortType} = require(`./db-const`);
+const {PostSortType} = require(`./const`);
 const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts, getCategories, updatePicture} = require(`./queries`);
 const {User, PostCategory, Category, Comment, Post} = require(`./models`);
 const {addPagination} = require(`./utils`);

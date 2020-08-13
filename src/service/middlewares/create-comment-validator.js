@@ -1,11 +1,7 @@
 'use strict';
 
-const {HttpStatusCode} = require(`../const`);
 const {commentSchema} = require(`../joi-schemas`);
-
-const getException = (messages) => ({
-  details: messages.map((it) => ({message: it}))
-});
+const {getValidationException} = require(`../utils`);
 
 const createCommentValidator = (service) => async (req, res, next) => {
   try {
@@ -15,14 +11,12 @@ const createCommentValidator = (service) => async (req, res, next) => {
     const user = await service.getUser(userId);
 
     if (!user) {
-      throw getException([`User "${userId}" is not exists`]);
+      throw getValidationException([`User "${userId}" is not exists`]);
     }
 
     next();
   } catch (err) {
-    res.status(HttpStatusCode.BAD_REQUEST).json({
-      messages: err.details.map((it) => it.message)
-    });
+    next(err);
   }
 };
 

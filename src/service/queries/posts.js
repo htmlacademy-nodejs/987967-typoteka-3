@@ -3,7 +3,7 @@
 const {Op} = require(`sequelize`);
 const {Post, PostCategory} = require(`../models`);
 const {addPagination} = require(`../utils`);
-const {PostSortType} = require(`../db-const`);
+const {PostSortType} = require(`../const`);
 
 const queryPostsByIds = (sequelize, ids) =>({
   attributes: [

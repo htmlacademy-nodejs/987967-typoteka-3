@@ -5,7 +5,7 @@ const Joi = require(`joi`);
 const postSchema = Joi.object({
   title: Joi.string().min(30).max(250).required(),
   announce: Joi.string().min(30).max(250).required(),
-  categories: Joi.array().items(Joi.string()).min(1).required(),
+  categories: Joi.array().items(Joi.number()).min(1).required(),
   date: Joi.string().isoDate(),
   text: Joi.string().max(1000).allow(``).optional(),
   picture: Joi.object({

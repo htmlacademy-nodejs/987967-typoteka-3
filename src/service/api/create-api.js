@@ -4,7 +4,7 @@ const {Router} = require(`express`);
 const {createCategoryRouter} = require(`./create-category-router`);
 const {createSearchRouter} = require(`./create-search-router`);
 const {createPostRouter} = require(`./create-post-router`);
-const {createCommentRouter} = require(`./ctreate-comment-router`);
+const {createCommentRouter} = require(`./create-comment-router`);
 
 const createAPI = (db) => {
   const router = new Router();

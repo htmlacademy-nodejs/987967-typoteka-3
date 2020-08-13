@@ -17,8 +17,8 @@ const {
   SentenceCount,
   CategoryCount,
   CommentCount,
+  VALIDATION_EXCEPTION
 } = require(`../const`);
-const {array} = require(`joi`);
 
 const getRandomInt = (min, max) => {
   const minInt = Math.ceil(min);
@@ -175,6 +175,15 @@ const generateCategories = (names) => {
 
 const getDifference = (arrayA, arrayB) => arrayA.reduce((acc, cur) => arrayB.find((it) => it === cur) ? [...acc] : [cur, ...acc], []);
 
+const getValidationException = (messages) => ({
+  type: VALIDATION_EXCEPTION,
+  details: messages.map((it) => ({message: it}))
+});
+
+const parseValidationException = (exception) =>
+  exception.type === VALIDATION_EXCEPTION || exception.isJoi
+    ? exception.details.map((it) => it.message) : null;
+
 module.exports = {
   getRandomInt,
   getRandomElement,
@@ -188,4 +197,6 @@ module.exports = {
   getMockTitles,
   getTitleList,
   getDifference,
+  getValidationException,
+  parseValidationException,
 };
