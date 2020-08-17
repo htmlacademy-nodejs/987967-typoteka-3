@@ -58,8 +58,8 @@ const preparePostData = ({title, date, announce, text, picture: pictureData, ori
 };
 
 class DB {
-  constructor() {
-    this.sequelize = new Sequelize(DBNAME, ADMIN, PSW, {
+  constructor(dbName = DBNAME, admin = ADMIN, psw = PSW) {
+    this.sequelize = new Sequelize(dbName, admin, psw, {
       host: HOST,
       dialect: `postgres`
     });
@@ -114,7 +114,6 @@ class DB {
 
   async createPosts(postData, users, categories) {
     const posts = postData.map((it) => preparePostData(it, users, categories));
-
     return Post.bulkCreate(posts, {
       include: [
         Post.Picture,
@@ -143,8 +142,24 @@ class DB {
 
   async createMockDB(posts, users, categories) {
     await this.reset();
-    const [dbUsers, dbCategories] = await Promise.all([this.createUsers(users, {plain: true}), this.createCategories(categories, {plain: true})]);
-    return this.createPosts(posts, dbUsers, dbCategories);
+    return this.fillMockDB(posts, users, categories);
+  }
+
+  async fillMockDB(posts, users, categories) {
+    // require(`fs`).writeFileSync(`${process.cwd()}/posts.json`, JSON.stringify(posts));
+    // require(`fs`).writeFileSync(`${process.cwd()}/users.json`, JSON.stringify(users));
+    // require(`fs`).writeFileSync(`${process.cwd()}/categories.json`, JSON.stringify(categories));
+    const [dbUsers, dbCategories] = await Promise.all([
+      this.createUsers(users),
+      this.createCategories(categories)
+    ]);
+    const dbPosts = await this.createPosts(posts, dbUsers, dbCategories);
+
+    return {
+      userIDs: dbUsers.map((it) => it.id),
+      categoryIDs: dbCategories.map((it) => it.id),
+      postIDs: dbPosts.map((it) => it.id),
+    };
   }
 
   async getCategoryPosts(categoryId, limit, offset) {
@@ -249,15 +264,39 @@ class DB {
     });
   }
 
+  async deletePosts(ids) {
+    return Post.destroy({
+      where: {id: ids}
+    });
+  }
+
   async deleteComment(id) {
     return Comment.destroy({
       where: {id}
     });
   }
 
+  async deleteUser(id) {
+    return User.destroy({
+      where: {id}
+    });
+  }
+
+  async deleteUsers(ids) {
+    return User.destroy({
+      where: {id: ids}
+    });
+  }
+
   async deleteCategory(id) {
     return Category.destroy({
       where: {id}
+    });
+  }
+
+  async deleteCategories(ids) {
+    return Category.destroy({
+      where: {id: ids}
     });
   }
 
