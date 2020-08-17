@@ -19,7 +19,7 @@ module.exports = {
 
   CommentCount: {
     MIN: 0,
-    MAX: 25
+    MAX: 5
   },
 
   CategoryCount: {
