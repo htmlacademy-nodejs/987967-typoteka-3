@@ -6,7 +6,15 @@ const models = require(`./models`);
 const {PostSortType} = require(`./const`);
 const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts, getCategories, updatePicture} = require(`./queries`);
 const {User, PostCategory, Category, Comment, Post} = require(`./models`);
-const {addPagination} = require(`./utils`);
+// const {addPagination} = require(`./utils`);
+
+const addPagination = (limit, offset = 0) => {
+  return limit ? {
+    limit,
+    offset
+  } : {};
+};
+
 
 const prepareUserData = ({email, firstname, lastname, password, avatar, originalAvatar}) => {
   const userData = {email, firstname, lastname};
@@ -58,10 +66,11 @@ const preparePostData = ({title, date, announce, text, picture: pictureData, ori
 };
 
 class DB {
-  constructor(dbName = DBNAME, admin = ADMIN, psw = PSW) {
+  constructor(dbName = DBNAME, admin = ADMIN, psw = PSW, silent) {
     this.sequelize = new Sequelize(dbName, admin, psw, {
       host: HOST,
-      dialect: `postgres`
+      dialect: `postgres`,
+      logging: silent ? false : console.log,
     });
 
     const modelList = Object.values(models);

@@ -184,6 +184,20 @@ const parseValidationException = (exception) =>
   exception.type === VALIDATION_EXCEPTION || exception.isJoi
     ? exception.details.map((it) => it.message) : null;
 
+const readTestMockFiles = async () => {
+  const [users, categories, posts] = await Promise.all([
+    fs.promises.readFile(`${process.cwd()}/data/mock-for-test/users.json`),
+    fs.promises.readFile(`${process.cwd()}/data/mock-for-test/categories.json`),
+    fs.promises.readFile(`${process.cwd()}/data/mock-for-test/posts.json`),
+  ]);
+
+  return {
+    users: JSON.parse(users.toString()),
+    categories: JSON.parse(categories.toString()),
+    posts: JSON.parse(posts.toString()),
+  };
+};
+
 module.exports = {
   getRandomInt,
   getRandomElement,
@@ -199,4 +213,5 @@ module.exports = {
   getDifference,
   getValidationException,
   parseValidationException,
+  readTestMockFiles,
 };

@@ -12,19 +12,15 @@ const {
   MAX_USER_COUNT,
   MOCK_FILE,
 } = require(`../const`);
-// const {DB} = require(`../db`);
 const {createDataBase} = require(`../utils`);
 
 const createDB = async (postCount, userCount) => {
   const {users, posts, categories} = await generatePosts(postCount, userCount);
   fs.promises.writeFile(MOCK_FILE, JSON.stringify({categories, users, posts}));
 
-  // const db = new DB();
   try {
-    await createDataBase(`typoteka`, users, categories, posts);
-    // await db.authenticate();
-    // await db.createMockDB(posts, users, categories);
-    // await db.close();
+    const db = await createDataBase(`typoteka`, users, categories, posts);
+    db.close();
 
     console.info(chalk.green(Message.DB_SUCCESS));
     return ExitCode.SUCCESS;

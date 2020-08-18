@@ -89,7 +89,7 @@ const createSchema = async ({dbName, admin, password, host, port}) => {
   client.end();
 };
 
-const createDataBase = async (dbName, users, categories, posts) => {
+const createDataBase = async (dbName, users, categories, posts, needLogging) => {
   await createEmptyDataBase({
     dbName,
     owner: ADMIN,
@@ -106,9 +106,9 @@ const createDataBase = async (dbName, users, categories, posts) => {
     port: DB_PORT
   });
 
-  const db = new DB(dbName, ADMIN, PSW);
+  const db = new DB(dbName, ADMIN, PSW, needLogging);
   await db.createMockDB(posts, users, categories);
-  db.close();
+  return db;
 };
 
 module.exports = {

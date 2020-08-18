@@ -2,8 +2,15 @@
 
 const {Op} = require(`sequelize`);
 const {Post, PostCategory} = require(`../models`);
-const {addPagination} = require(`../utils`);
+// const {addPagination} = require(`../utils`);
 const {PostSortType} = require(`../const`);
+
+const addPagination = (limit, offset = 0) => {
+  return limit ? {
+    limit,
+    offset
+  } : {};
+};
 
 const queryPostsByIds = (sequelize, ids) =>({
   attributes: [
@@ -62,7 +69,6 @@ const getCategoryPosts = async (sequelize, categoryId, limit, offset, sortType) 
     raw: true,
     ...addPagination(limit, offset),
   });
-
   const postIds = rows.map((it) => Number(it.id));
   const query = queryPostsByIds(sequelize, postIds);
 
