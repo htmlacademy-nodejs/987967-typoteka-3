@@ -13,13 +13,17 @@ const {
   MOCK_FILE,
 } = require(`../const`);
 const {createDataBase} = require(`../utils`);
+const {DB} = require(`../db`);
+const {ADMIN, PSW, DBNAME} = require(`../config`);
 
 const createDB = async (postCount, userCount) => {
   const {users, posts, categories} = await generatePosts(postCount, userCount);
   fs.promises.writeFile(MOCK_FILE, JSON.stringify({categories, users, posts}));
 
   try {
-    const db = await createDataBase(`typoteka`, users, categories, posts);
+    await createDataBase(DBNAME);
+    const db = new DB(DBNAME, ADMIN, PSW, false);
+    await db.fillDataBase(posts, users, categories, false);
     db.close();
 
     console.info(chalk.green(Message.DB_SUCCESS));

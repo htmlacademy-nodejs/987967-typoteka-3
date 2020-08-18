@@ -6,15 +6,7 @@ const models = require(`./models`);
 const {PostSortType} = require(`./const`);
 const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts, getCategories, updatePicture} = require(`./queries`);
 const {User, PostCategory, Category, Comment, Post} = require(`./models`);
-// const {addPagination} = require(`./utils`);
-
-const addPagination = (limit, offset = 0) => {
-  return limit ? {
-    limit,
-    offset
-  } : {};
-};
-
+const {addPagination} = require(`./utils`);
 
 const prepareUserData = ({email, firstname, lastname, password, avatar, originalAvatar}) => {
   const userData = {email, firstname, lastname};
@@ -71,6 +63,9 @@ class DB {
       host: HOST,
       dialect: `postgres`,
       logging: silent ? false : console.log,
+      define: {
+        timestamps: false,
+      },
     });
 
     const modelList = Object.values(models);
@@ -149,19 +144,16 @@ class DB {
     });
   }
 
-  async createMockDB(posts, users, categories) {
-    await this.reset();
-    return this.fillMockDB(posts, users, categories);
-  }
+  async fillDataBase(posts, users, categories, reset) {
+    if (reset) {
+      await this.reset();
+    }
 
-  async fillMockDB(posts, users, categories) {
-    // require(`fs`).writeFileSync(`${process.cwd()}/posts.json`, JSON.stringify(posts));
-    // require(`fs`).writeFileSync(`${process.cwd()}/users.json`, JSON.stringify(users));
-    // require(`fs`).writeFileSync(`${process.cwd()}/categories.json`, JSON.stringify(categories));
     const [dbUsers, dbCategories] = await Promise.all([
       this.createUsers(users),
       this.createCategories(categories)
     ]);
+
     const dbPosts = await this.createPosts(posts, dbUsers, dbCategories);
 
     return {

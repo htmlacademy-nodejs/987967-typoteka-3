@@ -3,7 +3,6 @@
 const fs = require(`fs`);
 const {Client} = require(`pg`);
 const {ADMIN, PSW, POSTGRES_PSW, HOST, DB_PORT} = require(`../config`);
-const {DB} = require(`../db`);
 
 const addPagination = (limit, offset = 0) => {
   return limit ? {
@@ -89,7 +88,7 @@ const createSchema = async ({dbName, admin, password, host, port}) => {
   client.end();
 };
 
-const createDataBase = async (dbName, users, categories, posts, needLogging) => {
+const createDataBase = async (dbName) => {
   await createEmptyDataBase({
     dbName,
     owner: ADMIN,
@@ -105,10 +104,6 @@ const createDataBase = async (dbName, users, categories, posts, needLogging) => 
     host: HOST,
     port: DB_PORT
   });
-
-  const db = new DB(dbName, ADMIN, PSW, needLogging);
-  await db.createMockDB(posts, users, categories);
-  return db;
 };
 
 module.exports = {

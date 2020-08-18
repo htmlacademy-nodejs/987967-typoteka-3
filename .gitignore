@@ -11,6 +11,7 @@ Thumbs.db
 logs
 log
 node_modules/
+http/
 
 # Папка с собранными файлами проекта
 build/
