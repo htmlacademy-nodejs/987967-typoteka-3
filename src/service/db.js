@@ -164,7 +164,7 @@ class DB {
   }
 
   async getCategoryPosts(categoryId, limit, offset) {
-    return getCategoryPosts(this.sequelize, categoryId, limit, offset, PostSortType.BY_DATE);
+    return getCategoryPosts(this.sequelize, categoryId, limit, offset);
   }
 
   async getCategories(excludeNoPost) {
