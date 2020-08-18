@@ -56,7 +56,7 @@ const createCategoryRouter = (service) => {
 
       const {name} = req.body;
       const result = await service.createCategory(name);
-      res.status(HttpStatusCode.OK).json(result);
+      res.status(HttpStatusCode.CREATE).json(result);
     } catch (err) {
       next(err);
     }
