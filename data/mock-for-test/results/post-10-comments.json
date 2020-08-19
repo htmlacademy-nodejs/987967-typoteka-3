@@ -1,0 +1,50 @@
+[
+  {
+    "id": "20",
+    "user_id": "1",
+    "post_id": "10",
+    "date": "2020-07-14T22:03:38.191Z",
+    "text": "Мне кажется или я уже читал это где-то?",
+    "author": {
+      "id": "1",
+      "email": "noah.ggeero@test.com",
+      "firstname": "Noah",
+      "lastname": "George",
+      "avatar": {
+        "name": "ec_Ut"
+      }
+    }
+  },
+  {
+    "id": "21",
+    "user_id": "1",
+    "post_id": "10",
+    "date": "2020-07-20T17:08:57.957Z",
+    "text": "Это где ж такие красоты?",
+    "author": {
+      "id": "1",
+      "email": "noah.ggeero@test.com",
+      "firstname": "Noah",
+      "lastname": "George",
+      "avatar": {
+        "name": "ec_Ut"
+      }
+    }
+  },
+  {
+    "id": "22",
+    "user_id": "2",
+    "post_id": "10",
+    "date": "2020-08-09T07:41:04.412Z",
+    "text": "Совсем немного...",
+    "author": {
+      "id": "2",
+      "email": "phoebe.learhci@test.com",
+      "firstname": "Phoebe",
+      "lastname": "Charlie",
+      "avatar": {
+        "name": "vEWwI"
+      }
+    }
+  }
+]
