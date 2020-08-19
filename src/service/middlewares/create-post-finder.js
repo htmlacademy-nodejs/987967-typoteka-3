@@ -9,7 +9,7 @@ const createPostFinder = (service) => async (req, res, next) => {
     await Joi.number().validateAsync(id);
     const post = await service.getPost(id);
 
-    if (!post) {
+    if (post === null) {
       const message = `Can't find post with ID='${id}'`;
       throw getValidationException([message]);
     }

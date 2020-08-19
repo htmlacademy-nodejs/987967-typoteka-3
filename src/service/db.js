@@ -324,13 +324,14 @@ class DB {
       });
 
       await PostCategory.bulkCreate(post.categories.map((it) => ({
-        [`category_id`]: it.id,
+        [`category_id`]: it,
         [`post_id`]: id,
       })), {transaction});
 
       await transaction.commit();
     } catch (err) {
       await transaction.rollback();
+      throw err;
     }
   }
 

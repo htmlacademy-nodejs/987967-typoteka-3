@@ -35,7 +35,7 @@ const createPostRouter = (service) => {
     }
   });
 
-  router.delete(`/:articleId`, [findPost], async (req, res, next) => {
+  router.delete(`/:articleId`, findPost, async (req, res, next) => {
     const post = res.locals.post;
 
     try {
@@ -62,7 +62,7 @@ const createPostRouter = (service) => {
 
   router.get(`/:articleId/comments`, findPost, async (req, res, next) => {
     try {
-      res.status(HttpStatusCode.OK).json(await service.getComments(req.params.articleId));
+      res.status(HttpStatusCode.OK).json(res.locals.post.comments);
     } catch (err) {
       next(err);
       return;

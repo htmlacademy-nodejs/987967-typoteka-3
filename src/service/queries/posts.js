@@ -38,7 +38,7 @@ const getPostsSortedByPopularity = async (sequelize, limit, offset) => {
       attributes: []
     }],
     group: `Post.id`,
-    order: [[sequelize.fn(`COUNT`, sequelize.col(`comments.id`)), `DESC`]],
+    order: [[sequelize.fn(`COUNT`, sequelize.col(`comments.id`)), `DESC`], [`id`, `ASC`]],
     ...addPagination(limit, offset),
     subQuery: false,
     raw: true
@@ -51,14 +51,14 @@ const getPostsSortedByPopularity = async (sequelize, limit, offset) => {
 
   return {
     posts: await Post.findAll(query),
-    total: count,
+    total: count.length,
   };
 };
 
 const getPostsSortedByDate = async (sequelize, limit, offset) => {
   const {rows, count} = await Post.findAndCountAll({
     attributes: [`id`, `date`],
-    order: [[`date`, `DESC`]],
+    order: [[`date`, `DESC`], [`id`, `ASC`]],
     ...addPagination(limit, offset),
     raw: true
   });
