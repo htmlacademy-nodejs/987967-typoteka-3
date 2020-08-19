@@ -198,6 +198,11 @@ const readTestMockFiles = async () => {
   };
 };
 
+const readJsonFile = (file) => {
+  const data = fs.readFileSync(file).toString();
+  return JSON.parse(data);
+};
+
 module.exports = {
   getRandomInt,
   getRandomElement,
@@ -214,4 +219,5 @@ module.exports = {
   getValidationException,
   parseValidationException,
   readTestMockFiles,
+  readJsonFile,
 };
