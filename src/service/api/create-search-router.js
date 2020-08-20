@@ -13,7 +13,7 @@ const createSearchRouter = (service) => {
     });
 
     try {
-      schema.validateAsync(req.query);
+      await schema.validateAsync(req.query);
 
       const query = req.query.query;
       const foundPosts = await service.search(query);
