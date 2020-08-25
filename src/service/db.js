@@ -177,6 +177,12 @@ class DB {
     })).map((it) => it.id);
   }
 
+  async getCategoryByName(name) {
+    return Category.findOne({
+      where: {name}
+    });
+  }
+
   async getCategory(id) {
     return Category.findByPk(id);
   }

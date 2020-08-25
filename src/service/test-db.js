@@ -11,8 +11,8 @@ const {DB} = require(`./db`);
   const db = new DB(`typoteka`);
 
   try {
-    const post = await db.getPost(`101`);
-    console.log(post === null);
+    const categpry = await db.getCategoryByName(`ITI`);
+    console.log(categpry);
   } catch (err) {
     console.log(err);
   }

@@ -4,6 +4,7 @@ const {Router} = require(`express`);
 const Joi = require(`joi`);
 const {limitSchema, categorySchema} = require(`../joi-schemas`);
 const {HttpStatusCode} = require(`../const`);
+const {getValidationException} = require(`../utils`);
 const {createCategoryFinder} = require(`../middlewares`);
 
 const createCategoryRouter = (service) => {
@@ -30,6 +31,12 @@ const createCategoryRouter = (service) => {
   router.delete(`/:categoryId`, findCategory, async (req, res, next) => {
     try {
       const categoryId = req.params.categoryId;
+      const categoryPosts = await service.getCategoryPosts(categoryId);
+
+      if (categoryPosts.total !== 0) {
+        throw getValidationException([`Can't delete category contains posts`]);
+      }
+
       await service.deleteCategory(categoryId);
       res.status(HttpStatusCode.OK).json(res.locals.category);
     } catch (err) {
@@ -55,6 +62,11 @@ const createCategoryRouter = (service) => {
       await categorySchema.validateAsync(req.body);
 
       const {name} = req.body;
+
+      if (await service.getCategoryByName(name)) {
+        throw getValidationException([`Category name must be unique`]);
+      }
+
       const result = await service.createCategory(name);
       res.status(HttpStatusCode.CREATE).json(result);
     } catch (err) {
