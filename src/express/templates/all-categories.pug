@@ -15,34 +15,38 @@ block content
     section.main-page__category.category
       h1.category__title &Kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&icy;
       .category__add-form
-        form(action='/categories' method='POST')
-          input#add-form-add-category(value=`${categories.newItem || ``}` type='text' name='category-new' placeholder='Новая категория')
+        form(action='/categories' method='GET')
+          input#add-form-add-category(value=`${newCategory.name}` type='text' name='name' placeholder='Новая категория')
           label(for='add-form-add-category')
             span.visually-hidden &Dcy;&ocy;&bcy;&acy;&vcy;&icy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
           button.category__button.button.button--category(type='submit' name='action' value='new') &Dcy;&ocy;&bcy;&acy;&vcy;&icy;&tcy;&softcy;
-        if (categories.newItemError)
-          p(style={
-            color: 'red',
-            ['font-size']: '0.7rem',
-            ['min-height']: '10px',
-            ['padding-top']: 0,
-          }) #{categories.newItemError}
+
+        if (newCategory.errors)
+            each error in newCategory.errors
+              p(style={
+                color: 'red',
+                ['font-size']: '0.7rem',
+                ['min-height']: '10px',
+                ['padding-top']: 0,
+              }) #{error}
 
       ul.category__list
         each category, index in categories
           li.category__list-item
-            form(action='/categories' method='POST')
-              input(id=`modify-form-category-${index}` type='text' name=`category-${category.id}` value=category.name)
+            form(action='/categories' method='GET')
+              input(type='hidden' name='id' value=category.id)
+              input(id=`modify-form-category-${index}` type='text' name='name' value=category.name)
               label(for=`modify-form-category-${index}`)
                 span.visually-hidden &Rcy;&iecy;&dcy;&acy;&kcy;&tcy;&icy;&rcy;&ocy;&vcy;&acy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
               button.category__button.button.button--category(type='submit' name='action' value='update') &Scy;&ocy;&khcy;&rcy;&acy;&ncy;&icy;&tcy;&softcy;
               button.category__button.button.button--category(type='submit' name='action' value='delete') &Ucy;&dcy;&acy;&lcy;&icy;&tcy;&softcy;
-          if (category.error)
-            li.category__list-item(style={
-              color: 'red',
-              ['font-size']: '0.7rem',
-              ['min-height']: '10px',
-              ['padding-top']: 0,
-              ['margin-top']: '-20px',
-            }) #{category.error}
 
+          if (category.errors)
+            each error in category.errors
+              li.category__list-item(style={
+                color: 'red',
+                ['font-size']: '0.7rem',
+                ['min-height']: '10px',
+                ['padding-top']: 0,
+                ['margin-top']: '-20px',
+              }) #{error}

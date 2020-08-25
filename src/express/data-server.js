@@ -37,7 +37,7 @@ class DataServer {
     this._api = createAPI();
   }
 
-  async getCategories(excludeEmpty) {
+  async getCategories(excludeEmpty = true) {
     return this._request(`/categories?${QueryString.encode({excludeEmpty})}`);
   }
 
@@ -108,6 +108,10 @@ class DataServer {
     try {
       res = await this._api[method](url, data);
     } catch (err) {
+      if (res.status < 500) {
+        return res.data;
+      }
+
       logger.error(err);
       throw new Error(err);
     }

@@ -2,7 +2,9 @@
 
 const chalk = require(`chalk`);
 const fs = require(`fs`);
-const {generatePosts, readTestMockFiles} = require(`../utils`);
+const {generatePosts} = require(`../utils`);
+// const {readTestMockFiles} = require(`../utils`);
+
 const {
   ExitCode,
   Message,
@@ -17,8 +19,8 @@ const {DB} = require(`../db`);
 const {ADMIN, PSW, DBNAME} = require(`../config`);
 
 const createDB = async (postCount, userCount) => {
-  // const {users, posts, categories} = await generatePosts(postCount, userCount);
-  const {users, posts, categories} = await readTestMockFiles();
+  const {users, posts, categories} = await generatePosts(postCount, userCount);
+  // const {users, posts, categories} = await readTestMockFiles();
   fs.promises.writeFile(MOCK_FILE, JSON.stringify({categories, users, posts}));
 
   try {

@@ -179,6 +179,9 @@ articleRouter.post(`/add`, upload.single(`picture`), async (req, res, next) => {
   res.redirect(`/my`);
 });
 
+// articleRouter.post(`/:articleId/comments`, async (req, res, next) => {
+// });
+
 module.exports = {
   articleRouter,
 };

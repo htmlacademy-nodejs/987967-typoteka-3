@@ -24,8 +24,17 @@ const formatDateTime = (date) => {
   return `${formatDate(date)}, ${hours}:${minutes}`;
 };
 
+const parseJoiException = (exception) => {
+  if (exception) {
+    return exception.details.map((it) => it.message);
+  }
+
+  return [];
+};
+
 module.exports = {
   getPagination,
   formatDate,
   formatDateTime,
+  parseJoiException,
 };
