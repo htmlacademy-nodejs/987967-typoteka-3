@@ -9,22 +9,19 @@ const dataServer = new DataServer();
 
 myRouter.get(`/`, async (req, res, next) => {
   const {delete: deleteId} = req.query;
-  if (deleteId) {
-    try {
+
+  try {
+    if (deleteId) {
       await dataServer.deletePost(deleteId);
       res.redirect(`/my`);
-    } catch (err) {
-      next(err);
-    }
-  } else {
-    try {
+    } else {
       const {posts} = await dataServer.getPostPreviews(PostSortType.DATE);
       res.render(`my`, {
         posts
       });
-    } catch (err) {
-      next(err);
     }
+  } catch (err) {
+    next(err);
   }
 });
 

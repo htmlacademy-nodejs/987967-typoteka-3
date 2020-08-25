@@ -1,11 +1,11 @@
 'use strict';
 
+const QueryString = require(`querystring`);
 const {Router} = require(`express`);
 const Joi = require(`joi`);
 const {DataServer} = require(`../data-server`);
 const {categorySchema} = require(`../joi-schemas`);
 const {parseJoiException} = require(`../utils`);
-const logger = require(`../../logger`).getLogger(`app`);
 
 const isEmpty = (object) => Object.keys(object).length === 0;
 const isUnique = (name, categories) => categories.find((it) => it.name === name) === undefined;
@@ -15,132 +15,128 @@ const categoryRouter = new Router();
 const dataServer = new DataServer();
 
 const querySchema = Joi.object({
-  action: Joi.string().valid(`new`, `update`, `delete`).required(),
-  name: Joi.string().when(`action`, {
-    not: `delete`,
-    then: Joi.required(),
-  }),
-  id: Joi.number().when(`action`, {
-    not: `new`,
-    then: Joi.required(),
-  }),
+  id: Joi.string().pattern(new RegExp(`^([0-9]+|new)$`)).required(),
+  name: categorySchema.required(),
+  action: Joi.string().valid(`delete`, `update`, `create`).required(),
 });
 
+const simpleQuerySchema = Joi.object({
+  id: Joi.string().pattern(new RegExp(`^([0-9]+|new)$`)).required(),
+  name: Joi.string().required(),
+  action: Joi.string().valid(`delete`, `update`, `create`).required(),
+});
+
+const validateCategoryName = (name, categories) => {
+  const errors = parseJoiException(categorySchema.validate(name, {abortEarly: false}).error);
+  if (!isUnique(name, categories)) {
+    errors.push(`Category name must be unique`);
+  }
+
+  return errors;
+};
+
 const validateQuery = async (req, res, next) => {
+  if (isEmpty(req.query)) {
+    next();
+    return;
+  }
+
   try {
-    res.locals = {
-      categories: await dataServer.getCategories(false),
-      newCategory: {
-        name: ``
-      },
-      targetCategory: undefined
-    };
+    await simpleQuerySchema.validateAsync(req.query);
+    next();
+  } catch (err) {
+    res.redirect(`/categories`);
+  }
+};
+
+categoryRouter.get(`/`, validateQuery, async (req, res, next) => {
+  try {
+    const categories = await dataServer.getCategories(false);
+    const newCategory = {name: ``};
 
     if (isEmpty(req.query)) {
-      res.render(`all-categories`, res.locals);
+      res.render(`all-categories`, {categories, newCategory});
       return;
     }
 
-    const errors = parseJoiException(querySchema.validate(req.query).error);
-    if (errors.length) {
-      logger.info(`Wrong query: ${errors}`);
+    const {action, id, name} = req.query;
+    const targetCategoryIndex = getCategoryIndex(id, categories);
+
+    if (targetCategoryIndex === -1 && action !== `create`) {
       res.redirect(`/categories`);
       return;
     }
 
-    next();
+    switch (action) {
+      case `create`:
+        newCategory.errors = validateCategoryName(name, categories);
+        newCategory.name = name;
+        break;
 
+      case `update`:
+        categories[targetCategoryIndex].errors = validateCategoryName(name, categories);
+        categories[targetCategoryIndex].name = name;
+        break;
+
+      case `delete`:
+        const postCount = categories[targetCategoryIndex].count;
+        if (postCount !== 0) {
+          categories[targetCategoryIndex].errors = [`Can't delete a category, contains any posts (${postCount})`];
+        }
+    }
+
+    res.render(`all-categories`, {categories, newCategory});
   } catch (err) {
     next(err);
   }
-};
+});
 
-const validateId = (req, res, next) => {
-  const {id} = req.query;
-
-  if (!id) {
-    res.locals.targetCategory = res.locals.newCategory;
-    next();
-    return;
-  }
-
-  const index = getCategoryIndex(id, res.locals.categories);
-  if (index === -1) {
-    logger.info(`Category with id ${id} not found`);
-    res.redirect(`/categories`);
-    return;
-  }
-
-  res.locals.targetCategory = res.locals.categories[index];
-  next();
-};
-
-const validateName = async (req, res, next) => {
-  const {name, action} = req.query;
-
-  if (!name || action === `delete`) {
-    next();
-    return;
-  }
-
-  const errors = parseJoiException(categorySchema.validate(name, {abortEarly: false}).error);
-  if (!isUnique(name, res.locals.categories)) {
-    errors.push(`Category's name must be unique`);
-  }
-
-  if (errors.length) {
-    res.locals.error = true;
-    res.locals.targetCategory.errors = errors;
-  }
-
-  res.locals.targetCategory.name = name;
-
-  next();
-};
-
-const validateCount = async (req, res, next) => {
-  const {action} = req.query;
-
-  if (action !== `delete`) {
-    next();
-    return;
-  }
-
-  const postCount = res.locals.targetCategory.count;
-  if (postCount !== 0) {
-    res.locals.error = true;
-    res.locals.targetCategory.errors = [`Can't delete category contains posts (${postCount})`];
-  }
-
-  next();
-};
-
-
-categoryRouter.get(`/`, [validateQuery, validateId, validateName, validateCount], async (req, res, next) => {
-  if (res.locals.error) {
-    res.render(`all-categories`, res.locals);
-    return;
-  }
-
-  const {id, name, action} = req.query;
+categoryRouter.post(`/`, async (req, res, next) => {
+  const {name} = req.body;
+  const query = {
+    name,
+    id: `new`,
+    action: `create`
+  };
 
   try {
-    switch (action) {
-      case `new`:
-        await dataServer.createCategory(name);
-        break;
+    await querySchema.validateAsync(query);
+    await dataServer.createCategory(name);
+    res.redirect(`/categories`);
+  } catch (err) {
+    if (err.isJoi || err.isDBServer) {
+      res.redirect(`/categories?${QueryString.encode(query)}`);
+      return;
+    }
 
+    next(err);
+  }
+});
+
+categoryRouter.post(`/:categoryId`, async (req, res, next) => {
+  const id = req.params.categoryId;
+  const {name, action} = req.body;
+  const query = {action, id, name};
+
+  try {
+    querySchema.validateAsync(query);
+
+    switch (action) {
       case `update`:
         await dataServer.updateCategory(id, name);
         break;
 
       case `delete`:
         await dataServer.deleteCategory(id);
-        break;
     }
 
     res.redirect(`/categories`);
   } catch (err) {
+    if (err.isJoi || err.isDBServer) {
+      res.redirect(`/categories?${QueryString.encode(query)}`);
+      return;
+    }
+
     next(err);
   }
 });

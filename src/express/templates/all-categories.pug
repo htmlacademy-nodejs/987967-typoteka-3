@@ -15,7 +15,7 @@ block content
     section.main-page__category.category
       h1.category__title &Kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&icy;
       .category__add-form
-        form(action='/categories' method='GET')
+        form(action='/categories' method='POST')
           input#add-form-add-category(value=`${newCategory.name}` type='text' name='name' placeholder='Новая категория')
           label(for='add-form-add-category')
             span.visually-hidden &Dcy;&ocy;&bcy;&acy;&vcy;&icy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
@@ -33,8 +33,7 @@ block content
       ul.category__list
         each category, index in categories
           li.category__list-item
-            form(action='/categories' method='GET')
-              input(type='hidden' name='id' value=category.id)
+            form(action=`/categories/${category.id}` method='POST')
               input(id=`modify-form-category-${index}` type='text' name='name' value=category.name)
               label(for=`modify-form-category-${index}`)
                 span.visually-hidden &Rcy;&iecy;&dcy;&acy;&kcy;&tcy;&icy;&rcy;&ocy;&vcy;&acy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;

@@ -2,7 +2,8 @@
 
 const QueryString = require(`querystring`);
 const axios = require(`axios`).default;
-const {TIMEOUT, DATA_SERVER_PORT} = require(`./const`);
+const {TIMEOUT, DATA_SERVER_PORT, ErrorType} = require(`./const`);
+const {simplify} = require(`./utils`);
 const {ServiceToExpressAdapter} = require(`./data-adapter`);
 const logger = require(`../logger`).getLogger(`axios`);
 
@@ -47,7 +48,8 @@ class DataServer {
   }
 
   async getPostPreviews(sortType, limit, offset) {
-    const {total, posts} = await this._request(`/articles?${QueryString.encode({sorting: sortType, limit, offset})}`);
+    const query = simplify({sorting: sortType, limit, offset});
+    const {total, posts} = await this._request(`/articles?${QueryString.encode(query)}`);
 
     return {
       postCount: total,
@@ -107,15 +109,21 @@ class DataServer {
     let res;
     try {
       res = await this._api[method](url, data);
+      return res.data;
+
     } catch (err) {
-      if (res.status < 500) {
-        return res.data;
+      if (err.response.status === 400) {
+        const message = `Bad database request: ${err.response.data}`;
+        const error = new Error(message);
+        error.isDBServer = true;
+
+        logger.info(message);
+        throw error;
       }
 
       logger.error(err);
       throw new Error(err);
     }
-    return res.data;
   }
 }
 
