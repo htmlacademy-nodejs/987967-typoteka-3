@@ -6,12 +6,24 @@ const loggerApp = require(`../../logger`).getLogger(`app`);
 
 const dataServer = new DataServer();
 
-const findPost = async (req, res, next) => {
+const findPostByParam = async (req, res, next) => {
   const {postId} = req.params;
+  return findPost(postId, req, res, next);
+};
 
+const findPostByQuery = async (req, res, next) => {
+  const {postId} = req.query;
+  return findPost(postId, req, res, next);
+};
+
+const findPost = async (postId, req, res, next) => {
   try {
     await Joi.number().validateAsync(postId);
-    res.locals.post = await dataServer.getPost(postId);
+
+    if (postId) {
+      res.locals.post = await dataServer.getPost(postId);
+    }
+
     next();
   } catch (err) {
     if (err.isJoi || err.isDBServer) {
@@ -25,5 +37,6 @@ const findPost = async (req, res, next) => {
 };
 
 module.exports = {
-  findPost,
+  findPostByParam,
+  findPostByQuery,
 };

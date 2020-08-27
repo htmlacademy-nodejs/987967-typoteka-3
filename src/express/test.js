@@ -3,26 +3,20 @@
 const Joi = require(`joi`);
 
 const schema = Joi.object({
-  picture: Joi.when(Joi.ref(`originalName`), {
-    is: Joi.valid(``),
-    then: Joi.valid(``),
-    otherwise: Joi.object({
-      name: Joi.when(`originalName`, {
-        is: Joi.valid(``),
-        then: Joi.valid(``),
-        otherwise: Joi.string()
-      }),
-      originalName: Joi.string().allow(``)
-    })
-  })
-});
+  postId: Joi.number().required(),
+  commentId: Joi.valid(...[1, 2, 3]).required()
+}).allow({});
 
 (async () => {
-  const q = await schema.validateAsync({
-    picture: {
-      name: ``,
-      originalName: ``
-    }
-  });
-  console.log(q);
+  try {
+    const q = await schema.validateAsync({
+    });
+    console.log(q);
+  } catch (err) {
+    console.error(err);
+  }
 })();
+
+
+// console.info(value)
+// console.info(error)

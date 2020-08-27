@@ -6,7 +6,7 @@ const multer = require(`multer`);
 const {DataServer} = require(`../data-server`);
 const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT} = require(`../const`);
 const {getPagination, parseJoiException} = require(`../utils`);
-const {findPost, getCategories, getAllCategories, getCategory} = require(`../middlewares`);
+const {findPostByParam, getCategories, getAllCategories, getCategory} = require(`../middlewares`);
 const {createPostSchema} = require(`../joi-schemas`);
 
 const articleRouter = new Router();
@@ -82,7 +82,7 @@ articleRouter.get(`/add`, getAllCategories, async (req, res, next) => {
   }
 });
 
-articleRouter.get(`/:postId`, [getCategories, findPost], async (req, res, next) => {
+articleRouter.get(`/:postId`, [getCategories, findPostByParam], async (req, res, next) => {
   try {
     const {categories, post} = res.locals;
 
@@ -118,7 +118,7 @@ articleRouter.get(`/category/:categoryId`, [getCategories, getCategory], async (
   }
 });
 
-articleRouter.get(`/edit/:postId`, [getAllCategories, findPost], async (req, res, next) => {
+articleRouter.get(`/edit/:postId`, [getAllCategories, findPostByParam], async (req, res, next) => {
   try {
     const {postId} = req.params;
     const {categories, post} = res.locals;
@@ -134,7 +134,7 @@ articleRouter.get(`/edit/:postId`, [getAllCategories, findPost], async (req, res
   }
 });
 
-articleRouter.post(`/edit/:postId`, [findPost, upload.single(`picture`), getAllCategories, validateFormData], async (req, res, next) => {
+articleRouter.post(`/edit/:postId`, [findPostByParam, upload.single(`picture`), getAllCategories, validateFormData], async (req, res, next) => {
   const {postData, post, errors, categories} = res.locals;
 
   try {

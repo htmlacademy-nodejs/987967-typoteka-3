@@ -1,9 +1,9 @@
 'use strict';
 
-const FindPost = require(`./find-post`);
-const GetCategories = require(`./get-categories`);
+const PostMiddlewares = require(`./post`);
+const CategoryMiddlewares = require(`./category`);
 
 module.exports = {
-  ...FindPost,
-  ...GetCategories,
+  ...PostMiddlewares,
+  ...CategoryMiddlewares,
 };

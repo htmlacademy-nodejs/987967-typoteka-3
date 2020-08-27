@@ -23,5 +23,5 @@ block content
               time.publication__item-time(datetime=comment.dateTime) #{comment.dateTimeLocalized}
             a.publication__item-text(href=`/articles/${comment.post.id}`) #{comment.text}
             p.publication__text-strong #{comment.post.title}
-            a.publication__button.button.button--close-item(href=`/my/comments/?delete=${comment.id}&post=${comment.post.id}`)
+            a.publication__button.button.button--close-item(href=`/my/comments/?commentId=${comment.id}&postId=${comment.post.id}`)
               span.visually-hidden &Zcy;&acy;&kcy;&rcy;&ycy;&tcy;&softcy; &scy;&tcy;&rcy;&ocy;&kcy;&ucy; &scy;&pcy;&icy;&scy;&kcy;&acy;
