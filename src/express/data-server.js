@@ -42,8 +42,9 @@ class DataServer {
     return this._request(`/categories?${QueryString.encode({excludeEmpty})}`);
   }
 
-  async getComments() {
-    const comments = await this._request(`/comments`);
+  async getComments(limit, offset) {
+    const queryString = limit || offset ? `?${QueryString.encode({limit, offset})}` : ``;
+    const comments = await this._request(`/comments${queryString}`);
     return comments.map((it) => ServiceToExpressAdapter.getComment(it));
   }
 
