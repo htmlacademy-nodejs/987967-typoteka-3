@@ -30,7 +30,7 @@ const createCategoryRouter = (service) => {
 
   router.delete(`/:categoryId`, findCategory, async (req, res, next) => {
     try {
-      const categoryId = req.params.categoryId;
+      const {categoryId} = req.params;
       const categoryPosts = await service.getCategoryPosts(categoryId);
 
       if (categoryPosts.total !== 0) {

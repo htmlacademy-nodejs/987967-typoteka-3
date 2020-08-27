@@ -14,7 +14,7 @@ beforeAll(async () => {
   const {users, posts, categories} = await readTestMockFiles();
   await createDataBase(dbName);
 
-  db = new DB(dbName);
+  db = new DB(dbName, undefined, undefined, true);
   await db.fillDataBase(posts, users, categories);
 
   server = createServer(db);
@@ -34,6 +34,7 @@ it(`should return a list of categories with its quantity`, async () => {
     {id: `1`, name: `Деревья`, count: 4},
     {id: `9`, name: `Железо`, count: 0},
     {id: `2`, name: `За жизнь`, count: 3},
+    {id: `10`, name: `Категория без постов`, count: 0},
     {id: `7`, name: `Кино`, count: 0},
     {id: `6`, name: `Музыка`, count: 1},
     {id: `8`, name: `Программирование`, count: 1},
@@ -98,11 +99,12 @@ it(`should return 200 and list of 1 post`, async () => {
 });
 
 it(`should return 200 and delete a category`, async () => {
-  const res = await supertest(server).delete(`/api/categories/5`);
+  const res = await supertest(server).delete(`/api/categories/10`);
+  console.log(res.body);
   expect(res.status).toBe(200);
-  expect(res.body.id).toBe(`5`);
+  expect(res.body.id).toBe(`10`);
 
-  const resCategories = await supertest(server).get(`/api/categories/5`);
+  const resCategories = await supertest(server).get(`/api/categories/10`);
   expect(resCategories.status).toBe(400);
 });
 
