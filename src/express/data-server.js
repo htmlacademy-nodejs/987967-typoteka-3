@@ -2,7 +2,7 @@
 
 const QueryString = require(`querystring`);
 const axios = require(`axios`).default;
-const {TIMEOUT, DATA_SERVER_PORT, ErrorType} = require(`./const`);
+const {TIMEOUT, DATA_SERVER_PORT} = require(`./const`);
 const {simplify} = require(`./utils`);
 const {ServiceToExpressAdapter} = require(`./data-adapter`);
 const logger = require(`../logger`).getLogger(`axios`);

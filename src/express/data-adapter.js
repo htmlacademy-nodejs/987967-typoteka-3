@@ -44,7 +44,7 @@ const ExpressToServiceAdapter = {
 
     const categories = Object.keys(postData).reduce((acc, cur) => {
       const matches = cur.match(regexp);
-      return matches ? [...acc, {id: matches[1]}] : acc;
+      return matches ? [...acc, matches[1]] : acc;
     }, []);
 
     const [day, month, year, hour, minute] = postData.date.replace(/[, :]+/g, `.`).split(`.`).map((it) => Number(it));

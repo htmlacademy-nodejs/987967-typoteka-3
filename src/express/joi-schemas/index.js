@@ -1,15 +1,15 @@
 'use strict';
 
-const {commentSchema} = require(`./comment`);
-const {postSchema} = require(`./post`);
-const {limitSchema} = require(`./limit-offset`);
-const {postLimitSchema} = require(`./post-limit`);
-const {categorySchema} = require(`./category`);
+const CommentSchema = require(`./comment`);
+const PostSchema = require(`./post`);
+const LimitSchema = require(`./limit-offset`);
+const PostLimitSchema = require(`./post-limit`);
+const CategorySchema = require(`./category`);
 
 module.exports = {
-  commentSchema,
-  postSchema,
-  limitSchema,
-  postLimitSchema,
-  categorySchema,
+  ...CommentSchema,
+  ...PostSchema,
+  ...LimitSchema,
+  ...PostLimitSchema,
+  ...CategorySchema,
 };
