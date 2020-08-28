@@ -1,21 +1,18 @@
 'use strict';
 
-const fs = require(`fs`);
-const {createDataBase, dropDataBase, addPagination} = require(`./utils`);
-const {Post} = require(`./models`);
-const {getCategoryPosts} = require(`./queries`);
-const {DB} = require(`./db`);
-
+const {getHash, compareHash} = require(`./utils`);
 
 (async () => {
-  const db = new DB(`typoteka`);
+  const password = `my_password`;
+  const password2 = `my_passwоrd`;
 
   try {
-    const categpry = await db.getCategoryByName(`ITI`);
-    console.log(categpry);
+    const hash = await getHash(password);
+    console.log(hash);
+
+    console.log(await compareHash(password, hash));
+    console.log(await compareHash(password2, hash));
   } catch (err) {
     console.log(err);
   }
-
-  db.close();
 })();

@@ -6,12 +6,14 @@ const models = require(`./models`);
 const {PostSortType} = require(`./const`);
 const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts, getCategories, updatePicture} = require(`./queries`);
 const {User, PostCategory, Category, Comment, Post} = require(`./models`);
-const {addPagination} = require(`./utils`);
+const {addPagination, getHash} = require(`./utils`);
 
-const prepareUserData = ({email, firstname, lastname, password, avatar, originalAvatar}) => {
+const prepareUserData = async ({email, firstname, lastname, password, avatar, originalAvatar}) => {
   const userData = {email, firstname, lastname};
   const avatarData = {name: avatar, originalName: originalAvatar};
-  const passwordData = {password};
+  const passwordData = {
+    password: await getHash(password),
+  };
 
   userData.avatar = avatarData;
   userData.password = passwordData;
@@ -90,7 +92,7 @@ class DB {
   }
 
   async createUser(data) {
-    const userData = prepareUserData(data);
+    const userData = await prepareUserData(data);
 
     return User.create(userData, {
       include: [User.Avatar, User.Password]
@@ -98,7 +100,7 @@ class DB {
   }
 
   async createUsers(data) {
-    const userData = data.map((it) => prepareUserData(it));
+    const userData = await Promise.all(data.map((it) => prepareUserData(it)));
 
     return User.bulkCreate(userData, {
       include: [User.Avatar, User.Password]

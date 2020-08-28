@@ -12,7 +12,7 @@ class Password extends Model {
       },
 
       password: {
-        type: DataTypes[`STRING`](50),
+        type: DataTypes[`STRING`](60),
         allowNull: false,
       },
 

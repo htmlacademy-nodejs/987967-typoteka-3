@@ -81,4 +81,6 @@ module.exports = {
   PICTURE_FOLDER: `src/express/public/img/post-images`,
 
   VALIDATION_EXCEPTION: `Validation exception`,
+
+  BCRYPT_SALT: 10,
 };
