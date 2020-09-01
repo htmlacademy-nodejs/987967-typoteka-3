@@ -92,10 +92,12 @@ class DB {
   }
 
   async createUser(data) {
-    const userData = await prepareUserData(data);
+    data.password = {
+      password: await getHash(data.password)
+    };
 
-    return User.create(userData, {
-      include: [User.Avatar, User.Password]
+    return this._create(User, data, {
+      include: [User.Avatar, User.Password],
     });
   }
 
@@ -239,6 +241,12 @@ class DB {
     return User.findByPk(id);
   }
 
+  async getUserByEmail(email) {
+    return User.findOne({
+      where: {email}
+    });
+  }
+
   async getComment(id) {
     return Comment.findByPk(id);
   }
@@ -351,6 +359,23 @@ class DB {
         }
       }
     });
+  }
+
+  async _create(model, data, options) {
+    const transaction = await this.sequelize.transaction();
+    const queryOptions = {
+      ...options,
+      transaction,
+    };
+
+    try {
+      const result = await model.create(data, queryOptions);
+      await transaction.commit();
+      return result;
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
   }
 }
 
