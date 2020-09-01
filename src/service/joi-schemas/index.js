@@ -5,6 +5,7 @@ const {postSchema} = require(`./post`);
 const {limitSchema} = require(`./limit-offset`);
 const {postLimitSchema} = require(`./post-limit`);
 const {categorySchema} = require(`./category`);
+const {userSchema} = require(`./user`);
 
 module.exports = {
   commentSchema,
@@ -12,4 +13,5 @@ module.exports = {
   limitSchema,
   postLimitSchema,
   categorySchema,
+  userSchema,
 };
