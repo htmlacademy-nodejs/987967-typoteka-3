@@ -1,18 +1,25 @@
 'use strict';
 
-const {getHash, compareHash} = require(`./utils`);
+const {DB} = require(`./db`);
+
+const db = new DB();
 
 (async () => {
-  const password = `my_password`;
-  const password2 = `my_passwоrd`;
-
   try {
-    const hash = await getHash(password);
-    console.log(hash);
-
-    console.log(await compareHash(password, hash));
-    console.log(await compareHash(password2, hash));
+    await db.createUser({
+      email: `d.orlov777@gmail.com`,
+      firstname: `Dimitriy`,
+      lastname: `Orloviy`,
+      avatar: {
+        originalName: `rozha.jpg`,
+        name: `fsddfgfg`
+      },
+      password: `dkfsjgkldasasdffgjlkdsf`
+    });
+    console.log(`Ok`);
   } catch (err) {
     console.log(err);
   }
+
+  db.close();
 })();

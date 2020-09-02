@@ -96,9 +96,11 @@ class DB {
       password: await getHash(data.password)
     };
 
-    return this._create(User, data, {
+    const user = await this._create(User, data, {
       include: [User.Avatar, User.Password],
     });
+
+    return user.get({plain: true});
   }
 
   async createUsers(data) {
@@ -115,7 +117,7 @@ class DB {
       postCategories: post.categories.map((it) => ({[`category_id`]: it}))
     };
 
-    return Post.create(postData, {
+    return this._create(Post, postData, {
       include: [Post.Picture, Post.PostCategory]
     });
   }
@@ -238,13 +240,15 @@ class DB {
   }
 
   async getUser(id) {
-    return User.findByPk(id);
+    return (await User.findByPk(id)).get({plain: true});
   }
 
   async getUserByEmail(email) {
-    return User.findOne({
+    const user = await User.findOne({
       where: {email}
     });
+
+    return user ? user.get({plain: true}) : null;
   }
 
   async getComment(id) {
