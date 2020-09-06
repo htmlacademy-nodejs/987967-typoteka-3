@@ -2,7 +2,7 @@
 
 const supertest = require(`supertest`);
 const {createServer} = require(`../cli/server`);
-const {createDataBase, dropDataBase, readTestMockFiles, readJsonFile, compareHash} = require(`../utils`);
+const {createDataBase, dropDataBase, readTestMockFiles, compareHash} = require(`../utils`);
 const {DB} = require(`../db`);
 
 let server;
