@@ -89,6 +89,10 @@ class DataServer {
     return this._request(`/categories`, `post`, {name});
   }
 
+  async createUser(data) {
+    return this._request(`/user`, `post`, data);
+  }
+
   async search(query) {
     const queryString = QueryString.encode({query});
     return (await this._request(`/search?${queryString}`)).map((it) => ServiceToExpressAdapter.getPost(it));
@@ -116,6 +120,7 @@ class DataServer {
       if (err.response.status === 400) {
         const message = `Bad database request: ${err.response.data}`;
         const error = new Error(message);
+        error.errors = err.response.data;
         error.isDBServer = true;
 
         logger.info(message);
