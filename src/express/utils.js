@@ -8,6 +8,17 @@ const getPagination = (page, pageCount, url) => ({
   pageCount,
 });
 
+const simplify = (object) => {
+  const simplifyObject = {};
+  Object.keys(object).forEach((it) => {
+    if (object[it] !== undefined) {
+      simplifyObject[it] = object[it];
+    }
+  });
+
+  return simplifyObject;
+};
+
 const formatNumber = (number) => `${number < 10 ? `0` : ``}${number}`;
 
 const formatDate = (date) => {
@@ -24,8 +35,18 @@ const formatDateTime = (date) => {
   return `${formatDate(date)}, ${hours}:${minutes}`;
 };
 
+const parseJoiException = (exception) => {
+  if (exception) {
+    return exception.details.map((it) => it.message);
+  }
+
+  return [];
+};
+
 module.exports = {
   getPagination,
   formatDate,
   formatDateTime,
+  parseJoiException,
+  simplify,
 };

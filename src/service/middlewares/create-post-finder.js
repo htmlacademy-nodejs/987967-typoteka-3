@@ -1,16 +1,17 @@
 'use strict';
 
-const appLogger = require(`../../logger`).getLogger(`app`);
+const Joi = require(`joi`);
+const {getValidationException} = require(`../utils`);
 
 const createPostFinder = (service) => async (req, res, next) => {
   try {
     const id = req.params.articleId;
+    await Joi.number().validateAsync(id);
     const post = await service.getPost(id);
 
-    if (!post) {
+    if (post === null) {
       const message = `Can't find post with ID='${id}'`;
-      appLogger.error(message);
-      throw new Error(message);
+      throw getValidationException([message]);
     }
 
     res.locals.post = post;

@@ -31,7 +31,7 @@ block content
                 .new-publication__date-form-division
                   .new-publication__date-block
                     label(for='new-publication-date' aria-label='Календарь')
-                    input#new-publication-date(type='text' name='date' value=post.dateTime)
+                    input#new-publication-date(type='text' name='date' value=post.date)
               button.new-publication__button.button.button--colored(type='submit') &Ocy;&pcy;&ucy;&bcy;&lcy;&icy;&kcy;&ocy;&vcy;&acy;&tcy;&softcy;
             a.popup__button.button.button--popup-close(href='/my' aria-label='Закрыть окно')
               | &Zcy;&acy;&kcy;&rcy;&ycy;&tcy;&softcy;
@@ -44,6 +44,7 @@ block content
                 .form__field.form__field--post-image
                   label
                     input#image-name-field(type='text' placeholder='Фотография' readonly='' name='picture-preview' value=`${post.picture ? post.picture.originalName : ``}`)
+                  input#image-db-name-field(type='hidden' name='picture-db-name' value=`${post.picture ? post.picture.name : ``}`)
                   .form__image-loader.form__image-loader--publication
                     label
                       input.visually-hidden(type='file' name='picture' value=`${post.picture ? post.picture.name: ``}`)
@@ -53,7 +54,7 @@ block content
                   each category in categories
                     input(id=`category-${category.id}` type='checkbox' name=`category-id-${category.id}` checked=category.checked)
                     label(for=`category-${category.id}`) #{category.name}
-                a.new-publication__form-link.button.button--transparent(href='#') &Dcy;&ocy;&bcy;&acy;&vcy;&icy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
+                a.new-publication__form-link.button.button--transparent(href='/categories') &Dcy;&ocy;&bcy;&acy;&vcy;&icy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
               .form__wrapper.form__wrapper--text
                 .form__field.form__field--publication-text
                   label
@@ -61,6 +62,6 @@ block content
                 .form__field.form__field--publication-text
                   label
                     textarea(rows='20' placeholder='Полный текст публикации' name='text') #{post.fullText}
+          if errors
+            include includes/form-validation-error.pug
       .modal__overlay
-    if errorMessage
-      include includes/error-modal.pug

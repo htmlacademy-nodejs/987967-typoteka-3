@@ -3,7 +3,7 @@
 const {Op} = require(`sequelize`);
 const {Post, PostCategory} = require(`../models`);
 const {addPagination} = require(`../utils`);
-const {PostSortType} = require(`../db-const`);
+const {PostSortType} = require(`../const`);
 
 const queryPostsByIds = (sequelize, ids) =>({
   attributes: [
@@ -38,7 +38,7 @@ const getPostsSortedByPopularity = async (sequelize, limit, offset) => {
       attributes: []
     }],
     group: `Post.id`,
-    order: [[sequelize.fn(`COUNT`, sequelize.col(`comments.id`)), `DESC`]],
+    order: [[sequelize.fn(`COUNT`, sequelize.col(`comments.id`)), `DESC`], [`id`, `ASC`]],
     ...addPagination(limit, offset),
     subQuery: false,
     raw: true
@@ -51,42 +51,14 @@ const getPostsSortedByPopularity = async (sequelize, limit, offset) => {
 
   return {
     posts: await Post.findAll(query),
-    total: count,
-  };
-};
-
-const getCategoryPosts = async (sequelize, categoryId, limit, offset, sortType) => {
-  const {rows, count} = await PostCategory.findAndCountAll({
-    attributes: [[`post_id`, `id`]],
-    where: {[`category_id`]: categoryId},
-    raw: true,
-    ...addPagination(limit, offset),
-  });
-
-  const postIds = rows.map((it) => Number(it.id));
-  const query = queryPostsByIds(sequelize, postIds);
-
-  let order;
-  switch (sortType) {
-    case PostSortType.BY_DATE:
-      order = [[`date`, `DESC`], [`title`, `ASC`]];
-      break;
-
-    case PostSortType.BY_POPULARITY:
-    default:
-      order = [[sequelize.fn(`COUNT`, sequelize.col(`comments.id`)), `DESC`], [`title`, `ASC`]];
-  }
-
-  return {
-    posts: await Post.findAll({...query, order}),
-    total: count,
+    total: count.length,
   };
 };
 
 const getPostsSortedByDate = async (sequelize, limit, offset) => {
   const {rows, count} = await Post.findAndCountAll({
     attributes: [`id`, `date`],
-    order: [[`date`, `DESC`]],
+    order: [[`date`, `DESC`], [`id`, `ASC`]],
     ...addPagination(limit, offset),
     raw: true
   });
@@ -98,6 +70,31 @@ const getPostsSortedByDate = async (sequelize, limit, offset) => {
 
   return {
     posts: await Post.findAll(query),
+    total: count,
+  };
+};
+
+const getCategoryPosts = async (sequelize, categoryId, limit, offset) => {
+  const {rows, count} = await PostCategory.findAndCountAll({
+    attributes: [[`post_id`, `id`]],
+    include: [{
+      association: PostCategory.Post,
+      attributes: [`date`, `title`]
+    }],
+    where: {[`category_id`]: categoryId},
+    raw: true,
+    order: [[sequelize.col(`post.date`), `DESC`], [sequelize.col(`post.title`), `ASC`]],
+    ...addPagination(limit, offset),
+  });
+
+  const postIds = rows.map((it) => Number(it.id));
+  const query = queryPostsByIds(sequelize, postIds);
+
+  return {
+    posts: await Post.findAll({
+      ...query,
+      order: [[`date`, `DESC`], [`title`, `ASC`]]
+    }),
     total: count,
   };
 };

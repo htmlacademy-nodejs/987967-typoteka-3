@@ -2,89 +2,134 @@
 
 const supertest = require(`supertest`);
 const {createServer} = require(`../cli/server`);
+const {createDataBase, dropDataBase, readTestMockFiles} = require(`../utils`);
+const {DB} = require(`../db`);
 
 let server;
+let dbName;
+let db;
 
-beforeAll(() => {
-  server = createServer(mockPosts);
+beforeAll(async () => {
+  dbName = `test_${Date.now()}`;
+  const {users, posts, categories} = await readTestMockFiles();
+  await createDataBase(dbName);
+
+  db = new DB(dbName, undefined, undefined, true);
+  await db.fillDataBase(posts, users, categories);
+
+  server = createServer(db);
 });
 
-const mockPosts = [
-  {
-    id: `2N_TWZ`,
-    title: `Как перестать беспокоиться и начать жить`,
-    createdDate: `2020-6-6, 19:49:04`,
-    announce: `Альбом стал настоящим открытием года. Мощные гитарные рифы и скоростные соло-партии не дадут заскучать.\nИ не знаю почему, когда я прочитал это письмо, мне так захотелось, чтобы и вы познакомились с этой прелестной девочкой, что я вдруг махнул рукой на свой "научный труд" и на все свои умные рассуждения и решил попробовать - только попробовать - рассказать о ней по-русски.\nПрограммировать не настолько сложно, как об этом говорят.\nИ я не посмел!\nЁлки — это не просто красивое дерево.Это прочная древесина.`,
-    fullText: `Вдруг да они это знают?\nРазве можно было считать скучным человека, который умел сделать из носового платка мышь - и эта мышь бегала как живая! Человека, который из простой бумаги складывал пистолет,- и пистолет этот стрелял почти не худее настоящего! Разве можно было считать скучным такого необыкновенного выдумщика!\nАльбом стал настоящим открытием года. Мощные гитарные рифы и скоростные соло-партии не дадут заскучать.\nИ не знаю почему, когда я прочитал это письмо, мне так захотелось, чтобы и вы познакомились с этой прелестной девочкой, что я вдруг махнул рукой на свой "научный труд" и на все свои умные рассуждения и решил попробовать - только попробовать - рассказать о ней по-русски.\nИ даже немножко раньше: с названия.\nПо совести говоря, бояться нечего.\nЁлки — это не просто красивое дерево.Это прочная древесина.\nВдруг да они это знают?\nНо это, впрочем, не обязательно.\nТам ее знает каждый и любят все.\nВот дочитаете до конца, тогда узнаете! А не дочитаете - ну что ж, дело ваше.\nНо это, впрочем, не обязательно.\nИ вскоре я понял, что самое главное в книжке об Алисе - не загадки, не фокусы, не головоломки, не игра слов и даже не блистательная игра ума, а... сама Алиса.\nПравильно, Алисой!\nИ я не посмел!\nПрограммировать не настолько сложно, как об этом говорят.\nОсобенно он любил и умел играть... словами.\nСловом, со мной вышло точь-в-точь как с одной маленькой девочкой, которая обычно говорила:\nДа, да!\nПо совести говоря, бояться нечего.\nНо это, впрочем, не обязательно.`,
-    categories: [
-      {
-        id: `ww-oGw`,
-        name: `За жизнь`
-      }
-    ],
-    comments: [
-      {
-        id: `y-SA31`,
-        text: `Мне кажется или я уже читал это где-то?\r`
-      }
-    ]
-  },
-  {
-    id: `YFBpPQ`,
-    title: `Как достигнуть успеха не вставая с кресла`,
-    createdDate: `2020-9-5, 17:39:03`,
-    announce: `Осталось добавить совсем немножко: как получилась русская книжка, которую вы сейчас читаете, и при чем тут я.\nИ чтобы это случилось поскорее, я поскорее заканчиваю эту ГЛАВУ (вы, конечно, давно догадались, что это всего-навсего ПРЕДИСЛОВИЕ!).\nКак вдруг в один прекрасный день я прочитал письмо Льюиса Кэрролла театральному режиссеру, который решил поставить сказку про Алису на сцене.\nТам ее знает каждый и любят все.\nУгадайте!..`,
-    fullText: `Там ее знает каждый и любят все.\nОсталось добавить совсем немножко: как получилась русская книжка, которую вы сейчас читаете, и при чем тут я.\nИ чтобы это случилось поскорее, я поскорее заканчиваю эту ГЛАВУ (вы, конечно, давно догадались, что это всего-навсего ПРЕДИСЛОВИЕ!).\nКак вдруг в один прекрасный день я прочитал письмо Льюиса Кэрролла театральному режиссеру, который решил поставить сказку про Алису на сцене.\nУгадайте!..`,
-    categories: [
-      {
-        id: `ww-oGw`,
-        name: `За жизнь`
-      }
-    ],
-    comments: [
-      {
-        id: `m1L7TK`,
-        text: `Мой кот понятнее излагает.\r`
-      }
-    ]
-  },
-  {
-    id: `ydBW9N`,
-    title: `Обзор новейшего смартфона`,
-    createdDate: `2020-20-5, 18:54:00`,
-    announce: `Тут я за вас совершенно спокоен - уверен, что смеяться вы умеете и любите!\nОсталось добавить совсем немножко: как получилась русская книжка, которую вы сейчас читаете, и при чем тут я.\nИ чтобы это случилось поскорее, я поскорее заканчиваю эту ГЛАВУ (вы, конечно, давно догадались, что это всего-навсего ПРЕДИСЛОВИЕ!).\nВот так: МОРЕ - ГОРЕ - ГОРА.\nИ вскоре я понял, что самое главное в книжке об Алисе - не загадки, не фокусы, не головоломки, не игра слов и даже не блистательная игра ума, а... сама Алиса.`,
-    fullText: `Есть у меня один знакомый, приблизительно двух лет от роду, у которого огромное чувство юмора - он может захохотать, когда никому другому и в голову не придет улыбнуться.\nОсталось добавить совсем немножко: как получилась русская книжка, которую вы сейчас читаете, и при чем тут я.\nОн написал больше 30 хитов.\nТут я за вас совершенно спокоен - уверен, что смеяться вы умеете и любите!\nДа, маленькая Алиса, которую автор так любит (хоть порой и посмеивается над ней), что эта великая любовь превращает фокусы в чудеса, а фокусника - в волшебника.\nИ вскоре я понял, что самое главное в книжке об Алисе - не загадки, не фокусы, не головоломки, не игра слов и даже не блистательная игра ума, а... сама Алиса.\nЗолотое сечение — соотношение двух величин, гармоническая пропорция.\nСоветую внимательно прочитать примечания (они напечатаны мелким шрифтом) - это может кое в чем помочь.\nСоветую внимательно прочитать примечания (они напечатаны мелким шрифтом) - это может кое в чем помочь.\nНо стоило мне заикнуться об этом своем желании, как все начинали на меня страшно кричать, чтобы я не смел.\nИ чтобы это случилось поскорее, я поскорее заканчиваю эту ГЛАВУ (вы, конечно, давно догадались, что это всего-навсего ПРЕДИСЛОВИЕ!).\nВот так: МОРЕ - ГОРЕ - ГОРА.\nДа, сразу видно, что это очень и очень непростая сказка!\nДело в том, что хотя перед вами - сказка, но сказка эта очень, очень не простая.\nЭнциклопедический Словарь.\nРок-музыка всегда ассоциировалась с протестами. Так ли это на самом деле?\nЭто и не удивительно\nНачнем с начала, как советует Червонный Король (вам предстоит с ним скоро встретиться).\nИз под его пера вышло 8 платиновых альбомов.\nБольше всего на свете я ненавижу обман и люблю честность и потому сразу честно признаюсь, что я вас (совсем немножко!) обманул: на самом деле это не НИКАКАЯ ГЛАВА, а НИКАКАЯ НЕ ГЛАВА - это просто-напросто...\nНет, фокусы с грехом пополам еще получались, но что-то - может быть, самое главное - пропадало, и веселая, умная, озорная, расчудесная сказка становилась малопонятной и - страшно сказать - скучной.\nЕсли я выполнил свое обещание и вы узнали КОЕ-ЧТО, мне очень приятно.\nПомните, небольшое количество ежедневных упражнений лучше, чем один раз, но много.\nПравильно, Алисой!`,
-    categories: [
-      {
-        id: `ww-oGw`,
-        name: `За жизнь`
-      },
-      {
-        id: `YurTME`,
-        name: `Музыка`
-      }
-    ],
-    comments: [
-      {
-        id: `iLPx9M`,
-        text: `Мне кажется или я уже читал это где-то?\r`
-      },
-      {
-        id: `bakuVg`,
-        text: `Я тоже могу так написать...\r`
-      },
-      {
-        id: `Q4Et4Z`,
-        text: `Давно не пользуюсь стационарными компьютерами. Ноутбуки победили.\r`
-      }
-    ]
-  }];
+afterAll(async () => {
+  db.close();
+  await dropDataBase(dbName);
+});
 
 it(`should return a list of categories with its quantity`, async () => {
   const res = await supertest(server).get(`/api/categories`);
   expect(res.status).toBe(200);
   expect(res.body).toEqual([
-    {id: `ww-oGw`, name: `За жизнь`, count: 3},
-    {id: `YurTME`, name: `Музыка`, count: 1}
+    {id: `5`, name: `IT`, count: 3},
+    {id: `3`, name: `Без рамки`, count: 1},
+    {id: `1`, name: `Деревья`, count: 4},
+    {id: `9`, name: `Железо`, count: 0},
+    {id: `2`, name: `За жизнь`, count: 3},
+    {id: `10`, name: `Категория без постов`, count: 0},
+    {id: `7`, name: `Кино`, count: 0},
+    {id: `6`, name: `Музыка`, count: 1},
+    {id: `8`, name: `Программирование`, count: 1},
+    {id: `4`, name: `Разное`, count: 3}
   ]);
 });
+
+it(`should return a list of categories with its quantity excluded empty`, async () => {
+  const res = await supertest(server).get(`/api/categories?excludeEmpty=true`);
+  expect(res.status).toBe(200);
+  expect(res.body).toEqual([
+    {id: `5`, name: `IT`, count: 3},
+    {id: `3`, name: `Без рамки`, count: 1},
+    {id: `1`, name: `Деревья`, count: 4},
+    {id: `2`, name: `За жизнь`, count: 3},
+    {id: `6`, name: `Музыка`, count: 1},
+    {id: `8`, name: `Программирование`, count: 1},
+    {id: `4`, name: `Разное`, count: 3}
+  ]);
+});
+
+it(`should return 400 if query parameter excludeEmpty is wrong`, async () => {
+  const res = await supertest(server).get(`/api/categories?excludeEmpty=wrong`);
+  expect(res.status).toBe(400);
+});
+
+it(`should return a list of posts`, async () => {
+  const res = await supertest(server).get(`/api/categories/5`);
+  expect(res.status).toBe(200);
+});
+
+it(`should return 400 when :categoryId is not a number`, async () => {
+  let res = await supertest(server).get(`/api/categories/five`);
+  expect(res.status).toBe(400);
+  res = await supertest(server).delete(`/api/categories/five`);
+  expect(res.status).toBe(400);
+  res = await supertest(server).put(`/api/categories/five`);
+  expect(res.status).toBe(400);
+});
+
+it(`should return 400 when a query parameter is not a number`, async () => {
+  const res = await supertest(server).get(`/api/categories/5?limit=wrong&offset=0`);
+  expect(res.status).toBe(400);
+});
+
+it(`should return 200 and list of 3 posts`, async () => {
+  const res = await supertest(server).get(`/api/categories/5`);
+  expect(res.status).toBe(200);
+  expect(res.body.posts).toHaveLength(3);
+
+  const titles = [`Поросенок и перец`, `Билль вылетает в трубу`, `Бег по кругу и длинный рассказ`];
+  expect(res.body.posts.map((it) => it.title)).toEqual(titles);
+});
+
+it(`should return 200 and list of 1 post`, async () => {
+  const res = await supertest(server).get(`/api/categories/5?limit=1&offset=0`);
+  expect(res.status).toBe(200);
+  expect(res.body.posts).toHaveLength(1);
+
+  const titles = [`Поросенок и перец`];
+  expect(res.body.posts.map((it) => it.title)).toEqual(titles);
+});
+
+it(`should return 200 and delete a category`, async () => {
+  const res = await supertest(server).delete(`/api/categories/10`);
+  console.log(res.body);
+  expect(res.status).toBe(200);
+  expect(res.body.id).toBe(`10`);
+
+  const resCategories = await supertest(server).get(`/api/categories/10`);
+  expect(resCategories.status).toBe(400);
+});
+
+it(`should return 400 when category data is not valid`, async () => {
+  let res = await supertest(server).put(`/api/categories/1`).send({name: `12`});
+  expect(res.status).toBe(400);
+  res = await supertest(server).post(`/api/categories`).send({name: `1234567890 1234567890 1234567890`});
+  expect(res.status).toBe(400);
+});
+
+it(`should return 200 and change a category name`, async () => {
+  const newName = `Новое имя`;
+  let res = await supertest(server).put(`/api/categories/1`).send({name: newName});
+  expect(res.status).toBe(200);
+  res = await supertest(server).get(`/api/categories`);
+  const updatedCategory = res.body.find((it) => it.id === `1`);
+  expect(updatedCategory.name).toBe(newName);
+});
+
+it(`should return 201 and create a new category`, async () => {
+  const newName = `Новое имя категории`;
+  let res = await supertest(server).post(`/api/categories`).send({name: newName});
+  expect(res.status).toBe(201);
+  res = await supertest(server).get(`/api/categories`);
+  const updatedCategory = res.body.find((it) => it.name === newName);
+  expect(updatedCategory).toBeDefined();
+});
+

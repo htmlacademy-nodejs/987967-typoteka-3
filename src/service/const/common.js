@@ -19,7 +19,7 @@ module.exports = {
 
   CommentCount: {
     MIN: 0,
-    MAX: 25
+    MAX: 5
   },
 
   CategoryCount: {
@@ -79,4 +79,6 @@ module.exports = {
   PICTURE_MOCK_FOLDER: `data/post-images`,
   AVATAR_FOLDER: `src/express/public/img/avatars`,
   PICTURE_FOLDER: `src/express/public/img/post-images`,
+
+  VALIDATION_EXCEPTION: `Validation exception`,
 };

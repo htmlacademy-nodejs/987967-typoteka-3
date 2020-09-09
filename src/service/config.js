@@ -7,4 +7,6 @@ module.exports = {
   ADMIN: process.env.TK_ADMIN,
   PSW: process.env.TK_PSW,
   HOST: process.env.TK_HOST,
+  POSTGRES_PSW: process.env.TK_POSTGRES_PSW,
+  DB_PORT: process.env.TK_DB_PORT,
 };

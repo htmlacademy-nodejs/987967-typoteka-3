@@ -3,49 +3,59 @@
 const {Router} = require(`express`);
 const {DataServer} = require(`../data-server`);
 const {PostSortType} = require(`../const`);
+const {findPostByQuery} = require(`../middlewares`);
+const Joi = require(`joi`);
 
 const myRouter = new Router();
 const dataServer = new DataServer();
 
-myRouter.get(`/`, async (req, res, next) => {
-  const {delete: deleteId} = req.query;
-  if (deleteId) {
-    try {
-      await dataServer.deletePost(deleteId);
+myRouter.get(`/`, findPostByQuery, async (req, res, next) => {
+  const {post} = res.locals;
+
+  try {
+    if (post) {
+      await dataServer.deletePost(post.id);
       res.redirect(`/my`);
-    } catch (err) {
-      next(err);
-    }
-  } else {
-    try {
+    } else {
       const {posts} = await dataServer.getPostPreviews(PostSortType.DATE);
       res.render(`my`, {
         posts
       });
-    } catch (err) {
-      next(err);
     }
+  } catch (err) {
+    next(err);
   }
 });
 
-myRouter.get(`/comments`, async (req, res, next) => {
-  const {delete: commentId, post: postId} = req.query;
-  if (commentId) {
-    try {
+myRouter.get(`/comments`, findPostByQuery, async (req, res, next) => {
+  const {post} = res.locals;
+  const commentIds = post ? post.comments.map((it) => it.id) : [];
+
+  const querySchema = Joi.object({
+    postId: Joi.number().required(),
+    commentId: Joi.valid(...commentIds).required()
+  }).allow({});
+
+  try {
+    await querySchema.validateAsync(req.query);
+    const {commentId, postId} = req.query;
+
+    if (commentId) {
       await dataServer.deleteComment(postId, commentId);
       res.redirect(`/my/comments`);
-    } catch (err) {
-      next(err);
-    }
-  } else {
-    try {
+    } else {
       const comments = await dataServer.getComments();
       res.render(`comments`, {
         comments,
       });
-    } catch (err) {
-      next(err);
     }
+  } catch (err) {
+    if (err.isJoi) {
+      res.render(`400`);
+      return;
+    }
+
+    next(err);
   }
 });
 

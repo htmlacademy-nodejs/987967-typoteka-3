@@ -1,16 +1,17 @@
 'use strict';
 
-const appLogger = require(`../../logger`).getLogger(`app`);
+const Joi = require(`joi`);
+const {getValidationException} = require(`../utils`);
 
 const createCategoryFinder = (service) => async (req, res, next) => {
   try {
     const {categoryId} = req.params;
+    await Joi.number().validateAsync(categoryId);
     const category = await service.getCategory(categoryId);
 
     if (!category) {
       const message = `Can't find category with ID='${categoryId}'`;
-      appLogger.error(message);
-      throw new Error(message);
+      throw getValidationException([message]);
     }
 
     res.locals.category = category;

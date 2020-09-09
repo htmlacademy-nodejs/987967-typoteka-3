@@ -3,7 +3,7 @@
 const {Sequelize, Op} = require(`sequelize`);
 const {DBNAME, ADMIN, PSW, HOST} = require(`./config`);
 const models = require(`./models`);
-const {PostSortType} = require(`./db-const`);
+const {PostSortType} = require(`./const`);
 const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts, getCategories, updatePicture} = require(`./queries`);
 const {User, PostCategory, Category, Comment, Post} = require(`./models`);
 const {addPagination} = require(`./utils`);
@@ -58,10 +58,14 @@ const preparePostData = ({title, date, announce, text, picture: pictureData, ori
 };
 
 class DB {
-  constructor() {
-    this.sequelize = new Sequelize(DBNAME, ADMIN, PSW, {
+  constructor(dbName = DBNAME, admin = ADMIN, psw = PSW, silent) {
+    this.sequelize = new Sequelize(dbName, admin, psw, {
       host: HOST,
-      dialect: `postgres`
+      dialect: `postgres`,
+      logging: silent ? false : console.log,
+      define: {
+        timestamps: false,
+      },
     });
 
     const modelList = Object.values(models);
@@ -104,7 +108,7 @@ class DB {
   async createPost(post) {
     const postData = {
       ...post,
-      postCategories: post.categories.map((it) => ({[`category_id`]: it.id}))
+      postCategories: post.categories.map((it) => ({[`category_id`]: it}))
     };
 
     return Post.create(postData, {
@@ -114,7 +118,6 @@ class DB {
 
   async createPosts(postData, users, categories) {
     const posts = postData.map((it) => preparePostData(it, users, categories));
-
     return Post.bulkCreate(posts, {
       include: [
         Post.Picture,
@@ -141,18 +144,43 @@ class DB {
     });
   }
 
-  async createMockDB(posts, users, categories) {
-    await this.reset();
-    const [dbUsers, dbCategories] = await Promise.all([this.createUsers(users, {plain: true}), this.createCategories(categories, {plain: true})]);
-    return this.createPosts(posts, dbUsers, dbCategories);
+  async fillDataBase(posts, users, categories, reset) {
+    if (reset) {
+      await this.reset();
+    }
+
+    const [dbUsers, dbCategories] = await Promise.all([
+      this.createUsers(users),
+      this.createCategories(categories)
+    ]);
+
+    const dbPosts = await this.createPosts(posts, dbUsers, dbCategories);
+
+    return {
+      userIDs: dbUsers.map((it) => it.id),
+      categoryIDs: dbCategories.map((it) => it.id),
+      postIDs: dbPosts.map((it) => it.id),
+    };
   }
 
   async getCategoryPosts(categoryId, limit, offset) {
-    return getCategoryPosts(this.sequelize, categoryId, limit, offset, PostSortType.BY_DATE);
+    return getCategoryPosts(this.sequelize, categoryId, limit, offset);
   }
 
   async getCategories(excludeNoPost) {
     return getCategories(this.sequelize, excludeNoPost);
+  }
+
+  async getAllCategories() {
+    return (await Category.findAll({
+      attributes: [`id`]
+    })).map((it) => it.id);
+  }
+
+  async getCategoryByName(name) {
+    return Category.findOne({
+      where: {name}
+    });
   }
 
   async getCategory(id) {
@@ -205,6 +233,10 @@ class DB {
     }
   }
 
+  async getUser(id) {
+    return User.findByPk(id);
+  }
+
   async getComment(id) {
     return Comment.findByPk(id);
   }
@@ -239,15 +271,39 @@ class DB {
     });
   }
 
+  async deletePosts(ids) {
+    return Post.destroy({
+      where: {id: ids}
+    });
+  }
+
   async deleteComment(id) {
     return Comment.destroy({
       where: {id}
     });
   }
 
+  async deleteUser(id) {
+    return User.destroy({
+      where: {id}
+    });
+  }
+
+  async deleteUsers(ids) {
+    return User.destroy({
+      where: {id: ids}
+    });
+  }
+
   async deleteCategory(id) {
     return Category.destroy({
       where: {id}
+    });
+  }
+
+  async deleteCategories(ids) {
+    return Category.destroy({
+      where: {id: ids}
     });
   }
 
@@ -274,13 +330,14 @@ class DB {
       });
 
       await PostCategory.bulkCreate(post.categories.map((it) => ({
-        [`category_id`]: it.id,
+        [`category_id`]: it,
         [`post_id`]: id,
       })), {transaction});
 
       await transaction.commit();
     } catch (err) {
       await transaction.rollback();
+      throw err;
     }
   }
 

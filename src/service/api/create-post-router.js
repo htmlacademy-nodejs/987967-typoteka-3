@@ -2,50 +2,49 @@
 
 const {Router} = require(`express`);
 const {HttpStatusCode} = require(`../const`);
-const {createPostFinder, validatePost, validateComment, createCommentFinder} = require(`../middlewares`);
+const {postLimitSchema, commentSchema} = require(`../joi-schemas`);
+const {createPostFinder, createPostValidator, createCommentValidator, createCommentFinder} = require(`../middlewares`);
 
 const createPostRouter = (service) => {
   const findPost = createPostFinder(service);
   const findComment = createCommentFinder(service);
+  const validatePost = createPostValidator(service);
+  const validateComment = createCommentValidator(service);
   const router = new Router();
 
   router.get(`/`, async (req, res, next) => {
-    const {limit, offset, sorting: sortType} = req.query;
-    let posts;
-
     try {
-      posts = await service.getPosts(sortType, limit, offset);
+      await postLimitSchema.validateAsync(req.query);
+
+      const {limit, offset, sorting: sortType} = req.query;
+      const posts = await service.getPosts(sortType, limit, offset);
+      res.status(HttpStatusCode.OK).json(posts);
     } catch (err) {
       next(err);
       return;
     }
-
-    res.status(HttpStatusCode.OK).json(posts);
   });
 
   router.post(`/`, validatePost, async (req, res, next) => {
-    let post;
-
     try {
-      post = await service.createPost(req.body);
+      const post = await service.createPost(req.body);
+      res.status(HttpStatusCode.CREATE).json(post);
     } catch (err) {
       next(err);
       return;
     }
-
-    res.status(HttpStatusCode.CREATE).json(post);
   });
 
-  router.delete(`/:articleId`, [findPost], async (req, res, next) => {
+  router.delete(`/:articleId`, findPost, async (req, res, next) => {
     const post = res.locals.post;
 
     try {
       await service.deletePost(post.id);
+      res.status(HttpStatusCode.OK).json(post);
     } catch (err) {
       next(err);
       return;
     }
-    res.status(HttpStatusCode.OK).json(post);
   });
 
   router.get(`/:articleId`, findPost, (req, res) => {
@@ -63,7 +62,7 @@ const createPostRouter = (service) => {
 
   router.get(`/:articleId/comments`, findPost, async (req, res, next) => {
     try {
-      res.status(HttpStatusCode.OK).json(await service.getComments(req.params.articleId));
+      res.status(HttpStatusCode.OK).json(res.locals.post.comments);
     } catch (err) {
       next(err);
       return;
@@ -71,15 +70,23 @@ const createPostRouter = (service) => {
   });
 
   router.post(`/:articleId/comments`, [findPost, validateComment], async (req, res, next) => {
-    let comment;
     try {
-      comment = await service.createComment(req.params.articleId, req.body);
+      await commentSchema.validateAsync(req.body);
+
+      const {text, userId, date} = req.body;
+      const commentData = {
+        postId: req.params.articleId,
+        userId,
+        text,
+        date,
+      };
+
+      const comment = await service.createComment(commentData);
+
+      res.status(HttpStatusCode.CREATE).json(comment);
     } catch (err) {
       next(err);
-      return;
     }
-
-    res.status(HttpStatusCode.CREATE).json(comment);
   });
 
   router.delete(`/:articleId/comments/:commentId`, [findPost, findComment], async (req, res, next) => {
@@ -87,12 +94,11 @@ const createPostRouter = (service) => {
 
     try {
       await service.deleteComment(commentId);
+      res.status(HttpStatusCode.OK).json(commentId);
     } catch (err) {
       next(err);
       return;
     }
-
-    res.status(HttpStatusCode.OK).json(commentId);
   });
 
   return router;

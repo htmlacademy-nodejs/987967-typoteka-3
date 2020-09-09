@@ -3,6 +3,8 @@
 const chalk = require(`chalk`);
 const fs = require(`fs`);
 const {generatePosts} = require(`../utils`);
+// const {readTestMockFiles} = require(`../utils`);
+
 const {
   ExitCode,
   Message,
@@ -12,17 +14,20 @@ const {
   MAX_USER_COUNT,
   MOCK_FILE,
 } = require(`../const`);
+const {createDataBase} = require(`../utils`);
 const {DB} = require(`../db`);
+const {ADMIN, PSW, DBNAME} = require(`../config`);
 
 const createDB = async (postCount, userCount) => {
   const {users, posts, categories} = await generatePosts(postCount, userCount);
+  // const {users, posts, categories} = await readTestMockFiles();
   fs.promises.writeFile(MOCK_FILE, JSON.stringify({categories, users, posts}));
 
-  const db = new DB();
   try {
-    await db.authenticate();
-    await db.createMockDB(posts, users, categories);
-    await db.close();
+    await createDataBase(DBNAME);
+    const db = new DB(DBNAME, ADMIN, PSW, false);
+    await db.fillDataBase(posts, users, categories, false);
+    db.close();
 
     console.info(chalk.green(Message.DB_SUCCESS));
     return ExitCode.SUCCESS;

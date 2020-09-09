@@ -23,7 +23,7 @@ class Password extends Model {
           model: `users`,
           key: `id`,
         },
-        onDelete: `RESTRICT`,
+        onDelete: `CASCADE`,
         onUpdate: `CASCADE`,
       }
     }, {

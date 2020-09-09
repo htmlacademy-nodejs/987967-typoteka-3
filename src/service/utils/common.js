@@ -17,6 +17,7 @@ const {
   SentenceCount,
   CategoryCount,
   CommentCount,
+  VALIDATION_EXCEPTION
 } = require(`../const`);
 
 const getRandomInt = (min, max) => {
@@ -172,6 +173,36 @@ const generateCategories = (names) => {
   }));
 };
 
+const getDifference = (arrayA, arrayB) => arrayA.reduce((acc, cur) => arrayB.find((it) => it === cur) ? [...acc] : [cur, ...acc], []);
+
+const getValidationException = (messages) => ({
+  type: VALIDATION_EXCEPTION,
+  details: messages.map((it) => ({message: it}))
+});
+
+const parseValidationException = (exception) =>
+  exception.type === VALIDATION_EXCEPTION || exception.isJoi
+    ? exception.details.map((it) => it.message) : null;
+
+const readTestMockFiles = async () => {
+  const [users, categories, posts] = await Promise.all([
+    fs.promises.readFile(`${process.cwd()}/data/mock-for-test/users.json`),
+    fs.promises.readFile(`${process.cwd()}/data/mock-for-test/categories.json`),
+    fs.promises.readFile(`${process.cwd()}/data/mock-for-test/posts.json`),
+  ]);
+
+  return {
+    users: JSON.parse(users.toString()),
+    categories: JSON.parse(categories.toString()),
+    posts: JSON.parse(posts.toString()),
+  };
+};
+
+const readJsonFile = (file) => {
+  const data = fs.readFileSync(file).toString();
+  return JSON.parse(data);
+};
+
 module.exports = {
   getRandomInt,
   getRandomElement,
@@ -184,4 +215,9 @@ module.exports = {
   getMockPosts,
   getMockTitles,
   getTitleList,
+  getDifference,
+  getValidationException,
+  parseValidationException,
+  readTestMockFiles,
+  readJsonFile,
 };

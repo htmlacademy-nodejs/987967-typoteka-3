@@ -36,4 +36,8 @@ module.exports = {
     MIN: 0,
     MAX: 1000,
   },
+
+  ErrorType: {
+    BAD_DB_REQUEST: `Bad DB request`,
+  },
 };

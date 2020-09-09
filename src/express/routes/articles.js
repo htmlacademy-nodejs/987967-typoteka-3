@@ -1,46 +1,74 @@
 'use strict';
 
 const {Router} = require(`express`);
+const Joi = require(`joi`);
 const multer = require(`multer`);
 const {DataServer} = require(`../data-server`);
-const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT, TitleLength, AnnounceLength, TextLength} = require(`../const`);
-const {ExpressToServiceAdapter, ServiceToExpressAdapter} = require(`../data-adapter`);
-const {getPagination, formatDate} = require(`../utils`);
+const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT} = require(`../const`);
+const {getPagination, parseJoiException} = require(`../utils`);
+const {findPostByParam, getCategories, getAllCategories, getCategory} = require(`../middlewares`);
+const {createPostSchema} = require(`../joi-schemas`);
 
 const articleRouter = new Router();
 const dataServer = new DataServer();
 const upload = multer({dest: `src/express/public/img/post-images`});
 
-const validatePost = (post) => {
-  switch (true) {
-    case post.title.length < TitleLength.MIN || post.title.length > TitleLength.MAX:
-      throw new Error(`Title length must be between ${TitleLength.MIN} and ${TitleLength.MAX}`);
+const checkCategories = (allCategories, checkedIds) => allCategories.map((category) => ({
+  ...category,
+  checked: !!checkedIds.find((it) => it === category.id)
+}));
 
-    case post.announce.length < AnnounceLength.MIN || post.announce.length > AnnounceLength.MAX:
-      throw new Error(`Announce length must be between ${AnnounceLength.MIN} and ${AnnounceLength.MAX}`);
+const filterCategories = (postCategories, categories) => categories.filter((category) => postCategories.find((it) => it.id === category.id));
 
-    case post.categories.length === 0:
-      throw new Error(`One category must be present`);
+const validateFormData = async (req, res, next) => {
+  const {categories} = res.locals;
 
-    case post.text.length > TextLength.MAX:
-      throw new Error(`Text length must be less then ${TextLength.MAX}`);
+  const {
+    date,
+    title,
+    announce,
+    text,
+    [`picture-preview`]: originalName,
+    [`picture-db-name`]: name
+  } = req.body;
+
+  const postCategories = Object.keys(req.body).filter((it) => /^category-id-\d+$/.test(it)).map((it) => it.replace(/^category-id-/, ``));
+  const postData = {
+    date,
+    title,
+    announce,
+    text,
+    categories: postCategories,
+    picture: originalName ? {
+      name: req.file ? req.file.filename : name,
+      originalName,
+    } : undefined
+  };
+
+  try {
+    res.locals.postData = postData;
+    const postSchema = createPostSchema(categories);
+    await postSchema.validateAsync(postData, {abortEarly: false});
+
+    next();
+  } catch (err) {
+
+    if (err.isJoi) {
+      res.locals.errors = parseJoiException(err);
+      next();
+      return;
+    }
+
+    next(err);
   }
 };
 
-const checkCategories = (post, categories) => categories.map((category) => ({
-  ...category,
-  checked: !!post.categories.find((it) => it.id === category.id)
-}));
-
-const addCategoryCount = (postCategories, categories) => categories.filter((category) => postCategories.find((it) => it.id === category.id));
-
-articleRouter.get(`/add`, async (req, res, next) => {
+articleRouter.get(`/add`, getAllCategories, async (req, res, next) => {
   try {
-    const categories = await dataServer.getCategories(false);
-    const date = new Date();
+    const {categories} = res.locals;
+    const date = new Date().toISOString();
     const post = {
-      dateLocalized: formatDate(date),
-      dateTime: date,
+      date,
     };
 
     res.render(`new-post`, {
@@ -54,129 +82,102 @@ articleRouter.get(`/add`, async (req, res, next) => {
   }
 });
 
-articleRouter.get(`/:id`, async (req, res, next) => {
+articleRouter.get(`/:postId`, [getCategories, findPostByParam], async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const [categories, post] = await Promise.all([dataServer.getCategories(), dataServer.getPost(id)]);
+    const {categories, post} = res.locals;
 
-    post.categories = addCategoryCount(post.categories, categories);
+    post.categories = filterCategories(post.categories, categories);
     res.render(`post`, {post});
   } catch (err) {
     next(err);
   }
 });
 
-articleRouter.get(`/category/:id`, async (req, res, next) => {
-  const page = Number(req.query.page) || 1;
-  const {id} = req.params;
-
-  let categories;
-  let categoryName;
-  let posts;
-  let postCount;
-
-  try {
-    [categories, {posts, postCount, categoryName}] = await Promise.all([
-      dataServer.getCategories(true),
-      dataServer.getCategoryPostPreviews(id, POST_PREVIEW_COUNT, (page - 1) * POST_PREVIEW_COUNT),
-    ]);
-  } catch (err) {
-    next(err);
-    return;
-  }
-
-  const pageCount = Math.ceil(Number(postCount) / POST_PREVIEW_COUNT);
-
-  res.render(`articles-by-category`, {
-    categories,
-    categoryName,
-    posts,
-    pagination: getPagination(page, pageCount, req.originalUrl.replace(/\?.+/, ``)),
+articleRouter.get(`/category/:categoryId`, [getCategories, getCategory], async (req, res, next) => {
+  const {categories, category} = res.locals;
+  const categoryPostCount = category.count;
+  const pageCount = Math.ceil(categoryPostCount / POST_PREVIEW_COUNT);
+  const querySchema = Joi.object({
+    page: Joi.number().min(1).max(pageCount),
   });
+
+  try {
+    const query = await querySchema.validateAsync(req.query);
+    const page = query.page || 1;
+
+    const {posts} = await dataServer.getCategoryPostPreviews(category.id, POST_PREVIEW_COUNT, (page - 1) * POST_PREVIEW_COUNT);
+
+    res.render(`articles-by-category`, {
+      categories,
+      categoryName: category.name,
+      posts,
+      pagination: getPagination(page, pageCount, req.originalUrl.replace(/\?.+/, ``)),
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
-articleRouter.get(`/edit/:id`, async (req, res, next) => {
+articleRouter.get(`/edit/:postId`, [getAllCategories, findPostByParam], async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const [categories, post] = await Promise.all([dataServer.getCategories(false), dataServer.getPost(id)]);
+    const {postId} = req.params;
+    const {categories, post} = res.locals;
 
     res.render(`new-post`, {
       title: EDIT_POST_TITLE,
       post,
-      categories: checkCategories(post, categories),
-      action: `/articles/edit/${id}`
+      categories: checkCategories(categories, post.categories.map((it) => it.id)),
+      action: `/articles/edit/${postId}`
     });
   } catch (err) {
     next(err);
   }
 });
 
-articleRouter.post(`/edit/:id`, upload.single(`picture`), async (req, res, next) => {
-  const id = req.params.id;
-  const postData = {
-    ...req.body,
-    picture: req.file ? {
-      name: req.file.filename,
-      originalName: req.body[`picture-preview`]
-    } : undefined,
-  };
-
-  const servicePost = ExpressToServiceAdapter.getPost(postData);
+articleRouter.post(`/edit/:postId`, [findPostByParam, upload.single(`picture`), getAllCategories, validateFormData], async (req, res, next) => {
+  const {postData, post, errors, categories} = res.locals;
 
   try {
-    validatePost(servicePost);
-    await dataServer.updatePost(id, servicePost);
+    if (errors) {
+      const renderData = {
+        title: EDIT_POST_TITLE,
+        post: postData,
+        categories: checkCategories(categories, postData.categories),
+        action: `/articles/edit/${post.id}`,
+        errors,
+      };
+
+      res.render(`new-post`, renderData);
+    } else {
+      await dataServer.updatePost(post.id, postData);
+      res.redirect(`/my`);
+    }
   } catch (err) {
-    const categories = await dataServer.getCategories(false);
-    const post = ServiceToExpressAdapter.getPost(servicePost);
-
-    res.render(`new-post`, {
-      title: EDIT_POST_TITLE,
-      post,
-      categories: checkCategories(post, categories),
-      action: `/articles/edit/${id}`,
-      errorMessage: err,
-    });
-
     next(err);
-
-    return;
   }
-
-  res.redirect(`/my`);
 });
 
-articleRouter.post(`/add`, upload.single(`picture`), async (req, res, next) => {
-  const postData = {
-    ...req.body,
-    picture: req.file ? {
-      name: req.file.filename,
-      originalName: req.body[`picture-preview`]
-    } : undefined,
-  };
-  const servicePost = ExpressToServiceAdapter.getPost(postData);
+articleRouter.post(`/add`, [upload.single(`picture`), getAllCategories, validateFormData], async (req, res, next) => {
+  const {postData, categories, errors} = res.locals;
 
   try {
-    validatePost(servicePost);
-    await dataServer.createPost(servicePost);
+    if (errors) {
+      const renderData = {
+        title: NEW_POST_TITLE,
+        post: postData,
+        categories: checkCategories(categories, postData.categories),
+        action: `/articles/add`,
+        errors,
+      };
+
+      res.render(`new-post`, renderData);
+    } else {
+      await dataServer.createPost(postData);
+      res.redirect(`/my`);
+    }
   } catch (err) {
-    const categories = await dataServer.getCategories(false);
-    const post = ServiceToExpressAdapter.getPost(servicePost);
-
-    res.render(`new-post`, {
-      title: NEW_POST_TITLE,
-      post,
-      categories: checkCategories(post, categories),
-      action: `/articles/add`,
-      errorMessage: err,
-    });
-
     next(err);
-
-    return;
   }
-
-  res.redirect(`/my`);
 });
 
 module.exports = {
