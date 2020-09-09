@@ -22,49 +22,55 @@ block content
             | Закрыть окно
           h2(class="visually-hidden") Форма регистрации
           ul(class="popup__tabs")
-            li(class="popup__tab popup__tab--active popup__tab--register")
+            li(class=`popup__tab ${activeForm === `register` ? `popup__tab--active` : ``} popup__tab--register`)
               button(type="button" class="popup__tab-switcher button") Регистрация
             
-            li(class="popup__tab popup__tab--log-in")
+            li(class=`popup__tab ${activeForm === `login` ? `popup__tab--active` : ``} popup__tab--log-in`)
               button(type="button" class="popup__tab-switcher button") Войти
           
-          div(class="popup__form popup__form--active form form--register")
-            form(action="#" method="get")
+          div(class=`popup__form ${activeForm === `register` ? `popup__form--active` : `popup__form--hidden`} form form--register`)
+            form(action="/register" method="post" enctype='multipart/form-data')
               div(class="form__field")
                 label
-                  input(type="email" placeholder="Электронная почта" required="")
+                  input(type="email" placeholder="Электронная почта" required="" name="email" value=email)
               div(class="form__field")
                 label
-                  input(type="text" placeholder="Имя" required="")
+                  input(type="text" placeholder="Имя" required="" name="firstname" value=firstname)
               div(class="form__field")
                 label
-                  input(type="text" placeholder="Фамилия")
+                  input(type="text" placeholder="Фамилия" name="lastname" value=lastname)
               div(class="form__field")
                 label
-                  input(type="password" placeholder="Пароль" required="")
+                  input(type="password" placeholder="Пароль" required="" name="password")
               div(class="form__field")
                 label
-                  input(type="password" placeholder="Повтор пароля" required="")
+                  input(type="password" placeholder="Повтор пароля" required="" name="repeatPassword")
+              
+              if errors 
+                include includes/form-validation-error
+
               div(class="form__image-loader")
                 a(class="form__avatar avatar")
                   img(src="img/icons/smile.svg" alt="аватар пользователя")
                 label
-                  input(type="file" class="visually-hidden")
+                  input(type="file" class="visually-hidden" name="avatarFile")
                   | Загрузить фото профиля
+                input(type="hidden" name="avatar" value=`${avatar ? avatar.name : ``}`)
+                input(type="hidden" name="originalAvatar" value=`${avatar ? avatar.originalName : ``}`)
               
               button(class="form__submit-btn form__submit-btn--register button button--colored" type="submit") 
                 | Зарегистрироваться
           
-          div(class="popup__form popup__form--hidden form form--log-in")
-            form(action="#" method="get")
+          div(class=`popup__form ${activeForm === `login` ? `popup__form--active` : `popup__form--hidden`} form form--log-in`)
+            form(action="/login" method="post")
               div(class="form__field")
                 label
-                  input(type="email" placeholder="Электронная почта" required="")
+                  input(type="email" placeholder="Электронная почта" required="" name="email")
               div(class="form__field")
                 label
-                  input(type="password" placeholder="Пароль" required="")
+                  input(type="password" placeholder="Пароль" required="" name="password")
 
-              button(class="form__submit-btn form__submit-btn--log-in button button--colored" type="submit" Войти)
+              button(class="form__submit-btn form__submit-btn--log-in button button--colored" type="submit") Войти
         
         div(class="modal__overlay")
       

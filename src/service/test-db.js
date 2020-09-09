@@ -1,18 +1,22 @@
 'use strict';
 
-const fs = require(`fs`);
-const {createDataBase, dropDataBase, addPagination} = require(`./utils`);
-const {Post} = require(`./models`);
-const {getCategoryPosts} = require(`./queries`);
 const {DB} = require(`./db`);
 
+const db = new DB();
 
 (async () => {
-  const db = new DB(`typoteka`);
-
   try {
-    const categpry = await db.getCategoryByName(`ITI`);
-    console.log(categpry);
+    await db.createUser({
+      email: `d.orlov777@gmail.com`,
+      firstname: `Dimitriy`,
+      lastname: `Orloviy`,
+      avatar: {
+        originalName: `rozha.jpg`,
+        name: `fsddfgfg`
+      },
+      password: `dkfsjgkldasasdffgjlkdsf`
+    });
+    console.log(`Ok`);
   } catch (err) {
     console.log(err);
   }

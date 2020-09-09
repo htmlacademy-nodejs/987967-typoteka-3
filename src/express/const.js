@@ -37,7 +37,17 @@ module.exports = {
     MAX: 1000,
   },
 
+  UserNameLength: {
+    MIN: 2,
+    MAX: 50,
+  },
+
   ErrorType: {
     BAD_DB_REQUEST: `Bad DB request`,
   },
+
+  UserFormType: {
+    REGISTER: `register`,
+    LOGIN: `login`,
+  }
 };

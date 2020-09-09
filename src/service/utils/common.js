@@ -4,6 +4,7 @@ const fs = require(`fs`);
 const path = require(`path`);
 const chalk = require(`chalk`);
 const {nanoid} = require(`nanoid`);
+const bcrypt = require(`bcrypt`);
 const {
   MOCK_FILE,
   AVATAR_MOCK_FOLDER,
@@ -17,7 +18,8 @@ const {
   SentenceCount,
   CategoryCount,
   CommentCount,
-  VALIDATION_EXCEPTION
+  VALIDATION_EXCEPTION,
+  BCRYPT_SALT,
 } = require(`../const`);
 
 const getRandomInt = (min, max) => {
@@ -203,6 +205,9 @@ const readJsonFile = (file) => {
   return JSON.parse(data);
 };
 
+const getHash = async (password) => bcrypt.hash(password, BCRYPT_SALT);
+const compareHash = async (password, hash) => bcrypt.compare(password, hash);
+
 module.exports = {
   getRandomInt,
   getRandomElement,
@@ -220,4 +225,6 @@ module.exports = {
   parseValidationException,
   readTestMockFiles,
   readJsonFile,
+  getHash,
+  compareHash,
 };

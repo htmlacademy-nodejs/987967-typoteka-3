@@ -53,7 +53,7 @@ ALTER SEQUENCE public.comments_id_seq OWNED BY public.comments.id;
 
 CREATE TABLE public.passwords (
   id bigint NOT NULL,
-  password character varying(50) NOT NULL,
+  password character varying(60) NOT NULL,
   user_id bigint NOT NULL
 );
 

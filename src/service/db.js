@@ -6,12 +6,14 @@ const models = require(`./models`);
 const {PostSortType} = require(`./const`);
 const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts, getCategories, updatePicture} = require(`./queries`);
 const {User, PostCategory, Category, Comment, Post} = require(`./models`);
-const {addPagination} = require(`./utils`);
+const {addPagination, getHash} = require(`./utils`);
 
-const prepareUserData = ({email, firstname, lastname, password, avatar, originalAvatar}) => {
+const prepareUserData = async ({email, firstname, lastname, password, avatar, originalAvatar}) => {
   const userData = {email, firstname, lastname};
   const avatarData = {name: avatar, originalName: originalAvatar};
-  const passwordData = {password};
+  const passwordData = {
+    password: await getHash(password),
+  };
 
   userData.avatar = avatarData;
   userData.password = passwordData;
@@ -90,15 +92,19 @@ class DB {
   }
 
   async createUser(data) {
-    const userData = prepareUserData(data);
+    data.password = {
+      password: await getHash(data.password)
+    };
 
-    return User.create(userData, {
-      include: [User.Avatar, User.Password]
+    const user = await this._create(User, data, {
+      include: [User.Avatar, User.Password],
     });
+
+    return user.get({plain: true});
   }
 
   async createUsers(data) {
-    const userData = data.map((it) => prepareUserData(it));
+    const userData = await Promise.all(data.map((it) => prepareUserData(it)));
 
     return User.bulkCreate(userData, {
       include: [User.Avatar, User.Password]
@@ -111,7 +117,7 @@ class DB {
       postCategories: post.categories.map((it) => ({[`category_id`]: it}))
     };
 
-    return Post.create(postData, {
+    return this._create(Post, postData, {
       include: [Post.Picture, Post.PostCategory]
     });
   }
@@ -234,7 +240,15 @@ class DB {
   }
 
   async getUser(id) {
-    return User.findByPk(id);
+    return (await User.findByPk(id)).get({plain: true});
+  }
+
+  async getUserByEmail(email) {
+    const user = await User.findOne({
+      where: {email}
+    });
+
+    return user ? user.get({plain: true}) : null;
   }
 
   async getComment(id) {
@@ -349,6 +363,23 @@ class DB {
         }
       }
     });
+  }
+
+  async _create(model, data, options) {
+    const transaction = await this.sequelize.transaction();
+    const queryOptions = {
+      ...options,
+      transaction,
+    };
+
+    try {
+      const result = await model.create(data, queryOptions);
+      await transaction.commit();
+      return result;
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
   }
 }
 
