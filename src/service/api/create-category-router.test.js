@@ -100,7 +100,6 @@ it(`should return 200 and list of 1 post`, async () => {
 
 it(`should return 200 and delete a category`, async () => {
   const res = await supertest(server).delete(`/api/categories/10`);
-  console.log(res.body);
   expect(res.status).toBe(200);
   expect(res.body.id).toBe(`10`);
 

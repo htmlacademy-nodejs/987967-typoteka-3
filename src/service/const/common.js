@@ -32,6 +32,16 @@ module.exports = {
     MAX: 25,
   },
 
+  NameLength: {
+    MIN: 2,
+    MAX: 50,
+  },
+
+  FileNameLength: {
+    MIN: 1,
+    MAX: 50,
+  },
+
   ANNOUNCE_SENTENCES_COUNT: 5,
 
   MOCK_FILE: `data/mocks.json`,
@@ -85,7 +95,7 @@ module.exports = {
   AVATAR_FOLDER: `src/express/public/img/avatars`,
   PICTURE_FOLDER: `src/express/public/img/post-images`,
 
-  VALIDATION_EXCEPTION: `Validation exception`,
+  BAD_REQUEST_EXCEPTION: `Bad request exception`,
 
   BCRYPT_SALT: 10,
 };

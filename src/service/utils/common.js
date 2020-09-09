@@ -18,7 +18,7 @@ const {
   SentenceCount,
   CategoryCount,
   CommentCount,
-  VALIDATION_EXCEPTION,
+  BAD_REQUEST_EXCEPTION,
   BCRYPT_SALT,
 } = require(`../const`);
 
@@ -177,13 +177,13 @@ const generateCategories = (names) => {
 
 const getDifference = (arrayA, arrayB) => arrayA.reduce((acc, cur) => arrayB.find((it) => it === cur) ? [...acc] : [cur, ...acc], []);
 
-const getValidationException = (messages) => ({
-  type: VALIDATION_EXCEPTION,
+const createBadRequestException = (messages) => ({
+  type: BAD_REQUEST_EXCEPTION,
   details: messages.map((it) => ({message: it}))
 });
 
-const parseValidationException = (exception) =>
-  exception.type === VALIDATION_EXCEPTION || exception.isJoi
+const parseException = (exception) =>
+  exception.type === BAD_REQUEST_EXCEPTION || exception.isJoi
     ? exception.details.map((it) => it.message) : null;
 
 const readTestMockFiles = async () => {
@@ -221,8 +221,8 @@ module.exports = {
   getMockTitles,
   getTitleList,
   getDifference,
-  getValidationException,
-  parseValidationException,
+  createBadRequestException,
+  parseException,
   readTestMockFiles,
   readJsonFile,
   getHash,
