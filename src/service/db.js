@@ -6,7 +6,7 @@ const models = require(`./models`);
 const {PostSortType} = require(`./const`);
 const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts, getCategories, updatePicture} = require(`./queries`);
 const {User, PostCategory, Category, Comment, Post} = require(`./models`);
-const {addPagination, getHash} = require(`./utils`);
+const {addPagination, getHash, compareHash} = require(`./utils`);
 
 const prepareUserData = async ({email, firstname, lastname, password, avatar, originalAvatar}) => {
   const userData = {email, firstname, lastname};
@@ -240,7 +240,8 @@ class DB {
   }
 
   async getUser(id) {
-    return (await User.findByPk(id)).get({plain: true});
+    const user = await User.findByPk(id);
+    return user ? user.get({plain: true}) : null;
   }
 
   async getUserByEmail(email) {
@@ -249,6 +250,39 @@ class DB {
     });
 
     return user ? user.get({plain: true}) : null;
+  }
+
+  async checkUser(email, password) {
+    const user = await this.getUserByEmail(email);
+    if (!user) {
+      return null;
+    }
+
+    const {id, lastname, firstname, avatar, password: passwordData} = (await User.findOne({
+      attributes: [`id`, `firstname`, `lastname`],
+      include: [{
+        association: User.Avatar,
+        attributes: [`name`]
+      }, {
+        association: User.Password,
+      }],
+      where: {email}
+    })).get({plain: true});
+
+    const passwordIsRight = await compareHash(password, passwordData.password);
+
+    if (!passwordIsRight) {
+      return null;
+    }
+
+    return {
+      id,
+      firstname,
+      lastname,
+      email,
+      avatar: avatar.name,
+      isAdmin: id === await this._getAdminId()
+    };
   }
 
   async getComment(id) {
@@ -380,6 +414,16 @@ class DB {
       await transaction.rollback();
       throw err;
     }
+  }
+
+  async _getAdminId() {
+    if (!this.adminId) {
+      this.adminId = (await User.findAll({
+        attributes: [[this.sequelize.fn(`min`, this.sequelize.col(`id`)), `adminId`]],
+      }))[0].get({plain: true}).adminId;
+    }
+
+    return this.adminId;
   }
 }
 

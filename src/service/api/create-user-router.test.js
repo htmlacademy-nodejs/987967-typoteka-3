@@ -122,3 +122,55 @@ it(`should return 400 when user data is not valid`, async () => {
   const statuses = res.map((it) => it.status);
   expect(statuses).toEqual([400, 400, 400, 400]);
 });
+
+it(`should authentificate user as admin`, async () => {
+  const email = `noah.ggeero@test.com`;
+  const password = `geNGerooah`;
+
+  const res = await supertest(server).post(`/api/user/auth`).send({email, password});
+
+  expect(res.status).toBe(200);
+  expect(res.body).toEqual({
+    id: `1`,
+    firstname: `Noah`,
+    lastname: `George`,
+    email: `noah.ggeero@test.com`,
+    avatar: `ec_Ut`,
+    isAdmin: true,
+  });
+});
+
+it(`should authentificate user as not admin`, async () => {
+  const email = `phoebe.learhci@test.com`;
+  const password = `CPlrhhieabeeo`;
+
+  const res = await supertest(server).post(`/api/user/auth`).send({email, password});
+
+  expect(res.status).toBe(200);
+  expect(res.body).toEqual({
+    id: `2`,
+    firstname: `Phoebe`,
+    lastname: `Charlie`,
+    email: `phoebe.learhci@test.com`,
+    avatar: `vEWwI`,
+    isAdmin: false,
+  });
+});
+
+it(`should not authentificate user and return 400 when user not found`, async () => {
+  const email = `wrong.learhci@test.com`;
+  const password = `CPlrhhieabeeo`;
+
+  const res = await supertest(server).post(`/api/user/auth`).send({email, password});
+
+  expect(res.status).toBe(400);
+});
+
+it(`should not authentificate user and return 400 when password is incorrect`, async () => {
+  const email = `phoebe.learhci@test.com`;
+  const password = `incorrect`;
+
+  const res = await supertest(server).post(`/api/user/auth`).send({email, password});
+
+  expect(res.status).toBe(400);
+});
