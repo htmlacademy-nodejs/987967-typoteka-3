@@ -3,7 +3,7 @@
 const {Sequelize, Op} = require(`sequelize`);
 const {DBNAME, ADMIN, PSW, HOST} = require(`./config`);
 const models = require(`./models`);
-const {PostSortType} = require(`./const`);
+const {PostSortType, UserRole} = require(`./const`);
 const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts, getCategories, updatePicture} = require(`./queries`);
 const {User, PostCategory, Category, Comment, Post} = require(`./models`);
 const {addPagination, getHash, compareHash} = require(`./utils`);
@@ -255,7 +255,7 @@ class DB {
   async checkUser(email, password) {
     const user = await this.getUserByEmail(email);
     if (!user) {
-      return null;
+      return {role: UserRole.UNAUTHORIZED};
     }
 
     const {id, lastname, firstname, avatar, password: passwordData} = (await User.findOne({
@@ -272,7 +272,7 @@ class DB {
     const passwordIsRight = await compareHash(password, passwordData.password);
 
     if (!passwordIsRight) {
-      return null;
+      return {role: UserRole.UNAUTHORIZED};
     }
 
     return {
@@ -281,7 +281,7 @@ class DB {
       lastname,
       email,
       avatar: avatar.name,
-      isAdmin: id === await this._getAdminId()
+      role: id === await this._getAdminId() ? UserRole.ADMIN : UserRole.READER
     };
   }
 

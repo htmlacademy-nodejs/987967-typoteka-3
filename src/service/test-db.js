@@ -2,17 +2,21 @@
 
 const {DB} = require(`./db`);
 const {User} = require(`./models`);
+const {ADMIN} = require(`./config`);
 
-const db = new DB();
+console.log(ADMIN);
 
-(async () => {
-  try {
-    const userInfo = await db.checkUser(`sophie.sophia@gmail.com`, `hSiohapepSio`);
+// const db = new DB();
 
-    console.log(userInfo);// .get({plain: true}));
-  } catch (err) {
-    console.log(err);
-  }
+// (async () => {
+//   try {
+//     await db.authenticate();
+//     const userInfo = await db.checkUser(`sophie.sophia@gmail.com`, `hSiohapepSio`);
 
-  db.close();
-})();
+//     console.log(userInfo);// .get({plain: true}));
+//   } catch (err) {
+//     console.log(`Error!!! ${err}`);
+//   }
+
+//   db.close();
+// })();

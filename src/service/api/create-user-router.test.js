@@ -3,6 +3,7 @@
 const supertest = require(`supertest`);
 const {createServer} = require(`../cli/server`);
 const {createDataBase, dropDataBase, readTestMockFiles, compareHash} = require(`../utils`);
+const {UserRole} = require(`../const`);
 const {DB} = require(`../db`);
 
 let server;
@@ -136,7 +137,7 @@ it(`should authentificate user as admin`, async () => {
     lastname: `George`,
     email: `noah.ggeero@test.com`,
     avatar: `ec_Ut`,
-    isAdmin: true,
+    role: UserRole.ADMIN,
   });
 });
 
@@ -153,7 +154,7 @@ it(`should authentificate user as not admin`, async () => {
     lastname: `Charlie`,
     email: `phoebe.learhci@test.com`,
     avatar: `vEWwI`,
-    isAdmin: false,
+    role: UserRole.READER,
   });
 });
 

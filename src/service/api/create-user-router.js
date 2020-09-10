@@ -1,7 +1,7 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {HttpStatusCode} = require(`../const`);
+const {HttpStatusCode, UserRole} = require(`../const`);
 const {createBadRequestException} = require(`../utils`);
 const {userSchema, userLoginSchema} = require(`../joi-schemas`);
 const {validateSchema} = require(`../middlewares`);
@@ -32,7 +32,7 @@ const createUserRouter = (service) => {
       }
 
       const userAuthData = await service.checkUser(email, password);
-      if (!userAuthData) {
+      if (userAuthData.role === UserRole.UNAUTHORIZED) {
         throw createBadRequestException([`Password incorrect`]);
       }
 

@@ -98,4 +98,10 @@ module.exports = {
   BAD_REQUEST_EXCEPTION: `Bad request exception`,
 
   BCRYPT_SALT: 10,
+
+  UserRole: {
+    ADMIN: `admin`,
+    READER: `reader`,
+    UNAUTHORIZED: `unauthorized`,
+  }
 };
