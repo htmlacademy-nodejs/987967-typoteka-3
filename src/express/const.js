@@ -49,5 +49,10 @@ module.exports = {
   UserFormType: {
     REGISTER: `register`,
     LOGIN: `login`,
+  },
+
+  UserRole: {
+    ADMIN: `admin`,
+    READER: `reader`,
   }
 };

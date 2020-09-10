@@ -43,10 +43,27 @@ const parseJoiException = (exception) => {
   return [];
 };
 
+const splitJoiException = (exception) => {
+  const errors = {};
+
+  exception.details.forEach((it) => {
+    const key = it.context.key;
+    if (!errors[key]) {
+      errors[key] = [];
+    }
+
+    errors[key].push(it.message);
+  });
+
+  return errors;
+};
+
+
 module.exports = {
   getPagination,
   formatDate,
   formatDateTime,
   parseJoiException,
+  splitJoiException,
   simplify,
 };
