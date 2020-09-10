@@ -3,11 +3,15 @@
 const Joi = require(`joi`);
 const {UserNameLength} = require(`../const`);
 
-const userRegisterSchema = Joi.object({
-  firstname: Joi.string().pattern(/^[a-zа-я \-]+$/i).min(UserNameLength.MIN).max(UserNameLength.MAX).required(),
-  lastname: Joi.string().pattern(/^[a-zа-я \-]+$/i).min(UserNameLength.MIN).max(UserNameLength.MAX).required(),
+const userLogin = {
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
+};
+
+const userRegisterSchema = Joi.object({
+  ...userLogin,
+  firstname: Joi.string().pattern(/^[a-zа-я \-]+$/i).min(UserNameLength.MIN).max(UserNameLength.MAX).required(),
+  lastname: Joi.string().pattern(/^[a-zа-я \-]+$/i).min(UserNameLength.MIN).max(UserNameLength.MAX).required(),
   repeatPassword: Joi.ref(`password`),
   avatar: Joi.object({
     originalName: Joi.string().max(250).required(),
@@ -15,7 +19,9 @@ const userRegisterSchema = Joi.object({
   }).allow(null),
 });
 
-const userLoginSchema = Joi.object();
+const userLoginSchema = Joi.object({
+  ...userLogin
+});
 
 
 module.exports = {
