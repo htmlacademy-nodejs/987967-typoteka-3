@@ -6,7 +6,7 @@ const multer = require(`multer`);
 const {DataServer} = require(`../data-server`);
 const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT} = require(`../const`);
 const {getPagination, parseJoiException} = require(`../utils`);
-const {findPostByParam, getCategories, getAllCategories, getCategory} = require(`../middlewares`);
+const {findPostByParam, getCategories, getAllCategories, getCategory, privateRoute} = require(`../middlewares`);
 const {createPostSchema} = require(`../joi-schemas`);
 
 const articleRouter = new Router();
@@ -63,7 +63,7 @@ const validateFormData = async (req, res, next) => {
   }
 };
 
-articleRouter.get(`/add`, getAllCategories, async (req, res, next) => {
+articleRouter.get(`/add`, [privateRoute, getAllCategories], async (req, res, next) => {
   try {
     const {categories} = res.locals;
     const date = new Date().toISOString();
@@ -85,9 +85,10 @@ articleRouter.get(`/add`, getAllCategories, async (req, res, next) => {
 articleRouter.get(`/:postId`, [getCategories, findPostByParam], async (req, res, next) => {
   try {
     const {categories, post} = res.locals;
+    const {user} = req.session;
 
     post.categories = filterCategories(post.categories, categories);
-    res.render(`post`, {post});
+    res.render(`post`, {user, post});
   } catch (err) {
     next(err);
   }
@@ -95,6 +96,8 @@ articleRouter.get(`/:postId`, [getCategories, findPostByParam], async (req, res,
 
 articleRouter.get(`/category/:categoryId`, [getCategories, getCategory], async (req, res, next) => {
   const {categories, category} = res.locals;
+  const {user} = req.session;
+
   const categoryPostCount = category.count;
   const pageCount = Math.ceil(categoryPostCount / POST_PREVIEW_COUNT);
   const querySchema = Joi.object({
@@ -108,6 +111,7 @@ articleRouter.get(`/category/:categoryId`, [getCategories, getCategory], async (
     const {posts} = await dataServer.getCategoryPostPreviews(category.id, POST_PREVIEW_COUNT, (page - 1) * POST_PREVIEW_COUNT);
 
     res.render(`articles-by-category`, {
+      user,
       categories,
       categoryName: category.name,
       posts,
@@ -118,7 +122,7 @@ articleRouter.get(`/category/:categoryId`, [getCategories, getCategory], async (
   }
 });
 
-articleRouter.get(`/edit/:postId`, [getAllCategories, findPostByParam], async (req, res, next) => {
+articleRouter.get(`/edit/:postId`, [privateRoute, getAllCategories, findPostByParam], async (req, res, next) => {
   try {
     const {postId} = req.params;
     const {categories, post} = res.locals;
@@ -134,7 +138,7 @@ articleRouter.get(`/edit/:postId`, [getAllCategories, findPostByParam], async (r
   }
 });
 
-articleRouter.post(`/edit/:postId`, [findPostByParam, upload.single(`picture`), getAllCategories, validateFormData], async (req, res, next) => {
+articleRouter.post(`/edit/:postId`, [privateRoute, findPostByParam, upload.single(`picture`), getAllCategories, validateFormData], async (req, res, next) => {
   const {postData, post, errors, categories} = res.locals;
 
   try {
@@ -157,7 +161,7 @@ articleRouter.post(`/edit/:postId`, [findPostByParam, upload.single(`picture`), 
   }
 });
 
-articleRouter.post(`/add`, [upload.single(`picture`), getAllCategories, validateFormData], async (req, res, next) => {
+articleRouter.post(`/add`, [privateRoute, upload.single(`picture`), getAllCategories, validateFormData], async (req, res, next) => {
   const {postData, categories, errors} = res.locals;
 
   try {
