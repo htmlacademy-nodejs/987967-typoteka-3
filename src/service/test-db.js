@@ -1,25 +1,22 @@
 'use strict';
 
 const {DB} = require(`./db`);
+const {User} = require(`./models`);
+const {ADMIN} = require(`./config`);
 
-const db = new DB();
+console.log(ADMIN);
 
-(async () => {
-  try {
-    await db.createUser({
-      email: `d.orlov777@gmail.com`,
-      firstname: `Dimitriy`,
-      lastname: `Orloviy`,
-      avatar: {
-        originalName: `rozha.jpg`,
-        name: `fsddfgfg`
-      },
-      password: `dkfsjgkldasasdffgjlkdsf`
-    });
-    console.log(`Ok`);
-  } catch (err) {
-    console.log(err);
-  }
+// const db = new DB();
 
-  db.close();
-})();
+// (async () => {
+//   try {
+//     await db.authenticate();
+//     const userInfo = await db.checkUser(`sophie.sophia@gmail.com`, `hSiohapepSio`);
+
+//     console.log(userInfo);// .get({plain: true}));
+//   } catch (err) {
+//     console.log(`Error!!! ${err}`);
+//   }
+
+//   db.close();
+// })();

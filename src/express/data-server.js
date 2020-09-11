@@ -110,6 +110,10 @@ class DataServer {
     return this._request(`/categories/${id}`, `delete`);
   }
 
+  async authUser(authData) {
+    return this._request(`/user/auth`, `post`, authData);
+  }
+
   async _request(url, method = `get`, data) {
     let res;
     try {

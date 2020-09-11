@@ -38,7 +38,9 @@ mainRouter.get(`/`, async (req, res, next) => {
       dataServer.getComments(LASTST_COMMENT_COUNT, 0),
     ]);
 
+    console.log(req.session.user);
     res.render(`main`, {
+      user: req.session.user,
       categories,
       posts,
       popularPosts: popularPosts.filter((it) => it[`comment_count`] > 0).map((it) => ({

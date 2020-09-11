@@ -1,7 +1,7 @@
 'use strict';
 
 const Joi = require(`joi`);
-const {getValidationException} = require(`../utils`);
+const {createBadRequestException} = require(`../utils`);
 
 const createPostFinder = (service) => async (req, res, next) => {
   try {
@@ -11,7 +11,7 @@ const createPostFinder = (service) => async (req, res, next) => {
 
     if (post === null) {
       const message = `Can't find post with ID='${id}'`;
-      throw getValidationException([message]);
+      throw createBadRequestException([message]);
     }
 
     res.locals.post = post;

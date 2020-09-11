@@ -10,6 +10,7 @@ const dataServer = new DataServer();
 
 searchRouter.get(`/`, async (req, res, next) => {
   try {
+    const {user} = req.session;
     const querySchema = Joi.object({
       query: Joi.string().max(TitleLength.MAX).required()
     }).allow({});
@@ -24,6 +25,7 @@ searchRouter.get(`/`, async (req, res, next) => {
     }));
 
     res.render(`search`, {
+      user,
       queryString,
       foundPosts: markedPosts,
     });

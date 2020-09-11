@@ -66,9 +66,16 @@ block content
               div(class="form__field")
                 label
                   input(type="email" placeholder="Электронная почта" required="" name="email")
+              if errors && errors.email
+                each error in errors.email
+                  p.form__error-message #{error}
+
               div(class="form__field")
                 label
                   input(type="password" placeholder="Пароль" required="" name="password")
+              if errors && errors.password
+                each error in errors.password
+                  p.form__error-message #{error}
 
               button(class="form__submit-btn form__submit-btn--log-in button button--colored" type="submit") Войти
         

@@ -5,7 +5,7 @@ const express = require(`express`);
 const expressPinoLogger = require(`express-pino-logger`);
 const {createAPI} = require(`../api`);
 const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo} = require(`../const`);
-const {parseValidationException} = require(`../utils`);
+const {parseException} = require(`../utils`);
 const {getLogger} = require(`../../logger`);
 const {DB} = require(`../db`);
 
@@ -38,7 +38,7 @@ const createServer = (db) => {
   });
 
   app.use((err, req, res, next) => {
-    const validationException = parseValidationException(err);
+    const validationException = parseException(err);
 
     if (validationException) {
       appLogger.error(`Validation error: ${validationException}`);
