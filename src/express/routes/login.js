@@ -1,6 +1,7 @@
 'use strict';
 
 const {Router} = require(`express`);
+const Joi = require(`joi`);
 const {UserFormType} = require(`../const`);
 const {splitJoiException} = require(`../utils`);
 const {userLoginSchema} = require(`../joi-schemas`);
@@ -10,12 +11,21 @@ const loginRouter = new Router();
 const dataServer = new DataServer();
 
 loginRouter.get(`/`, (req, res) => {
+  const {logout} = req.query;
+  const logoutSchema = Joi.boolean().optional();
+
+  if (!logoutSchema.validate(logout).error && logout === `true`) {
+    req.session.user = null;
+  }
+
   res.render(`login`, {
     activeForm: UserFormType.LOGIN
   });
 });
 
 loginRouter.post(`/`, async (req, res, next) => {
+  const {email} = req.body;
+
   try {
     await userLoginSchema.validateAsync(req.body, {abortEarly: false});
 
@@ -26,6 +36,7 @@ loginRouter.post(`/`, async (req, res, next) => {
     if (err.isJoi) {
       res.render(`login`, {
         activeForm: UserFormType.LOGIN,
+        email,
         errors: splitJoiException(err)
       });
       return;
@@ -36,6 +47,7 @@ loginRouter.post(`/`, async (req, res, next) => {
 
       res.render(`login`, {
         activeForm: UserFormType.LOGIN,
+        email,
         errors
       });
       return;
