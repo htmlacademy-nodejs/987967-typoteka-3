@@ -23,6 +23,7 @@ const dataServer = new DataServer();
 
 mainRouter.get(`/`, async (req, res, next) => {
   try {
+    const {user} = req.session;
     const {posts: popularPosts, postCount} = await dataServer.getPostPreviews(PostSortType.POPULARITY, POPULAR_POST_COUNT, 0);
     const pageCount = Math.ceil(Number(postCount) / POST_PREVIEW_COUNT);
     const pageSchema = Joi.object({
@@ -40,7 +41,7 @@ mainRouter.get(`/`, async (req, res, next) => {
 
     console.log(req.session.user);
     res.render(`main`, {
-      user: req.session.user,
+      user,
       categories,
       posts,
       popularPosts: popularPosts.filter((it) => it[`comment_count`] > 0).map((it) => ({

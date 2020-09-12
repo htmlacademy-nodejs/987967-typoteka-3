@@ -42,6 +42,11 @@ module.exports = {
     MAX: 50,
   },
 
+  CommentLength: {
+    MIN: 20,
+    MAX: 1000,
+  },
+
   ErrorType: {
     BAD_DB_REQUEST: `Bad DB request`,
   },

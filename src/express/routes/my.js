@@ -11,6 +11,7 @@ const dataServer = new DataServer();
 
 myRouter.get(`/`, findPostByQuery, async (req, res, next) => {
   const {post} = res.locals;
+  const {user} = req.session;
 
   try {
     if (post) {
@@ -19,7 +20,8 @@ myRouter.get(`/`, findPostByQuery, async (req, res, next) => {
     } else {
       const {posts} = await dataServer.getPostPreviews(PostSortType.DATE);
       res.render(`my`, {
-        posts
+        posts,
+        user,
       });
     }
   } catch (err) {
@@ -29,6 +31,7 @@ myRouter.get(`/`, findPostByQuery, async (req, res, next) => {
 
 myRouter.get(`/comments`, findPostByQuery, async (req, res, next) => {
   const {post} = res.locals;
+  const {user} = req.session;
   const commentIds = post ? post.comments.map((it) => it.id) : [];
 
   const querySchema = Joi.object({
@@ -47,6 +50,7 @@ myRouter.get(`/comments`, findPostByQuery, async (req, res, next) => {
       const comments = await dataServer.getComments();
       res.render(`comments`, {
         comments,
+        user,
       });
     }
   } catch (err) {

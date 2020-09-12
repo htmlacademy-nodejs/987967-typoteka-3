@@ -53,6 +53,7 @@ const validateQuery = async (req, res, next) => {
 categoryRouter.get(`/`, [privateRoute, validateQuery], async (req, res, next) => {
   try {
     const categories = await dataServer.getCategories(false);
+    const {user} = req.session;
     const newCategory = {name: ``};
 
     if (isEmpty(req.query)) {
@@ -86,7 +87,7 @@ categoryRouter.get(`/`, [privateRoute, validateQuery], async (req, res, next) =>
         }
     }
 
-    res.render(`all-categories`, {categories, newCategory});
+    res.render(`all-categories`, {user, categories, newCategory});
   } catch (err) {
     next(err);
   }

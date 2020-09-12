@@ -15,7 +15,7 @@ loginRouter.get(`/`, (req, res) => {
   const logoutSchema = Joi.boolean().optional();
 
   if (!logoutSchema.validate(logout).error && logout === `true`) {
-    req.session.user = null;
+    req.session.destroy();
   }
 
   res.render(`login`, {

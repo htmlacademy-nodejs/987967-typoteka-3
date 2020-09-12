@@ -93,6 +93,10 @@ class DataServer {
     return this._request(`/user`, `post`, data);
   }
 
+  async createComment({text, date, userId, postId}) {
+    return this._request(`/articles/${postId}/comments`, `post`, {date, text, userId});
+  }
+
   async search(query) {
     const queryString = QueryString.encode({query});
     return (await this._request(`/search?${queryString}`)).map((it) => ServiceToExpressAdapter.getPost(it));

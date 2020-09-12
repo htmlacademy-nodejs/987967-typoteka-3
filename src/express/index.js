@@ -15,6 +15,7 @@ const {registerRouter} = require(`./routes/register`);
 const {searchRouter} = require(`./routes/search`);
 const {SECRET} = require(`./config`);
 const {privateRoute} = require(`./middlewares`);
+const {getSequelizeStore} = require(`./sequelize-store`);
 
 const pino = expressPinoLogger({
   req: (req) => ({
@@ -37,7 +38,12 @@ app.use(expressSession({
   secret: SECRET,
   resave: false,
   saveUninitialized: false,
-  name: `session_id`
+  name: `session_id`,
+  store: getSequelizeStore(expressSession.Store),
+  cookie: {
+    sameSite: true,
+    httpOnly: true,
+  }
 }));
 
 app.use(express.static(path.resolve(__dirname, `public`)));

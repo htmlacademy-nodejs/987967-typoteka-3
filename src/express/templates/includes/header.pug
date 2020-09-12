@@ -11,7 +11,7 @@ header.header(class=headerClasses)
         li.header__list-item 
           a.header__enter(href="/login") Вход с паролем
     a.header__search.button.button--search(href="/search" aria-label="поиск по сайту")
-
+  
   if user && user.role === "reader"
     nav.header__nav
       ul.header__nav-list

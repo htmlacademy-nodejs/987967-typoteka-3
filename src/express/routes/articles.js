@@ -7,7 +7,7 @@ const {DataServer} = require(`../data-server`);
 const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT} = require(`../const`);
 const {getPagination, parseJoiException} = require(`../utils`);
 const {findPostByParam, getCategories, getAllCategories, getCategory, privateRoute} = require(`../middlewares`);
-const {createPostSchema} = require(`../joi-schemas`);
+const {createPostSchema, commentSchema} = require(`../joi-schemas`);
 
 const articleRouter = new Router();
 const dataServer = new DataServer();
@@ -66,12 +66,14 @@ const validateFormData = async (req, res, next) => {
 articleRouter.get(`/add`, [privateRoute, getAllCategories], async (req, res, next) => {
   try {
     const {categories} = res.locals;
+    const {user} = req.session;
     const date = new Date().toISOString();
     const post = {
       date,
     };
 
     res.render(`new-post`, {
+      user,
       title: NEW_POST_TITLE,
       post,
       categories,
@@ -126,8 +128,10 @@ articleRouter.get(`/edit/:postId`, [privateRoute, getAllCategories, findPostByPa
   try {
     const {postId} = req.params;
     const {categories, post} = res.locals;
+    const {user} = req.session;
 
     res.render(`new-post`, {
+      user,
       title: EDIT_POST_TITLE,
       post,
       categories: checkCategories(categories, post.categories.map((it) => it.id)),
@@ -180,6 +184,40 @@ articleRouter.post(`/add`, [privateRoute, upload.single(`picture`), getAllCatego
       res.redirect(`/my`);
     }
   } catch (err) {
+    next(err);
+  }
+});
+
+articleRouter.post(`/:postId/comment`, [getCategories, findPostByParam], async (req, res, next) => {
+  const {postId} = req.params;
+  const {user} = req.session;
+  const {text} = req.body;
+  const {categories, post} = res.locals;
+
+  if (!user) {
+    res.redirect(`/login`);
+    return;
+  }
+
+  const commentData = {
+    date: new Date().toISOString(),
+    text,
+    postId,
+    userId: user.id
+  };
+
+  try {
+    await commentSchema.validateAsync(commentData.text);
+    await dataServer.createComment(commentData);
+    res.redirect(`/articles/${postId}`);
+  } catch (err) {
+    if (err.isJoi) {
+      const errors = parseJoiException(err);
+      post.categories = filterCategories(post.categories, categories);
+      res.render(`post`, {user, post, comment: text, errors});
+      return;
+    }
+
     next(err);
   }
 });
