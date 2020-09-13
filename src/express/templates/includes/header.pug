@@ -7,7 +7,7 @@ header.header(class=headerClasses)
     nav.header__nav 
       ul.header__nav-list 
         li.header__list-item 
-          a.header__registration(href="/registration") Регистрация
+          a.header__registration(href="/register") Регистрация
         li.header__list-item 
           a.header__enter(href="/login") Вход с паролем
     a.header__search.button.button--search(href="/search" aria-label="поиск по сайту")
@@ -20,7 +20,8 @@ header.header(class=headerClasses)
         li.header__list-item
           a.header__exit(href="/login?logout=true") Выйти
     a.header__avatar.avatar
-      img(src=`img/avatars/${user.avatar}` alt="аватар пользователя")
+      if user.avatar
+        img(src=`img/avatars/${user.avatar}` alt="аватар пользователя")
     a.header__search.button.button--search(href="/search" aria-label="поиск по сайту")
 
   if user && user.role === "admin"

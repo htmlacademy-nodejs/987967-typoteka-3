@@ -3,7 +3,6 @@
 const {Router} = require(`express`);
 const {DataServer} = require(`../data-server`);
 const {getPagination} = require(`../utils`);
-const {getCategories} = require(`../middlewares`);
 const {
   POST_PREVIEW_COUNT,
   LASTST_COMMENT_COUNT,
@@ -39,7 +38,6 @@ mainRouter.get(`/`, async (req, res, next) => {
       dataServer.getComments(LASTST_COMMENT_COUNT, 0),
     ]);
 
-    console.log(req.session.user);
     res.render(`main`, {
       user,
       categories,

@@ -2,9 +2,10 @@
 
 const {Router} = require(`express`);
 const multer = require(`multer`);
-const {validateUserData} = require(`../middlewares`);
+const {validateBodySchema} = require(`../middlewares`);
 const {UserFormType} = require(`../const`);
 const {DataServer} = require(`../data-server`);
+const {userRegisterSchema} = require(`../joi-schemas`);
 
 const registerRouter = new Router();
 const upload = multer({dest: `src/express/public/img/avatars`});
@@ -16,16 +17,28 @@ registerRouter.get(`/`, (req, res) => {
   });
 });
 
-registerRouter.post(`/`, [upload.single(`avatarFile`), validateUserData], async (req, res, next) => {
-  const {userData} = res.locals;
-  const {firstname, lastname, email, avatar, password} = userData;
+registerRouter.post(`/`, [upload.single(`avatarFile`), validateBodySchema(userRegisterSchema, `login`, {activeForm: UserFormType.REGISTER})], async (req, res, next) => {
+  const {firstname, lastname, email, password, originalName, fileName} = req.body;
+
+  const storedAvatarData = originalName && fileName ? {
+    originalName,
+    name: fileName
+  } : null;
+
+  const uploadAvatar = req.file ? {
+    originalName: req.file.originalname,
+    name: req.file.filename
+  } : null;
+
+  const avatar = uploadAvatar || storedAvatarData;
+
   try {
     await dataServer.createUser({
       firstname,
       lastname,
       email,
       password,
-      avatar
+      avatar,
     });
 
     res.redirect(`/login`);
@@ -33,11 +46,12 @@ registerRouter.post(`/`, [upload.single(`avatarFile`), validateUserData], async 
     if (err.isDBServer) {
       res.render(`login`, {
         activeForm: UserFormType.REGISTER,
-        errors: err.errors,
+        allErrors: err.errors,
         firstname,
         lastname,
         email,
-        avatar
+        fileName: avatar.name,
+        originalName: avatar.originalName,
       });
     } else {
       next(err);

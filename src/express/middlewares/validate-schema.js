@@ -26,7 +26,13 @@ const validateQuerySchema = (schema, template, templateData) => async (req, res,
 };
 
 const validateBodySchema = (schema, template, templateData) => async (req, res, next) => {
-  validateSchema(schema, req.body, template, templateData)(req, res, next);
+  const data = req.file ? {
+    ...req.body,
+    fileName: req.file.filename,
+    originalName: req.file.originalname,
+  } : {...req.body};
+
+  validateSchema(schema, data, template, templateData)(req, res, next);
 };
 
 const validateParamSchema = (schema, template, templateData) => async (req, res, next) => {

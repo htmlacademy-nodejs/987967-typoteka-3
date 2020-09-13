@@ -45,7 +45,8 @@ block content
                 label
                   input(type="password" placeholder="Повтор пароля" required="" name="repeatPassword")
               
-              if errors 
+              if allErrors 
+                -var errors = allErrors
                 include includes/form-validation-error
 
               div(class="form__image-loader")
@@ -54,8 +55,8 @@ block content
                 label
                   input(type="file" class="visually-hidden" name="avatarFile")
                   | Загрузить фото профиля
-                input(type="hidden" name="avatar" value=`${avatar ? avatar.name : ``}`)
-                input(type="hidden" name="originalAvatar" value=`${avatar ? avatar.originalName : ``}`)
+                input(type="hidden" name="fileName" value=fileName)
+                input(type="hidden" name="originalName" value=originalName)
               
               button(class="form__submit-btn form__submit-btn--register button button--colored" type="submit") 
                 | Зарегистрироваться

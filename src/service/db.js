@@ -280,7 +280,7 @@ class DB {
       firstname,
       lastname,
       email,
-      avatar: avatar.name,
+      avatar: avatar ? avatar.name : null,
       role: id === await this._getAdminId() ? UserRole.ADMIN : UserRole.READER
     };
   }

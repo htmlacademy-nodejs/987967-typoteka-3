@@ -13,10 +13,10 @@ const userRegisterSchema = Joi.object({
   firstname: Joi.string().pattern(/^[a-zа-я \-]+$/i).min(UserNameLength.MIN).max(UserNameLength.MAX).required(),
   lastname: Joi.string().pattern(/^[a-zа-я \-]+$/i).min(UserNameLength.MIN).max(UserNameLength.MAX).required(),
   repeatPassword: Joi.ref(`password`),
-  avatar: Joi.object({
-    originalName: Joi.string().max(250).required(),
-    name: Joi.string().max(100).required(),
-  }).allow(null),
+
+  originalName: Joi.string().max(250).allow(``),
+  fileName: Joi.string().max(100).allow(``),
+  avatarFile: Joi.string().allow(``),
 });
 
 const userLoginSchema = Joi.object({
