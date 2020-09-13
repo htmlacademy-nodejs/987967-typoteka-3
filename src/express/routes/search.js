@@ -4,18 +4,18 @@ const {Router} = require(`express`);
 const {DataServer} = require(`../data-server`);
 const Joi = require(`joi`);
 const {TitleLength} = require(`../const`);
+const {validateQuerySchema} = require(`../middlewares`);
 
 const searchRouter = new Router();
 const dataServer = new DataServer();
 
-searchRouter.get(`/`, async (req, res, next) => {
+const querySchema = Joi.object({
+  query: Joi.string().max(TitleLength.MAX).required()
+}).allow({});
+
+searchRouter.get(`/`, validateQuerySchema(querySchema, `search`), async (req, res, next) => {
   try {
     const {user} = req.session;
-    const querySchema = Joi.object({
-      query: Joi.string().max(TitleLength.MAX).required()
-    }).allow({});
-
-    await querySchema.validateAsync(req.query);
 
     const queryString = req.query.query;
     const foundPosts = queryString ? await dataServer.search(queryString) : [];
@@ -30,11 +30,6 @@ searchRouter.get(`/`, async (req, res, next) => {
       foundPosts: markedPosts,
     });
   } catch (err) {
-    if (err.isJoi) {
-      res.render(`400`);
-      return;
-    }
-
     next(err);
   }
 });

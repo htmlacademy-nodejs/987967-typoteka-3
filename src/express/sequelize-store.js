@@ -10,7 +10,7 @@ const getSequelizeStore = (storeConstructor) => {
   const db = new Sequelize(DBNAME, ADMIN, PSW, {
     host: HOST,
     dialect: `postgres`,
-    // logging: false,
+    logging: false,
   });
 
   const store = new SequelizeStore({
