@@ -3,9 +3,9 @@
 const {Router} = require(`express`);
 const Joi = require(`joi`);
 const {UserFormType} = require(`../const`);
-const {splitJoiException} = require(`../utils`);
 const {userLoginSchema} = require(`../joi-schemas`);
 const {DataServer} = require(`../data-server`);
+const {validateBodySchema} = require(`../middlewares`);
 
 const loginRouter = new Router();
 const dataServer = new DataServer();
@@ -23,25 +23,14 @@ loginRouter.get(`/`, (req, res) => {
   });
 });
 
-loginRouter.post(`/`, async (req, res, next) => {
+loginRouter.post(`/`, validateBodySchema(userLoginSchema, `login`, {activeForm: UserFormType.LOGIN}), async (req, res, next) => {
   const {email} = req.body;
 
   try {
-    await userLoginSchema.validateAsync(req.body, {abortEarly: false});
-
     const authData = await dataServer.authUser(req.body);
     req.session.user = authData;
     res.redirect(`/`);
   } catch (err) {
-    if (err.isJoi) {
-      res.render(`login`, {
-        activeForm: UserFormType.LOGIN,
-        email,
-        errors: splitJoiException(err)
-      });
-      return;
-    }
-
     if (err.isDBServer) {
       const errors = {email: err.errors.filter(((it) => /mail/i.test(it))), password: err.errors.filter((it) => /password/i.test(it))};
 
