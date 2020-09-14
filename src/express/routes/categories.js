@@ -57,7 +57,7 @@ categoryRouter.get(`/`, [privateRoute, validateQuery], async (req, res, next) =>
     const newCategory = {name: ``};
 
     if (isEmpty(req.query)) {
-      res.render(`all-categories`, {categories, newCategory});
+      res.render(`all-categories`, {user, categories, newCategory});
       return;
     }
 

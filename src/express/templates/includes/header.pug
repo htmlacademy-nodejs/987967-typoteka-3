@@ -30,11 +30,13 @@ header.header(class=headerClasses)
       a.button.button--burger.header__burger(href="#") Открыть меню
       ul.navigation.header__navigation 
         li.navigation__item
-          a(href="index.html") index.html --- все ссылки
+          a(href="/") Главная страница
         li.navigation__item
-          a(href="main.html") main.html --- Главная страница
+          a(href="/my") Публикации
         li.navigation__item
-          a(href="main-variation.html") main-variation.html --- Главная страница (варианты вида)
+          a(href="/categories") Категории
+        li.navigation__item
+          a(href="/my/comments") Комментарии
         li.navigation__item
           a(href="/login?logout=true") Выйти
     a.header__search.button.button--search(href="/search" aria-label="поиск по сайту")
