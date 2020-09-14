@@ -6,7 +6,7 @@ const multer = require(`multer`);
 const {DataServer} = require(`../data-server`);
 const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT} = require(`../const`);
 const {getPagination, parseJoiException, extractPicture} = require(`../utils`);
-const {findPostByParam, getCategories, getAllCategories, getCategory, privateRoute, validateBodySchema} = require(`../middlewares`);
+const {findPostByParam, getCategories, getAllCategories, getCategory, privateRoute, privateReaderRoute, validateBodySchema} = require(`../middlewares`);
 const {postSchema, commentSchema} = require(`../joi-schemas`);
 
 const FormType = {
@@ -20,8 +20,9 @@ const upload = multer({dest: `src/express/public/img/post-images`});
 
 const filterCategories = (postCategories, categories) => categories.filter((category) => postCategories.find((it) => it.id === category.id));
 
-const validateFormData = (formType) => async (req, res, next) => {
+const validatePostData = (formType) => async (req, res, next) => {
   const {categories, post} = res.locals;
+
   const formPreferences = formType === FormType.EDIT ? {
     title: EDIT_POST_TITLE,
     action: `/articles/edit/${post.id}`
@@ -30,11 +31,17 @@ const validateFormData = (formType) => async (req, res, next) => {
     action: `/articles/add`
   };
 
-  const addtionalData = {
+  const additionData = {
     categories,
     ...formPreferences,
   };
-  await validateBodySchema(postSchema, `new-post`, addtionalData)(req, res, next);
+  await validateBodySchema(postSchema, `new-post`, additionData)(req, res, next);
+};
+
+const validateCommentData = async (req, res, next) => {
+  const {post, categories} = res.locals;
+  post.categories = filterCategories(post.categories, categories);
+  await validateBodySchema(commentSchema, `post`, {post})(req, res, next);
 };
 
 articleRouter.get(`/add`, [privateRoute, getAllCategories], async (req, res, next) => {
@@ -130,7 +137,7 @@ articleRouter.get(`/edit/:postId`, [privateRoute, getAllCategories, findPostByPa
   }
 });
 
-articleRouter.post(`/edit/:postId`, [privateRoute, findPostByParam, upload.single(`picture`), getAllCategories, validateFormData(FormType.EDIT)], async (req, res, next) => {
+articleRouter.post(`/edit/:postId`, [privateRoute, findPostByParam, upload.single(`picture`), getAllCategories, validatePostData(FormType.EDIT)], async (req, res, next) => {
   const {postId} = req.params;
   const picture = extractPicture(req);
   const {title, date, announce, text} = req.body;
@@ -152,7 +159,7 @@ articleRouter.post(`/edit/:postId`, [privateRoute, findPostByParam, upload.singl
   }
 });
 
-articleRouter.post(`/add`, [privateRoute, upload.single(`picture`), getAllCategories, validateFormData(FormType.CREATE)], async (req, res, next) => {
+articleRouter.post(`/add`, [privateRoute, upload.single(`picture`), getAllCategories, validatePostData(FormType.CREATE)], async (req, res, next) => {
   const picture = extractPicture(req);
   const {title, date, announce, text} = req.body;
   const categories = Object.keys(req.body).filter((it) => /^category-id-\d+$/.test(it)).map((it) => it. replace(/^category-id-(\d+)$/, `$1`));
@@ -173,16 +180,10 @@ articleRouter.post(`/add`, [privateRoute, upload.single(`picture`), getAllCatego
   }
 });
 
-articleRouter.post(`/:postId/comment`, [getCategories, findPostByParam], async (req, res, next) => {
+articleRouter.post(`/:postId`, [privateReaderRoute, getCategories, findPostByParam, validateCommentData], async (req, res, next) => {
   const {postId} = req.params;
-  const {user} = req.session;
   const {text} = req.body;
-  const {categories, post} = res.locals;
-
-  if (!user) {
-    res.redirect(`/login`);
-    return;
-  }
+  const {user} = req.session;
 
   const commentData = {
     date: new Date().toISOString(),
@@ -192,17 +193,9 @@ articleRouter.post(`/:postId/comment`, [getCategories, findPostByParam], async (
   };
 
   try {
-    await commentSchema.validateAsync(commentData.text);
     await dataServer.createComment(commentData);
     res.redirect(`/articles/${postId}`);
   } catch (err) {
-    if (err.isJoi) {
-      const errors = parseJoiException(err);
-      post.categories = filterCategories(post.categories, categories);
-      res.render(`post`, {user, post, comment: text, errors});
-      return;
-    }
-
     next(err);
   }
 });

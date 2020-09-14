@@ -52,12 +52,12 @@ block content
                   p.comments__message #{comment.text}
           if user
             .comments__footer.comments__footer--user
-              form(action=`/articles/${post.id}/comment` method='POST')
+              form(action=`/articles/${post.id}` method='POST')
                 .comments__avatar.avatar
                   img(src=`img/avatars/${user.avatar}` alt='аватар пользователя')
                 label
-                  textarea(rows='1' placeholder='Присоединиться к обсуждению' name='text') #{comment}
+                  textarea(rows='1' placeholder='Присоединиться к обсуждению' name='text') #{formData ? formData.text : ``}
                 button.comments__button.button.button--colored(type='submit') &Ocy;&pcy;&ucy;&bcy;&lcy;&icy;&kcy;&ocy;&vcy;&acy;&tcy;&softcy;
               if errors
-                each error in errors
+                each error in allErrors
                   p.comments__error #{error}
