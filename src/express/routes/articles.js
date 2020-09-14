@@ -5,8 +5,8 @@ const Joi = require(`joi`);
 const multer = require(`multer`);
 const {DataServer} = require(`../data-server`);
 const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT} = require(`../const`);
-const {getPagination, parseJoiException, extractPicture} = require(`../utils`);
-const {findPostByParam, getCategories, getAllCategories, getCategory, privateRoute, privateReaderRoute, validateBodySchema} = require(`../middlewares`);
+const {getPagination, extractPicture} = require(`../utils`);
+const {findPostByParam, getCategories, getAllCategories, getCategory, privateRoute, privateReaderRoute, validateBodySchema, validateQuerySchema} = require(`../middlewares`);
 const {postSchema, commentSchema} = require(`../joi-schemas`);
 
 const FormType = {
@@ -44,6 +44,18 @@ const validateCommentData = async (req, res, next) => {
   await validateBodySchema(commentSchema, `post`, {post})(req, res, next);
 };
 
+const validatePagination = async (req, res, next) => {
+  const {category} = res.locals;
+  const categoryPostCount = category.count;
+  const pageCount = Math.ceil(categoryPostCount / POST_PREVIEW_COUNT);
+
+  const querySchema = Joi.object({
+    page: Joi.number().min(1).max(pageCount).optional(),
+  });
+
+  await validateQuerySchema(querySchema, `400`)(req, res, next);
+};
+
 articleRouter.get(`/add`, [privateRoute, getAllCategories], async (req, res, next) => {
   try {
     const {categories} = res.locals;
@@ -77,20 +89,15 @@ articleRouter.get(`/:postId`, [getCategories, findPostByParam], async (req, res,
   }
 });
 
-articleRouter.get(`/category/:categoryId`, [getCategories, getCategory], async (req, res, next) => {
+articleRouter.get(`/category/:categoryId`, [getCategories, getCategory, validatePagination], async (req, res, next) => {
   const {categories, category} = res.locals;
   const {user} = req.session;
+  const page = req.query.page || 1;
 
   const categoryPostCount = category.count;
   const pageCount = Math.ceil(categoryPostCount / POST_PREVIEW_COUNT);
-  const querySchema = Joi.object({
-    page: Joi.number().min(1).max(pageCount),
-  });
 
   try {
-    const query = await querySchema.validateAsync(req.query);
-    const page = query.page || 1;
-
     const {posts} = await dataServer.getCategoryPostPreviews(category.id, POST_PREVIEW_COUNT, (page - 1) * POST_PREVIEW_COUNT);
 
     res.render(`articles-by-category`, {
