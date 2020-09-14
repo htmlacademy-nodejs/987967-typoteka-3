@@ -12,7 +12,7 @@ const validateSchema = (schema, data, template, templateData = {}) => async (req
     const allErrors = parseJoiException(err);
     const errors = splitJoiException(err);
     res.render(template, {
-      ...data,
+      formData: data,
       ...templateData,
       errors,
       allErrors,

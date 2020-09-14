@@ -18,7 +18,7 @@ module.exports = {
   },
 
   CategoryLength: {
-    MIN: 5,
+    MIN: 2,
     MAX: 30,
   },
 
@@ -35,6 +35,11 @@ module.exports = {
   TextLength: {
     MIN: 0,
     MAX: 1000,
+  },
+
+  FileNameLength: {
+    MIN: 3,
+    MAX: 200,
   },
 
   UserNameLength: {

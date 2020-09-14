@@ -58,6 +58,22 @@ const splitJoiException = (exception) => {
   return errors;
 };
 
+const extractPicture = (req) => {
+  const {originalName, fileName} = req.body;
+
+  const storedPictureData = originalName && fileName ? {
+    originalName,
+    name: fileName
+  } : null;
+
+  const uploadPicture = req.file ? {
+    originalName: req.file.originalname,
+    name: req.file.filename
+  } : null;
+
+  return uploadPicture || storedPictureData;
+};
+
 
 module.exports = {
   getPagination,
@@ -66,4 +82,5 @@ module.exports = {
   parseJoiException,
   splitJoiException,
   simplify,
+  extractPicture,
 };

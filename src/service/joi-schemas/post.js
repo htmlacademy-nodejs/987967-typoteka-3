@@ -15,7 +15,7 @@ const postSchema = Joi.object({
       otherwise: Joi.optional()
     }),
     originalName: Joi.string()
-  }).optional()
+  }).optional().allow(null)
 });
 
 module.exports = {

@@ -30,7 +30,7 @@ block content
                 .new-publication__date-form-division
                   .new-publication__date-block
                     label(for='new-publication-date' aria-label='Календарь')
-                    input#new-publication-date(type='text' name='date' value=post.date)
+                    input#new-publication-date(type='text' name='date' value=formData.date)
               button.new-publication__button.button.button--colored(type='submit') &Ocy;&pcy;&ucy;&bcy;&lcy;&icy;&kcy;&ocy;&vcy;&acy;&tcy;&softcy;
             a.popup__button.button.button--popup-close(href='/my' aria-label='Закрыть окно')
               | &Zcy;&acy;&kcy;&rcy;&ycy;&tcy;&softcy;
@@ -39,28 +39,28 @@ block content
               .form__wrapper.form__wrapper--intro
                 .form__field
                   label
-                    input(type='text' placeholder='Заголовок' required='' name='title' value=post.title)
+                    input(type='text' placeholder='Заголовок' required='' name='title' value=formData.title)
                 .form__field.form__field--post-image
                   label
-                    input#image-name-field(type='text' placeholder='Фотография' readonly='' name='picture-preview' value=`${post.picture ? post.picture.originalName : ``}`)
-                  input#image-db-name-field(type='hidden' name='picture-db-name' value=`${post.picture ? post.picture.name : ``}`)
+                    input#image-name-field(type='text' placeholder='Фотография' readonly='' name='originalName' value=formData.originalName)
+                  input#image-db-name-field(type='hidden' name='fileName' value=formData.fileName)
                   .form__image-loader.form__image-loader--publication
                     label
-                      input.visually-hidden(type='file' name='picture' value=`${post.picture ? post.picture.name: ``}`)
+                      input.visually-hidden(type='file' name='picture')
                       | &Ocy;&bcy;&zcy;&ocy;&rcy;
                   button.button--transparent(type='button') Удалить
                 .new-publication__checkbox.new-publication__checkbox--auto
                   each category in categories
-                    input(id=`category-${category.id}` type='checkbox' name=`category-id-${category.id}` checked=category.checked)
+                    input(id=`category-${category.id}` type='checkbox' name=`category-id-${category.id}` checked=formData[`category-id-${category.id}`] !== undefined)
                     label(for=`category-${category.id}`) #{category.name}
                 a.new-publication__form-link.button.button--transparent(href='/categories') &Dcy;&ocy;&bcy;&acy;&vcy;&icy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
               .form__wrapper.form__wrapper--text
                 .form__field.form__field--publication-text
                   label
-                    textarea(rows='5' placeholder='Анонс публикации' name='announce') #{post.announce}
+                    textarea(rows='5' placeholder='Анонс публикации' name='announce') #{formData.announce}
                 .form__field.form__field--publication-text
                   label
-                    textarea(rows='20' placeholder='Полный текст публикации' name='text') #{post.fullText}
-          if errors
+                    textarea(rows='20' placeholder='Полный текст публикации' name='text') #{formData.text}
+          if allErrors
             include includes/form-validation-error.pug
       .modal__overlay

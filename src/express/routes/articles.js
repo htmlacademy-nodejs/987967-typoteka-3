@@ -5,62 +5,36 @@ const Joi = require(`joi`);
 const multer = require(`multer`);
 const {DataServer} = require(`../data-server`);
 const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT} = require(`../const`);
-const {getPagination, parseJoiException} = require(`../utils`);
-const {findPostByParam, getCategories, getAllCategories, getCategory, privateRoute} = require(`../middlewares`);
-const {createPostSchema, commentSchema} = require(`../joi-schemas`);
+const {getPagination, parseJoiException, extractPicture} = require(`../utils`);
+const {findPostByParam, getCategories, getAllCategories, getCategory, privateRoute, validateBodySchema} = require(`../middlewares`);
+const {postSchema, commentSchema} = require(`../joi-schemas`);
+
+const FormType = {
+  CREATE: `create`,
+  EDIT: `edit`
+};
 
 const articleRouter = new Router();
 const dataServer = new DataServer();
 const upload = multer({dest: `src/express/public/img/post-images`});
 
-const checkCategories = (allCategories, checkedIds) => allCategories.map((category) => ({
-  ...category,
-  checked: !!checkedIds.find((it) => it === category.id)
-}));
-
 const filterCategories = (postCategories, categories) => categories.filter((category) => postCategories.find((it) => it.id === category.id));
 
-const validateFormData = async (req, res, next) => {
-  const {categories} = res.locals;
-
-  const {
-    date,
-    title,
-    announce,
-    text,
-    [`picture-preview`]: originalName,
-    [`picture-db-name`]: name
-  } = req.body;
-
-  const postCategories = Object.keys(req.body).filter((it) => /^category-id-\d+$/.test(it)).map((it) => it.replace(/^category-id-/, ``));
-  const postData = {
-    date,
-    title,
-    announce,
-    text,
-    categories: postCategories,
-    picture: originalName ? {
-      name: req.file ? req.file.filename : name,
-      originalName,
-    } : undefined
+const validateFormData = (formType) => async (req, res, next) => {
+  const {categories, post} = res.locals;
+  const formPreferences = formType === FormType.EDIT ? {
+    title: EDIT_POST_TITLE,
+    action: `/articles/edit/${post.id}`
+  } : {
+    title: NEW_POST_TITLE,
+    action: `/articles/add`
   };
 
-  try {
-    res.locals.postData = postData;
-    const postSchema = createPostSchema(categories);
-    await postSchema.validateAsync(postData, {abortEarly: false});
-
-    next();
-  } catch (err) {
-
-    if (err.isJoi) {
-      res.locals.errors = parseJoiException(err);
-      next();
-      return;
-    }
-
-    next(err);
-  }
+  const addtionalData = {
+    categories,
+    ...formPreferences,
+  };
+  await validateBodySchema(postSchema, `new-post`, addtionalData)(req, res, next);
 };
 
 articleRouter.get(`/add`, [privateRoute, getAllCategories], async (req, res, next) => {
@@ -68,14 +42,14 @@ articleRouter.get(`/add`, [privateRoute, getAllCategories], async (req, res, nex
     const {categories} = res.locals;
     const {user} = req.session;
     const date = new Date().toISOString();
-    const post = {
+    const formData = {
       date,
     };
 
     res.render(`new-post`, {
       user,
       title: NEW_POST_TITLE,
-      post,
+      formData,
       categories,
       action: `/articles/add`
     });
@@ -128,13 +102,27 @@ articleRouter.get(`/edit/:postId`, [privateRoute, getAllCategories, findPostByPa
   try {
     const {postId} = req.params;
     const {categories, post} = res.locals;
+
     const {user} = req.session;
+    const {title, date, text, announce, picture, categories: postCategories} = post;
+    const {name, originalName} = picture || {name: ``, originalName: ``};
+    const checkedCategories = postCategories.reduce((acc, cur) => ({...acc, [`category-id-${cur.id}`]: cur.name}), {});
+
+    const formData = {
+      title,
+      date,
+      text,
+      announce,
+      ...checkedCategories,
+      fileName: name,
+      originalName,
+    };
 
     res.render(`new-post`, {
       user,
       title: EDIT_POST_TITLE,
-      post,
-      categories: checkCategories(categories, post.categories.map((it) => it.id)),
+      formData,
+      categories,
       action: `/articles/edit/${postId}`
     });
   } catch (err) {
@@ -142,47 +130,44 @@ articleRouter.get(`/edit/:postId`, [privateRoute, getAllCategories, findPostByPa
   }
 });
 
-articleRouter.post(`/edit/:postId`, [privateRoute, findPostByParam, upload.single(`picture`), getAllCategories, validateFormData], async (req, res, next) => {
-  const {postData, post, errors, categories} = res.locals;
+articleRouter.post(`/edit/:postId`, [privateRoute, findPostByParam, upload.single(`picture`), getAllCategories, validateFormData(FormType.EDIT)], async (req, res, next) => {
+  const {postId} = req.params;
+  const picture = extractPicture(req);
+  const {title, date, announce, text} = req.body;
+  const categories = Object.keys(req.body).filter((it) => /^category-id-\d+$/.test(it)).map((it) => it. replace(/^category-id-(\d+)$/, `$1`));
+  const postData = {
+    title,
+    date,
+    announce,
+    text,
+    categories,
+    picture,
+  };
 
   try {
-    if (errors) {
-      const renderData = {
-        title: EDIT_POST_TITLE,
-        post: postData,
-        categories: checkCategories(categories, postData.categories),
-        action: `/articles/edit/${post.id}`,
-        errors,
-      };
-
-      res.render(`new-post`, renderData);
-    } else {
-      await dataServer.updatePost(post.id, postData);
-      res.redirect(`/my`);
-    }
+    await dataServer.updatePost(postId, postData);
+    res.redirect(`/my`);
   } catch (err) {
     next(err);
   }
 });
 
-articleRouter.post(`/add`, [privateRoute, upload.single(`picture`), getAllCategories, validateFormData], async (req, res, next) => {
-  const {postData, categories, errors} = res.locals;
+articleRouter.post(`/add`, [privateRoute, upload.single(`picture`), getAllCategories, validateFormData(FormType.CREATE)], async (req, res, next) => {
+  const picture = extractPicture(req);
+  const {title, date, announce, text} = req.body;
+  const categories = Object.keys(req.body).filter((it) => /^category-id-\d+$/.test(it)).map((it) => it. replace(/^category-id-(\d+)$/, `$1`));
+  const postData = {
+    title,
+    date,
+    announce,
+    text,
+    categories,
+    picture,
+  };
 
   try {
-    if (errors) {
-      const renderData = {
-        title: NEW_POST_TITLE,
-        post: postData,
-        categories: checkCategories(categories, postData.categories),
-        action: `/articles/add`,
-        errors,
-      };
-
-      res.render(`new-post`, renderData);
-    } else {
-      await dataServer.createPost(postData);
-      res.redirect(`/my`);
-    }
+    await dataServer.createPost(postData);
+    res.redirect(`/my`);
   } catch (err) {
     next(err);
   }
