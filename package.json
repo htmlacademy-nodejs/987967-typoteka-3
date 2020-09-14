@@ -14,13 +14,8 @@
     "start-front-server": "node ./src/express/index.js",
     "start-front-server:dev": "nodemon -e js,pug ./src/express/index.js | npx pino-pretty -t",
     "start-front-server:dev:debug": "cross-env LOG_LEVEL=debug nodemon -e js,pug ./src/express/index.js",
-<<<<<<< HEAD
-    "start:server:dev": "concurrently \"npm:start-front-server:dev\" \"npm:start:dev\"",
-    "start:server": "concurrently \"npm:start-front-server\" \"npm:start\""
-=======
     "start:server:dev": "concurrently --names \"SSR, REST\" --prefix-colors \"green,blue\" \"npm:start-front-server:dev\" \"npm:start:dev\"",
     "start:server": "concurrently --names \"SSR, REST\" --prefix-colors \"green,blue\" \"npm:start-front-server\" \"npm:start\""
->>>>>>> _module8-task1
   },
   "repository": {
     "type": "git",
