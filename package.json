@@ -7,13 +7,15 @@
     "test": "npm run test:rest",
     "test:rest": "jest api",
     "eslint": "eslint --ext .js src/",
-    "eslint:fix": "eslint --ext .js src/ --fix",
-    "start": "node ./src/service/service.js",
+    "start:service": "node ./src/service/service.js",
+    "start": "node ./src/service/service.js --server",
     "start:dev": "nodemon ./src/service/service.js --server | npx pino-pretty -t",
     "start:debug": "cross-env LOG_LEVEL=debug nodemon ./src/service/service.js --server",
     "start-front-server": "node ./src/express/index.js",
     "start-front-server:dev": "nodemon -e js,pug ./src/express/index.js | npx pino-pretty -t",
-    "start-front-server:dev:debug": "cross-env LOG_LEVEL=debug nodemon -e js,pug ./src/express/index.js"
+    "start-front-server:dev:debug": "cross-env LOG_LEVEL=debug nodemon -e js,pug ./src/express/index.js",
+    "start:server:dev": "concurrently \"npm:start-front-server:dev\" \"npm:start:dev\"",
+    "start:server": "concurrently \"npm:start-front-server\" \"npm:start\""
   },
   "repository": {
     "type": "git",
@@ -38,6 +40,7 @@
     "axios": "0.19.2",
     "bcrypt": "5.0.0",
     "chalk": "4.1.0",
+    "concurrently": "5.3.0",
     "connect-session-sequelize": "7.0.1",
     "cross-env": "7.0.2",
     "dotenv": "8.2.0",
