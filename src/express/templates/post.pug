@@ -39,17 +39,18 @@ block content
             p #{post.text}
       .post__wrapper.post__wrapper--comments
         section.post__comments.comments
-          h2.comments__title.title.title--middle &Kcy;&ocy;&mcy;&mcy;&iecy;&ncy;&tcy;&acy;&rcy;&icy;&icy;
-          ul.comments__list
-            each comment in post.comments
-              li.comments__comment
-                .comments__avatar.avatar
-                  img(src=`img/avatars/${comment.author.avatar.name}` alt='аватар пользователя')
-                .comments__text
-                  .comments__head
-                    p #{comment.author.firstname} #{comment.author.lastname} &bull;
-                    time.comments__date(datetime=comment.dateTime) #{comment.dateTimeLocalized}
-                  p.comments__message #{comment.text}
+          h2.comments__title.title.title--middle #{post.comments.length ? `Комментарии` : `Комментарии отсутствуют`}
+          if post.comments.length
+            ul.comments__list
+              each comment in post.comments
+                li.comments__comment
+                  .comments__avatar.avatar
+                    img(src=`img/avatars/${comment.author.avatar.name}` alt='аватар пользователя')
+                  .comments__text
+                    .comments__head
+                      p #{comment.author.firstname} #{comment.author.lastname} &bull;
+                      time.comments__date(datetime=comment.dateTime) #{comment.dateTimeLocalized}
+                    p.comments__message #{comment.text}
           if user
             .comments__footer.comments__footer--user
               form(action=`/articles/${post.id}` method='POST')
@@ -61,3 +62,13 @@ block content
               if errors
                 each error in allErrors
                   p.comments__error #{error}
+
+          if !user
+            .comments__footer.comments__footer--visitor
+              a.comments__button.button.button--colored(href="/login") Войти
+              .comments__registration
+                p.text.text--signature
+                  a.title.title--small(href="/register") Регистрация
+                  br
+                  | Чтобы присоединиться к переписке нужно зарегистрироваться
+
