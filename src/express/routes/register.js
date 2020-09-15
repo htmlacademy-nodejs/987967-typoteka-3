@@ -6,16 +6,16 @@ const {validateBodySchema} = require(`../middlewares`);
 const {UserFormType} = require(`../const`);
 const {DataServer} = require(`../data-server`);
 const {userRegisterSchema} = require(`../joi-schemas`);
-const {extractPicture} = require(`../utils`);
+const {extractPicture, render} = require(`../utils`);
 
 const registerRouter = new Router();
 const upload = multer({dest: `src/express/public/img/avatars`});
 const dataServer = new DataServer();
 
 registerRouter.get(`/`, (req, res) => {
-  res.render(`login`, {
+  render(`login`, {
     activeForm: UserFormType.REGISTER,
-  });
+  }, req, res);
 });
 
 registerRouter.post(`/`, [upload.single(`avatarFile`), validateBodySchema(userRegisterSchema, `login`, {activeForm: UserFormType.REGISTER})], async (req, res, next) => {
@@ -34,7 +34,7 @@ registerRouter.post(`/`, [upload.single(`avatarFile`), validateBodySchema(userRe
     res.redirect(`/login`);
   } catch (err) {
     if (err.isDBServer) {
-      res.render(`login`, {
+      render(`login`, {
         activeForm: UserFormType.REGISTER,
         allErrors: err.errors,
         firstname,
@@ -42,7 +42,7 @@ registerRouter.post(`/`, [upload.single(`avatarFile`), validateBodySchema(userRe
         email,
         fileName: avatar.name,
         originalName: avatar.originalName,
-      });
+      }, req, res);
     } else {
       next(err);
     }

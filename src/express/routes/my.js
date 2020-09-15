@@ -3,6 +3,7 @@
 const {Router} = require(`express`);
 const {DataServer} = require(`../data-server`);
 const {PostSortType} = require(`../const`);
+const {render} = require(`../utils`);
 const {findPostByQuery} = require(`../middlewares`);
 const Joi = require(`joi`);
 
@@ -11,7 +12,6 @@ const dataServer = new DataServer();
 
 myRouter.get(`/`, findPostByQuery, async (req, res, next) => {
   const {post} = res.locals;
-  const {user} = req.session;
 
   try {
     if (post) {
@@ -19,10 +19,9 @@ myRouter.get(`/`, findPostByQuery, async (req, res, next) => {
       res.redirect(`/my`);
     } else {
       const {posts} = await dataServer.getPostPreviews(PostSortType.DATE);
-      res.render(`my`, {
+      render(`my`, {
         posts,
-        user,
-      });
+      }, req, res);
     }
   } catch (err) {
     next(err);
@@ -31,7 +30,6 @@ myRouter.get(`/`, findPostByQuery, async (req, res, next) => {
 
 myRouter.get(`/comments`, findPostByQuery, async (req, res, next) => {
   const {post} = res.locals;
-  const {user} = req.session;
   const commentIds = post ? post.comments.map((it) => it.id) : [];
 
   const querySchema = Joi.object({
@@ -48,14 +46,13 @@ myRouter.get(`/comments`, findPostByQuery, async (req, res, next) => {
       res.redirect(`/my/comments`);
     } else {
       const comments = await dataServer.getComments();
-      res.render(`comments`, {
+      render(`comments`, {
         comments,
-        user,
-      });
+      }, req, res);
     }
   } catch (err) {
     if (err.isJoi) {
-      res.render(`400`);
+      render(`400`, {}, req, res, 404);
       return;
     }
 

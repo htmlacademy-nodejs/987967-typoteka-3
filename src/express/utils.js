@@ -74,6 +74,17 @@ const extractPicture = (req) => {
   return uploadPicture || storedPictureData;
 };
 
+const render = (template, data, req, res, status = 200) => {
+  const {user} = req.session || {user: null};
+  const url = encodeURIComponent(req.originalUrl);
+
+  res.status(status).render(template, {
+    ...data,
+    user,
+    url,
+  });
+};
+
 
 module.exports = {
   getPagination,
@@ -83,4 +94,5 @@ module.exports = {
   splitJoiException,
   simplify,
   extractPicture,
+  render,
 };

@@ -3,7 +3,7 @@
 const {Router} = require(`express`);
 const Joi = require(`joi`);
 const {DataServer} = require(`../data-server`);
-const {getPagination} = require(`../utils`);
+const {getPagination, render} = require(`../utils`);
 const {validateQuerySchema} = require(`../middlewares`);
 const {
   POST_PREVIEW_COUNT,
@@ -45,7 +45,6 @@ const getPopularPosts = async (req, res, next) => {
 
 mainRouter.get(`/`, getPopularPosts, validatePagination, async (req, res, next) => {
   try {
-    const {user} = req.session;
     const {popularPosts, postCount} = res.locals;
     const pageCount = Math.ceil(Number(postCount) / POST_PREVIEW_COUNT);
 
@@ -57,8 +56,7 @@ mainRouter.get(`/`, getPopularPosts, validatePagination, async (req, res, next) 
       dataServer.getComments(LASTST_COMMENT_COUNT, 0),
     ]);
 
-    res.render(`main`, {
-      user,
+    const renderData = {
       categories,
       posts,
       popularPosts: popularPosts.filter((it) => it[`comment_count`] > 0).map((it) => ({
@@ -72,7 +70,9 @@ mainRouter.get(`/`, getPopularPosts, validatePagination, async (req, res, next) 
       })),
 
       pagination: getPagination(page, pageCount, req.path),
-    });
+    };
+
+    render(`main`, renderData, req, res);
   } catch (err) {
     next(err);
   }

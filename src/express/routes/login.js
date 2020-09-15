@@ -3,6 +3,7 @@
 const {Router} = require(`express`);
 const Joi = require(`joi`);
 const {UserFormType} = require(`../const`);
+const {render} = require(`../utils`);
 const {userLoginSchema} = require(`../joi-schemas`);
 const {DataServer} = require(`../data-server`);
 const {validateBodySchema} = require(`../middlewares`);
@@ -18,9 +19,9 @@ loginRouter.get(`/`, (req, res) => {
     req.session.destroy();
   }
 
-  res.render(`login`, {
+  render(`login`, {
     activeForm: UserFormType.LOGIN
-  });
+  }, req, res);
 });
 
 loginRouter.post(`/`, validateBodySchema(userLoginSchema, `login`, {activeForm: UserFormType.LOGIN}), async (req, res, next) => {
@@ -34,11 +35,11 @@ loginRouter.post(`/`, validateBodySchema(userLoginSchema, `login`, {activeForm: 
     if (err.isDBServer) {
       const errors = {email: err.errors.filter(((it) => /mail/i.test(it))), password: err.errors.filter((it) => /password/i.test(it))};
 
-      res.render(`login`, {
+      render(`login`, {
         activeForm: UserFormType.LOGIN,
         email,
         errors
-      });
+      }, req, res);
       return;
     }
 

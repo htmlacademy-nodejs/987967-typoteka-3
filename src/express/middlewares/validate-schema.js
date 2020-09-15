@@ -1,6 +1,6 @@
 'use strict';
 
-const {parseJoiException, splitJoiException} = require(`../utils`);
+const {parseJoiException, splitJoiException, render} = require(`../utils`);
 const logger = require(`../../logger`).getLogger(`app`);
 
 const validateSchema = (schema, data, template, templateData = {}) => async (req, res, next) => {
@@ -11,13 +11,12 @@ const validateSchema = (schema, data, template, templateData = {}) => async (req
     logger.info(`Validate error ${err}`);
     const allErrors = parseJoiException(err);
     const errors = splitJoiException(err);
-    res.render(template, {
+    render(template, {
       formData: data,
       ...templateData,
       errors,
       allErrors,
-      user: req.session.user,
-    });
+    }, req, res);
   }
 };
 

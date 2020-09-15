@@ -7,9 +7,9 @@ header.header(class=headerClasses)
     nav.header__nav 
       ul.header__nav-list 
         li.header__list-item 
-          a.header__registration(href="/register") Регистрация
+          a.header__registration(href=`/register?back=${url}`) Регистрация
         li.header__list-item 
-          a.header__enter(href="/login") Вход с паролем
+          a.header__enter(href=`/login?back=${url}`) Вход с паролем
     a.header__search.button.button--search(href="/search" aria-label="поиск по сайту")
   
   if user && user.role === "reader"
@@ -18,14 +18,14 @@ header.header(class=headerClasses)
         li.header__list-item
           p #{user.firstname} #{user.lastname}
         li.header__list-item
-          a.header__exit(href="/login?logout=true") Выйти
+          a.header__exit(href=`/login?logout=true&back=${url}`) Выйти
     a.header__avatar.avatar
       if user.avatar
         img(src=`img/avatars/${user.avatar}` alt="аватар пользователя")
     a.header__search.button.button--search(href="/search" aria-label="поиск по сайту")
 
   if user && user.role === "admin"
-    a.button.button--colored.header__button-new(href="/articles/add") Новая запись
+    a.button.button--colored.header__button-new(href=`/articles/add?back=${url}`) Новая запись
     div.header__dropdown 
       a.button.button--burger.header__burger(href="#") Открыть меню
       ul.navigation.header__navigation 
@@ -38,7 +38,7 @@ header.header(class=headerClasses)
         li.navigation__item
           a(href="/my/comments") Комментарии
         li.navigation__item
-          a(href="/login?logout=true") Выйти
+          a(href=`/login?logout=true&back=${url}`) Выйти
     a.header__search.button.button--search(href="/search" aria-label="поиск по сайту")
       
 

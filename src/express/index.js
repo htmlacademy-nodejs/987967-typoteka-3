@@ -16,6 +16,7 @@ const {searchRouter} = require(`./routes/search`);
 const {SECRET} = require(`./config`);
 const {privateRoute} = require(`./middlewares`);
 const {getSequelizeStore} = require(`./sequelize-store`);
+const {render} = require(`./utils`);
 
 const pino = expressPinoLogger({
   req: (req) => ({
@@ -59,13 +60,13 @@ app.use(`/register`, registerRouter);
 app.use(`/search`, searchRouter);
 
 app.use((req, res) => {
-  res.status(404).render(`400.pug`);
+  render(`400`, {}, req, res, 404);
 });
 
 app.use((err, req, res, next) => {
   const errorMessage = err.msg ? `${err.msg}: ${err.filename}, line: ${err.line}` : err;
   loggerApp.error(errorMessage);
-  res.status(500).render(`500.pug`);
+  render(`500`, {}, req, res, 500);
   next();
 });
 

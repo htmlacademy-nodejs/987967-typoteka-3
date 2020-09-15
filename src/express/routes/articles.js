@@ -5,7 +5,7 @@ const Joi = require(`joi`);
 const multer = require(`multer`);
 const {DataServer} = require(`../data-server`);
 const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT} = require(`../const`);
-const {getPagination, extractPicture} = require(`../utils`);
+const {getPagination, extractPicture, render} = require(`../utils`);
 const {findPostByParam, getCategories, getAllCategories, getCategory, privateRoute, privateReaderRoute, validateBodySchema, validateQuerySchema} = require(`../middlewares`);
 const {postSchema, commentSchema} = require(`../joi-schemas`);
 
@@ -59,19 +59,17 @@ const validatePagination = async (req, res, next) => {
 articleRouter.get(`/add`, [privateRoute, getAllCategories], async (req, res, next) => {
   try {
     const {categories} = res.locals;
-    const {user} = req.session;
     const date = new Date().toISOString();
     const formData = {
       date,
     };
 
-    res.render(`new-post`, {
-      user,
+    render(`new-post`, {
       title: NEW_POST_TITLE,
       formData,
       categories,
       action: `/articles/add`
-    });
+    }, req, res);
   } catch (err) {
     next(err);
   }
@@ -80,10 +78,9 @@ articleRouter.get(`/add`, [privateRoute, getAllCategories], async (req, res, nex
 articleRouter.get(`/:postId`, [getCategories, findPostByParam], async (req, res, next) => {
   try {
     const {categories, post} = res.locals;
-    const {user} = req.session;
 
     post.categories = filterCategories(post.categories, categories);
-    res.render(`post`, {user, post});
+    render(`post`, {post}, req, res);
   } catch (err) {
     next(err);
   }
@@ -91,7 +88,6 @@ articleRouter.get(`/:postId`, [getCategories, findPostByParam], async (req, res,
 
 articleRouter.get(`/category/:categoryId`, [getCategories, getCategory, validatePagination], async (req, res, next) => {
   const {categories, category} = res.locals;
-  const {user} = req.session;
   const page = req.query.page || 1;
 
   const categoryPostCount = category.count;
@@ -100,13 +96,12 @@ articleRouter.get(`/category/:categoryId`, [getCategories, getCategory, validate
   try {
     const {posts} = await dataServer.getCategoryPostPreviews(category.id, POST_PREVIEW_COUNT, (page - 1) * POST_PREVIEW_COUNT);
 
-    res.render(`articles-by-category`, {
-      user,
+    render(`articles-by-category`, {
       categories,
       categoryName: category.name,
       posts,
       pagination: getPagination(page, pageCount, req.originalUrl.replace(/\?.+/, ``)),
-    });
+    }, req, res);
   } catch (err) {
     next(err);
   }
@@ -117,7 +112,6 @@ articleRouter.get(`/edit/:postId`, [privateRoute, getAllCategories, findPostByPa
     const {postId} = req.params;
     const {categories, post} = res.locals;
 
-    const {user} = req.session;
     const {title, date, text, announce, picture, categories: postCategories} = post;
     const {name, originalName} = picture || {name: ``, originalName: ``};
     const checkedCategories = postCategories.reduce((acc, cur) => ({...acc, [`category-id-${cur.id}`]: cur.name}), {});
@@ -132,13 +126,12 @@ articleRouter.get(`/edit/:postId`, [privateRoute, getAllCategories, findPostByPa
       originalName,
     };
 
-    res.render(`new-post`, {
-      user,
+    render(`new-post`, {
       title: EDIT_POST_TITLE,
       formData,
       categories,
       action: `/articles/edit/${postId}`
-    });
+    }, req, res);
   } catch (err) {
     next(err);
   }

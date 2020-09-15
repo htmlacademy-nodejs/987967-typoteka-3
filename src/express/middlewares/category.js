@@ -3,6 +3,7 @@
 const Joi = require(`joi`);
 const {DataServer} = require(`../data-server`);
 const loggerApp = require(`../../logger`).getLogger(`app`);
+const {render} = require(`../utils`);
 
 const dataServer = new DataServer();
 
@@ -39,7 +40,7 @@ const getCategory = async (req, res, next) => {
     next();
   } catch (err) {
     if (err.isJoi || err.isDBServer) {
-      res.status(404).render(`400.pug`);
+      render(`400.pug`, {}, req, res, 404);
       loggerApp.error(err);
       return;
     }

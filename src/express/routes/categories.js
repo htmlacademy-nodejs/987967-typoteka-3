@@ -5,7 +5,7 @@ const {Router} = require(`express`);
 const Joi = require(`joi`);
 const {DataServer} = require(`../data-server`);
 const {categorySchema} = require(`../joi-schemas`);
-const {parseJoiException} = require(`../utils`);
+const {parseJoiException, render} = require(`../utils`);
 const {privateRoute} = require(`../middlewares`);
 
 const isEmpty = (object) => Object.keys(object).length === 0;
@@ -53,11 +53,10 @@ const validateQuery = async (req, res, next) => {
 categoryRouter.get(`/`, [privateRoute, validateQuery], async (req, res, next) => {
   try {
     const categories = await dataServer.getCategories(false);
-    const {user} = req.session;
     const newCategory = {name: ``};
 
     if (isEmpty(req.query)) {
-      res.render(`all-categories`, {user, categories, newCategory});
+      render(`all-categories`, {categories, newCategory}, req, res);
       return;
     }
 
@@ -87,7 +86,7 @@ categoryRouter.get(`/`, [privateRoute, validateQuery], async (req, res, next) =>
         }
     }
 
-    res.render(`all-categories`, {user, categories, newCategory});
+    render(`all-categories`, {categories, newCategory}, req, res);
   } catch (err) {
     next(err);
   }

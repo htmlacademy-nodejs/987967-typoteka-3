@@ -5,6 +5,7 @@ const {DataServer} = require(`../data-server`);
 const Joi = require(`joi`);
 const {TitleLength} = require(`../const`);
 const {validateQuerySchema} = require(`../middlewares`);
+const {render} = require(`../utils`);
 
 const searchRouter = new Router();
 const dataServer = new DataServer();
@@ -15,8 +16,6 @@ const querySchema = Joi.object({
 
 searchRouter.get(`/`, validateQuerySchema(querySchema, `search`), async (req, res, next) => {
   try {
-    const {user} = req.session;
-
     const queryString = req.query.query;
     const foundPosts = queryString ? await dataServer.search(queryString) : [];
     const markedPosts = foundPosts.map((it) => ({
@@ -24,11 +23,10 @@ searchRouter.get(`/`, validateQuerySchema(querySchema, `search`), async (req, re
       title: it.title.replace(RegExp(`(${queryString})`, `ig`), `<b>$1</b>`)
     }));
 
-    res.render(`search`, {
-      user,
+    render(`search`, {
       queryString,
       foundPosts: markedPosts,
-    });
+    }, req, res);
   } catch (err) {
     next(err);
   }
