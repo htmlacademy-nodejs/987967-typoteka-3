@@ -77,11 +77,13 @@ const extractPicture = (req) => {
 const render = (template, data, req, res, status = 200) => {
   const {user} = req.session || {user: null};
   const url = encodeURIComponent(req.originalUrl);
+  const back = decodeURIComponent(req.query.back || `/`);
 
   res.status(status).render(template, {
     ...data,
     user,
     url,
+    back,
   });
 };
 
