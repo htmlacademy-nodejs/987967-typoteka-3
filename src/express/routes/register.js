@@ -37,11 +37,13 @@ registerRouter.post(`/`, [upload.single(`avatarFile`), validateBodySchema(userRe
       render(`login`, {
         activeForm: UserFormType.REGISTER,
         allErrors: err.errors,
-        firstname,
-        lastname,
-        email,
-        fileName: avatar.name,
-        originalName: avatar.originalName,
+        formData: {
+          firstname,
+          lastname,
+          email,
+          fileName: avatar.name,
+          originalName: avatar.originalName
+        },
       }, req, res);
     } else {
       next(err);

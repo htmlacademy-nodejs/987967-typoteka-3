@@ -31,22 +31,21 @@ block content
             form(action="/register" method="post" enctype='multipart/form-data')
               div(class="form__field")
                 label
-                  input(type="email" placeholder="Электронная почта" required="" name="email" value=email)
+                  input(type="email" placeholder="Электронная почта" required="" name="email" value=formData.email)
               div(class="form__field")
                 label
-                  input(type="text" placeholder="Имя" required="" name="firstname" value=firstname)
+                  input(type="text" placeholder="Имя" required="" name="firstname" value=formData.firstname)
               div(class="form__field")
                 label
-                  input(type="text" placeholder="Фамилия" name="lastname" value=lastname)
+                  input(type="text" placeholder="Фамилия" name="lastname" value=formData.lastname)
               div(class="form__field")
                 label
-                  input(type="password" placeholder="Пароль" required="" name="password")
+                  input(type="password" placeholder="Пароль" required="" name="password" value="")
               div(class="form__field")
                 label
-                  input(type="password" placeholder="Повтор пароля" required="" name="repeatPassword")
+                  input(type="password" placeholder="Повтор пароля" required="" name="repeatPassword" value="")
               
               if allErrors 
-                -var errors = allErrors
                 include includes/form-validation-error
 
               div(class="form__image-loader")
@@ -55,8 +54,8 @@ block content
                 label
                   input(type="file" class="visually-hidden" name="avatarFile")
                   | Загрузить фото профиля
-                input(type="hidden" name="fileName" value=fileName)
-                input(type="hidden" name="originalName" value=originalName)
+                input(type="hidden" name="fileName" value=formData.fileName)
+                input(type="hidden" name="originalName" value=formData.originalName)
               
               button(class="form__submit-btn form__submit-btn--register button button--colored" type="submit") 
                 | Зарегистрироваться
@@ -65,7 +64,7 @@ block content
             form(action="/login" method="post")
               div(class="form__field")
                 label
-                  input(type="email" placeholder="Электронная почта" required="" name="email" value=email)
+                  input(type="email" placeholder="Электронная почта" required="" name="email" value=formData.email)
               if errors && errors.email
                 each error in errors.email
                   p.form__error-message #{error}

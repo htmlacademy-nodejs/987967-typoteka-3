@@ -20,7 +20,8 @@ loginRouter.get(`/`, (req, res) => {
   }
 
   render(`login`, {
-    activeForm: UserFormType.LOGIN
+    activeForm: UserFormType.LOGIN,
+    formData: {},
   }, req, res);
 });
 
@@ -37,7 +38,7 @@ loginRouter.post(`/`, validateBodySchema(userLoginSchema, `login`, {activeForm: 
 
       render(`login`, {
         activeForm: UserFormType.LOGIN,
-        email,
+        formData: {email},
         errors
       }, req, res);
       return;

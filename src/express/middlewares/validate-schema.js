@@ -11,6 +11,7 @@ const validateSchema = (schema, data, template, templateData = {}) => async (req
     logger.info(`Validate error ${err}`);
     const allErrors = parseJoiException(err);
     const errors = splitJoiException(err);
+
     render(template, {
       formData: data,
       ...templateData,
