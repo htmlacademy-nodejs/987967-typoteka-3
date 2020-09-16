@@ -1,6 +1,10 @@
 'use strict';
 
+const MainConst = require(`../const`);
+
 module.exports = {
+  ...MainConst,
+
   DEFAULT_PORT: 8080,
   DATA_SERVER_PORT: 3000,
   TIMEOUT: 3000,
@@ -17,41 +21,6 @@ module.exports = {
     DATE: `date`,
   },
 
-  CategoryLength: {
-    MIN: 2,
-    MAX: 30,
-  },
-
-  TitleLength: {
-    MIN: 30,
-    MAX: 250,
-  },
-
-  AnnounceLength: {
-    MIN: 30,
-    MAX: 250,
-  },
-
-  TextLength: {
-    MIN: 0,
-    MAX: 1000,
-  },
-
-  FileNameLength: {
-    MIN: 3,
-    MAX: 200,
-  },
-
-  UserNameLength: {
-    MIN: 2,
-    MAX: 50,
-  },
-
-  CommentLength: {
-    MIN: 20,
-    MAX: 1000,
-  },
-
   ErrorType: {
     BAD_DB_REQUEST: `Bad DB request`,
   },
@@ -66,10 +35,4 @@ module.exports = {
     READER: `reader`,
   },
 
-  HttpStatusCode: {
-    OK: 200,
-    BAD_REQUEST: 400,
-    NOT_FOUND: 404,
-    SERVER_ERROR: 500,
-  },
 };
