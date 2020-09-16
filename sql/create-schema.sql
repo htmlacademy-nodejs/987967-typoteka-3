@@ -4,8 +4,8 @@ SET
 CREATE TABLE public.avatars (
   id bigint NOT NULL,
   user_id bigint NOT NULL,
-  name character varying(250) NOT NULL,
-  "originalName" character varying(100) NOT NULL
+  name character varying(200) NOT NULL,
+  "originalName" character varying(200) NOT NULL
 );
 
 ALTER TABLE
@@ -20,7 +20,7 @@ ALTER SEQUENCE public.avatars_id_seq OWNED BY public.avatars.id;
 
 CREATE TABLE public.categories (
   id bigint NOT NULL,
-  name character varying(60) NOT NULL
+  name character varying(30) NOT NULL
 );
 
 ALTER TABLE
@@ -38,7 +38,7 @@ CREATE TABLE public.comments (
   user_id bigint NOT NULL,
   post_id bigint NOT NULL,
   date timestamp with time zone NOT NULL,
-  text character varying(250) NOT NULL
+  text character varying(500) NOT NULL
 );
 
 ALTER TABLE
@@ -69,8 +69,8 @@ ALTER SEQUENCE public.passwords_id_seq OWNED BY public.passwords.id;
 
 CREATE TABLE public.pictures (
   id bigint NOT NULL,
-  name character varying(250) NOT NULL,
-  "originalName" character varying(100) NOT NULL,
+  name character varying(200) NOT NULL,
+  "originalName" character varying(200) NOT NULL,
   post_id bigint NOT NULL
 );
 
@@ -113,8 +113,8 @@ ALTER SEQUENCE public.posts_id_seq OWNED BY public.posts.id;
 CREATE TABLE public.users (
   id bigint NOT NULL,
   email character varying(250) NOT NULL,
-  firstname character varying(250) NOT NULL,
-  lastname character varying(250) NOT NULL
+  firstname character varying(50) NOT NULL,
+  lastname character varying(50) NOT NULL
 );
 
 ALTER TABLE
