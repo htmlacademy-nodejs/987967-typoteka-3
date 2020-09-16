@@ -4,7 +4,7 @@ const express = require(`express`);
 const expressPinoLogger = require(`express-pino-logger`);
 const expressSession = require(`express-session`);
 const path = require(`path`);
-const {DEFAULT_PORT} = require(`./const`);
+const {DEFAULT_PORT, HttpStatusCode} = require(`./const`);
 const {getLogger} = require(`../logger`);
 const {articleRouter} = require(`./routes/articles`);
 const {mainRouter} = require(`./routes/main`);
@@ -60,13 +60,13 @@ app.use(`/register`, registerRouter);
 app.use(`/search`, searchRouter);
 
 app.use((req, res) => {
-  render(`400`, {}, req, res, 404);
+  render(`400`, {}, req, res, HttpStatusCode.NOT_FOUND);
 });
 
 app.use((err, req, res, next) => {
   const errorMessage = err.msg ? `${err.msg}: ${err.filename}, line: ${err.line}` : err;
   loggerApp.error(errorMessage);
-  render(`500`, {}, req, res, 500);
+  render(`500`, {}, req, res, HttpStatusCode.SERVER_ERROR);
   next();
 });
 

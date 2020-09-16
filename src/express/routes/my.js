@@ -2,7 +2,7 @@
 
 const {Router} = require(`express`);
 const {DataServer} = require(`../data-server`);
-const {PostSortType} = require(`../const`);
+const {PostSortType, HttpStatusCode} = require(`../const`);
 const {render} = require(`../utils`);
 const {findPostByQuery} = require(`../middlewares`);
 const Joi = require(`joi`);
@@ -52,7 +52,7 @@ myRouter.get(`/comments`, findPostByQuery, async (req, res, next) => {
     }
   } catch (err) {
     if (err.isJoi) {
-      render(`400`, {}, req, res, 404);
+      render(`400`, {}, req, res, HttpStatusCode.NOT_FOUND);
       return;
     }
 
