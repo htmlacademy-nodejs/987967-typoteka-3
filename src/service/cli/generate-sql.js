@@ -1,12 +1,14 @@
 'use strict';
 
-const {generatePosts} = require(`../utils`);
-const {createUsers, createCategories, createPosts} = require(`../fill-database`);
 const fs = require(`fs`);
+const path = require(`path`);
 const chalk = require(`chalk`);
+const {generatePosts} = require(`../utils`);
+const {createUsersSQL, createCategoriesSQL, createPostsSQL} = require(`../utils`);
 const {
   ExitCode,
   SQL_FILE,
+  MOCK_FILE,
   Message,
   DEFAULT_POSTS_COUNT,
   DEFAULT_USER_COUNT,
@@ -16,17 +18,18 @@ const {
 } = require(`../const`);
 
 const createSQLFile = async (postCount, userCount) => {
-  const {users, posts, categories} = generatePosts(postCount, userCount);
+  const {users, posts, categories} = await generatePosts(postCount, userCount);
 
-  const userSQL = createUsers(users);
-  const categorySQL = createCategories(categories);
-  const postSQL = createPosts(posts);
+  const userSQL = await createUsersSQL(users);
+  const categorySQL = createCategoriesSQL(categories);
+  const postSQL = createPostsSQL(posts);
 
   const content = [userSQL, categorySQL, postSQL].join(`\n`);
 
   try {
+    await fs.promises.writeFile(MOCK_FILE, JSON.stringify({categories, users, posts}));
     await fs.promises.writeFile(SQL_FILE, content);
-    console.info(chalk.green(Message.FILE_SUCCESS));
+    console.info(chalk.green(`${Message.FILE_SUCCESS} ${path.resolve(process.cwd(), SQL_FILE)}, ${path.resolve(process.cwd(), MOCK_FILE)}`));
     return ExitCode.SUCCESS;
   } catch (err) {
     console.error(chalk.red(`${Message.FILE_ERROR}: ${err}`));

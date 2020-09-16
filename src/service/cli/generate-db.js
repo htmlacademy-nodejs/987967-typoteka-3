@@ -20,11 +20,12 @@ const {DB} = require(`../db`);
 const {ADMIN, PSW, DBNAME} = require(`../config`);
 
 const createDB = async (postCount, userCount) => {
-  const {users, posts, categories} = await generatePosts(postCount, userCount);
-  fs.promises.writeFile(MOCK_FILE, JSON.stringify({categories, users, posts}));
-
   try {
+    const {users, posts, categories} = await generatePosts(postCount, userCount);
+
+    await fs.promises.writeFile(MOCK_FILE, JSON.stringify({categories, users, posts}));
     await createDataBase(DBNAME);
+
     const db = new DB(DBNAME, ADMIN, PSW, false);
     await db.fillDataBase(posts, users, categories, false);
     db.close();

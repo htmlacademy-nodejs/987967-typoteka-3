@@ -20,6 +20,10 @@ const {
   CommentCount,
   BAD_REQUEST_EXCEPTION,
   BCRYPT_SALT,
+  TitleLength,
+  CommentLength,
+  CategoryLength,
+  TextLength,
 } = require(`../const`);
 
 const getRandomInt = (min, max) => {
@@ -109,14 +113,14 @@ const generatePost = ({sentences, titles, categories, comments, users, pictureFi
 
   return {
     id: nanoid(ID_LENGTH),
-    title: getRandomElement(titles).slice(0, 250),
+    title: correctStringLength(getRandomElement(titles), TitleLength),
     date,
     announce: announceSentences.join(`\n`).slice(0, 250),
-    text: textSentences.join(`\n`).slice(0, 1000),
+    text: correctStringLength(textSentences.join(`\n`), TextLength),
     categories: getRandomUniqueElements(categories, getRandomInt(CategoryCount.MIN, CategoryCount.MAX)),
     comments: getRandomElements(comments, getRandomInt(CommentCount.MIN, CommentCount.MAX)).map((it) => ({
       id: nanoid(ID_LENGTH),
-      text: it.slice(0, 250),
+      text: correctStringLength(it, CommentLength),
       date: getRandomDate(date, now),
       user: getRandomElement(users),
     })),
@@ -171,7 +175,7 @@ const getTitleList = (titles) => `<ul>${titles.map((it) => `<li>${it}</li>`).joi
 const generateCategories = (names) => {
   return names.map((it) => ({
     id: nanoid(ID_LENGTH),
-    name: it,
+    name: correctStringLength(it, CategoryLength),
   }));
 };
 
@@ -207,6 +211,19 @@ const readJsonFile = (file) => {
 
 const getHash = async (password) => bcrypt.hash(password, BCRYPT_SALT);
 const compareHash = async (password, hash) => bcrypt.compare(password, hash);
+
+const correctStringLength = (string, range) => {
+  if (string.length > range.MAX) {
+    return string.slice(0, range.MAX);
+  }
+
+  if (string.length < range.MIN) {
+    const addition = Array(range.MIN - string.length).fill(`.`).join(``);
+    return `${string}${addition}`;
+  }
+
+  return string;
+};
 
 module.exports = {
   getRandomInt,
