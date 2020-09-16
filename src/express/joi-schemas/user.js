@@ -1,11 +1,11 @@
 'use strict';
 
 const Joi = require(`joi`);
-const {UserNameLength} = require(`../const`);
+const {UserNameLength, FileNameLength, PasswordLength} = require(`../const`);
 
 const userLogin = {
   email: Joi.string().email().required(),
-  password: Joi.string().min(6).required(),
+  password: Joi.string().min(PasswordLength.MIN).required(),
 };
 
 const userRegisterSchema = Joi.object({
@@ -14,8 +14,8 @@ const userRegisterSchema = Joi.object({
   lastname: Joi.string().pattern(/^[a-zа-я \-]+$/i).min(UserNameLength.MIN).max(UserNameLength.MAX).required(),
   repeatPassword: Joi.ref(`password`),
 
-  originalName: Joi.string().max(250).allow(``),
-  fileName: Joi.string().max(100).allow(``),
+  originalName: Joi.string().min(FileNameLength.MIN).max(FileNameLength.MAX).allow(``),
+  fileName: Joi.string().min(FileNameLength.MIN).max(FileNameLength.MAX).allow(``),
   avatarFile: Joi.string().allow(``),
 });
 

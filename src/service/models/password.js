@@ -1,6 +1,7 @@
 'use strict';
 
 const {DataTypes, Model} = require(`sequelize`);
+const {PasswordHashLength} = require(`../const`);
 
 class Password extends Model {
   static init(sequelize) {
@@ -12,7 +13,7 @@ class Password extends Model {
       },
 
       password: {
-        type: DataTypes[`STRING`](60),
+        type: DataTypes[`STRING`](PasswordHashLength.MAX),
         allowNull: false,
       },
 

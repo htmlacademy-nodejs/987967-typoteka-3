@@ -1,6 +1,7 @@
 'use strict';
 
 const {DataTypes, Model} = require(`sequelize`);
+const {UserNameLength, EmailLength} = require(`../const`);
 
 class User extends Model {
   static init(sequelize) {
@@ -12,19 +13,19 @@ class User extends Model {
       },
 
       email: {
-        type: DataTypes[`STRING`](250),
+        type: DataTypes[`STRING`](EmailLength.MAX),
         allowNull: false,
         unique: true,
         isEmail: true,
       },
 
       firstname: {
-        type: DataTypes[`STRING`](250),
+        type: DataTypes[`STRING`](UserNameLength.MAX),
         allowNull: false,
       },
 
       lastname: {
-        type: DataTypes[`STRING`](250),
+        type: DataTypes[`STRING`](UserNameLength.MAX),
         allowNull: false,
       },
 

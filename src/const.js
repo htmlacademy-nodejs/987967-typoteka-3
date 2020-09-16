@@ -33,7 +33,20 @@ module.exports = {
 
   CommentLength: {
     MIN: 20,
-    MAX: 1000,
+    MAX: 500,
+  },
+
+  PasswordLength: {
+    MIN: 6,
+    MAX: 200,
+  },
+
+  PasswordHashLength: {
+    MAX: 60,
+  },
+
+  EmailLength: {
+    MAX: 250,
   },
 
   HttpStatusCode: {

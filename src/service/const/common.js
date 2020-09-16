@@ -27,21 +27,6 @@ module.exports = {
     MAX: 3
   },
 
-  PasswordLength: {
-    MIN: 5,
-    MAX: 25,
-  },
-
-  NameLength: {
-    MIN: 2,
-    MAX: 50,
-  },
-
-  FileNameLength: {
-    MIN: 1,
-    MAX: 50,
-  },
-
   ANNOUNCE_SENTENCES_COUNT: 5,
 
   MOCK_FILE: `data/mocks.json`,

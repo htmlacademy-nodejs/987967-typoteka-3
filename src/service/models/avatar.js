@@ -1,6 +1,7 @@
 'use strict';
 
 const {DataTypes, Model} = require(`sequelize`);
+const {FileNameLength} = require(`../const`);
 
 class Avatar extends Model {
   static init(sequelize) {
@@ -22,13 +23,13 @@ class Avatar extends Model {
       },
 
       name: {
-        type: DataTypes[`STRING`](250),
+        type: DataTypes[`STRING`](FileNameLength.MAX),
         allowNull: false,
         unique: true,
       },
 
       originalName: {
-        type: DataTypes[`STRING`](100),
+        type: DataTypes[`STRING`](FileNameLength.MAX),
         allowNull: false,
       },
     }, {
