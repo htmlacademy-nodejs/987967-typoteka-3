@@ -3,7 +3,6 @@
 const chalk = require(`chalk`);
 const fs = require(`fs`);
 const {generatePosts} = require(`../utils`);
-// const {readTestMockFiles} = require(`../utils`);
 
 const {
   ExitCode,
@@ -13,14 +12,15 @@ const {
   MAX_POSTS_COUNT,
   MAX_USER_COUNT,
   MOCK_FILE,
+  CliCommandName,
 } = require(`../const`);
+
 const {createDataBase} = require(`../utils`);
 const {DB} = require(`../db`);
 const {ADMIN, PSW, DBNAME} = require(`../config`);
 
 const createDB = async (postCount, userCount) => {
   const {users, posts, categories} = await generatePosts(postCount, userCount);
-  // const {users, posts, categories} = await readTestMockFiles();
   fs.promises.writeFile(MOCK_FILE, JSON.stringify({categories, users, posts}));
 
   try {
@@ -38,7 +38,8 @@ const createDB = async (postCount, userCount) => {
 };
 
 module.exports = {
-  name: `--generate-db`,
+  name: CliCommandName.GENERATE_DB,
+  help: `${CliCommandName.GENERATE_DB} <post-count> <user-count> - формирует базу данных`,
   async run(arg) {
     let [postCount, userCount] = arg;
     postCount = parseInt(postCount, 10) || DEFAULT_POSTS_COUNT;

@@ -11,6 +11,7 @@ const {
   DEFAULT_USER_COUNT,
   MAX_POSTS_COUNT,
   MAX_USER_COUNT,
+  CliCommandName,
 } = require(`../const`);
 
 const createMockFile = async (postCount, userCount) => {
@@ -26,7 +27,8 @@ const createMockFile = async (postCount, userCount) => {
 };
 
 module.exports = {
-  name: `--generate`,
+  name: CliCommandName.GENERATE_JSON,
+  help: `${CliCommandName.GENERATE_JSON} <post-count> <user-count> - формирует mock.json`,
   async run(arg) {
     let [postCount, userCount] = arg;
     postCount = parseInt(postCount, 10) || DEFAULT_POSTS_COUNT;

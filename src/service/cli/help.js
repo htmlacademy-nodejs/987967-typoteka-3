@@ -1,19 +1,21 @@
 'use strict';
 
 const chalk = require(`chalk`);
-const {ExitCode} = require(`../const`);
+const {ExitCode, CliCommandName} = require(`../const`);
 
-const HELP_MESSAGE = `Гайд:
-    server <command>
-    Команды:
-    --version             выводит номер версии
-    --help                печатает этот текст
-    --generate <count>    формирует файл mocks.json`;
 
 module.exports = {
-  name: `--help`,
+  name: CliCommandName.HELP,
+  help: `${CliCommandName.HELP} - печатает этот текст`,
+
+  setMessage(message) {
+    this.message = message;
+  },
+
   run() {
-    console.info(chalk.grey(HELP_MESSAGE));
+    const helpMessage = `Гайд:\n\tservice <command>\n\n\tКоманды:\n\t\t${this.message}`;
+
+    console.info(chalk.grey(helpMessage));
     return ExitCode.SUCCESS;
   }
 };

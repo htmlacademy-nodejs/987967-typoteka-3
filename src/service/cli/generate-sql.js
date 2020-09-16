@@ -12,6 +12,7 @@ const {
   DEFAULT_USER_COUNT,
   MAX_POSTS_COUNT,
   MAX_USER_COUNT,
+  CliCommandName,
 } = require(`../const`);
 
 const createSQLFile = async (postCount, userCount) => {
@@ -34,7 +35,8 @@ const createSQLFile = async (postCount, userCount) => {
 };
 
 module.exports = {
-  name: `--generate-sql`,
+  name: CliCommandName.GENERATE_SQL,
+  help: `${CliCommandName.GENERATE_SQL} <post-count> <user-count> - формирует SQL-файл для наполнения базы данных`,
   async run(arg) {
     let [postCount, userCount] = arg;
     postCount = parseInt(postCount, 10) || DEFAULT_POSTS_COUNT;
