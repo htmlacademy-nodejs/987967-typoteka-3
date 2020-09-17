@@ -2,7 +2,8 @@
 
 const {Router} = require(`express`);
 const {DataServer} = require(`../data-server`);
-const {PostSortType} = require(`../const`);
+const {PostSortType, HttpStatusCode} = require(`../const`);
+const {render} = require(`../utils`);
 const {findPostByQuery} = require(`../middlewares`);
 const Joi = require(`joi`);
 
@@ -18,9 +19,9 @@ myRouter.get(`/`, findPostByQuery, async (req, res, next) => {
       res.redirect(`/my`);
     } else {
       const {posts} = await dataServer.getPostPreviews(PostSortType.DATE);
-      res.render(`my`, {
-        posts
-      });
+      render(`my`, {
+        posts,
+      }, req, res);
     }
   } catch (err) {
     next(err);
@@ -45,13 +46,13 @@ myRouter.get(`/comments`, findPostByQuery, async (req, res, next) => {
       res.redirect(`/my/comments`);
     } else {
       const comments = await dataServer.getComments();
-      res.render(`comments`, {
+      render(`comments`, {
         comments,
-      });
+      }, req, res);
     }
   } catch (err) {
     if (err.isJoi) {
-      res.render(`400`);
+      render(`400`, {}, req, res, HttpStatusCode.NOT_FOUND);
       return;
     }
 

@@ -6,3 +6,5 @@ TK_HOST - хост
 TK_DB_PORT - порт сервера БД
 
 TK_POSTGRES_PSW - пароль пользователя postgres
+
+TK_SECRET - секрет для сессий

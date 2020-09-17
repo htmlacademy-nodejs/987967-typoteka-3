@@ -1,9 +1,13 @@
 'use strict';
 
-const commonConst = require(`./common`);
-const dbConst = require(`./db`);
+const MainConst = require(`../../const`);
+const CommonConst = require(`./common`);
+const DbConst = require(`./db`);
+const CliConst = require(`./cli`);
 
 module.exports = {
-  ...commonConst,
-  ...dbConst,
+  ...MainConst,
+  ...CommonConst,
+  ...DbConst,
+  ...CliConst,
 };

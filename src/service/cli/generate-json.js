@@ -1,7 +1,8 @@
 'use strict';
 
-const {generatePosts} = require(`../utils`);
 const fs = require(`fs`);
+const path = require(`path`);
+const {generatePosts} = require(`../utils`);
 const chalk = require(`chalk`);
 const {
   ExitCode,
@@ -11,13 +12,14 @@ const {
   DEFAULT_USER_COUNT,
   MAX_POSTS_COUNT,
   MAX_USER_COUNT,
+  CliCommandName,
 } = require(`../const`);
 
 const createMockFile = async (postCount, userCount) => {
   const mocks = await generatePosts(postCount, userCount);
   try {
     await fs.promises.writeFile(MOCK_FILE, JSON.stringify(mocks));
-    console.info(chalk.green(Message.FILE_SUCCESS));
+    console.info(chalk.green(`${Message.FILE_SUCCESS} ${path.resolve(process.cwd(), MOCK_FILE)}`));
     return ExitCode.SUCCESS;
   } catch (err) {
     console.error(chalk.red(`${Message.FILE_ERROR}: ${err}`));
@@ -26,7 +28,8 @@ const createMockFile = async (postCount, userCount) => {
 };
 
 module.exports = {
-  name: `--generate`,
+  name: CliCommandName.GENERATE_JSON,
+  help: `${CliCommandName.GENERATE_JSON} <post-count> <user-count> - формирует mock.json`,
   async run(arg) {
     let [postCount, userCount] = arg;
     postCount = parseInt(postCount, 10) || DEFAULT_POSTS_COUNT;

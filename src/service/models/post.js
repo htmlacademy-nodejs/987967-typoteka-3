@@ -1,6 +1,7 @@
 'use strict';
 
 const {DataTypes, Model, Sequelize} = require(`sequelize`);
+const {TitleLength, TextLength, AnnounceLength} = require(`../const`);
 
 class Post extends Model {
   static init(sequelize) {
@@ -18,17 +19,17 @@ class Post extends Model {
       },
 
       title: {
-        type: DataTypes[`STRING`](250),
+        type: DataTypes[`STRING`](TitleLength.MAX),
         allowNull: false,
       },
 
       announce: {
-        type: DataTypes[`STRING`](250),
+        type: DataTypes[`STRING`](AnnounceLength.MAX),
         allowNull: false,
       },
 
       text: {
-        type: DataTypes[`STRING`](1000),
+        type: DataTypes[`STRING`](TextLength.MAX),
         allowNull: true,
       },
 

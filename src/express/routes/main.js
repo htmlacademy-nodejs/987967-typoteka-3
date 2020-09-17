@@ -1,9 +1,10 @@
 'use strict';
 
 const {Router} = require(`express`);
+const Joi = require(`joi`);
 const {DataServer} = require(`../data-server`);
-const {getPagination} = require(`../utils`);
-const {getCategories} = require(`../middlewares`);
+const {getPagination, render} = require(`../utils`);
+const {validateQuerySchema} = require(`../middlewares`);
 const {
   POST_PREVIEW_COUNT,
   LASTST_COMMENT_COUNT,
@@ -12,7 +13,6 @@ const {
   COMMENT_PREVIEW_LENGTH,
   PostSortType,
 } = require(`../const`);
-const Joi = require(`joi`);
 
 const reduceText = (text, length) => {
   return text.length > length ? `${text.slice(0, length)}...` : text;
@@ -21,15 +21,33 @@ const reduceText = (text, length) => {
 const mainRouter = new Router();
 const dataServer = new DataServer();
 
-mainRouter.get(`/`, async (req, res, next) => {
-  try {
-    const {posts: popularPosts, postCount} = await dataServer.getPostPreviews(PostSortType.POPULARITY, POPULAR_POST_COUNT, 0);
-    const pageCount = Math.ceil(Number(postCount) / POST_PREVIEW_COUNT);
-    const pageSchema = Joi.object({
-      page: Joi.number().min(1).max(pageCount).optional()
-    });
+const validatePagination = async (req, res, next) => {
+  const {postCount} = res.locals;
+  const pageCount = Math.ceil(Number(postCount) / POST_PREVIEW_COUNT);
 
-    await pageSchema.validateAsync(req.query);
+  const querySchema = Joi.object({
+    page: Joi.number().min(1).max(pageCount).optional(),
+  });
+
+  await validateQuerySchema(querySchema, `400`)(req, res, next);
+};
+
+const getPopularPosts = async (req, res, next) => {
+  try {
+    const {posts, postCount} = await dataServer.getPostPreviews(PostSortType.POPULARITY, POPULAR_POST_COUNT, 0);
+    res.locals.postCount = postCount;
+    res.locals.popularPosts = posts;
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
+mainRouter.get(`/`, getPopularPosts, validatePagination, async (req, res, next) => {
+  try {
+    const {popularPosts, postCount} = res.locals;
+    const pageCount = Math.ceil(Number(postCount) / POST_PREVIEW_COUNT);
+
     const page = Number(req.query.page) || 1;
 
     const [categories, {posts}, comments] = await Promise.all([
@@ -38,7 +56,7 @@ mainRouter.get(`/`, async (req, res, next) => {
       dataServer.getComments(LASTST_COMMENT_COUNT, 0),
     ]);
 
-    res.render(`main`, {
+    const renderData = {
       categories,
       posts,
       popularPosts: popularPosts.filter((it) => it[`comment_count`] > 0).map((it) => ({
@@ -52,15 +70,11 @@ mainRouter.get(`/`, async (req, res, next) => {
       })),
 
       pagination: getPagination(page, pageCount, req.path),
-    });
-  } catch (err) {
-    if (err.isJoi) {
-      res.render(`400`);
-      return;
-    }
+    };
 
+    render(`main`, renderData, req, res);
+  } catch (err) {
     next(err);
-    return;
   }
 });
 

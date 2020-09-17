@@ -4,8 +4,8 @@ const chalk = require(`chalk`);
 const express = require(`express`);
 const expressPinoLogger = require(`express-pino-logger`);
 const {createAPI} = require(`../api`);
-const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo} = require(`../const`);
-const {parseValidationException} = require(`../utils`);
+const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo, CliCommandName} = require(`../const`);
+const {parseException} = require(`../utils`);
 const {getLogger} = require(`../../logger`);
 const {DB} = require(`../db`);
 
@@ -38,7 +38,7 @@ const createServer = (db) => {
   });
 
   app.use((err, req, res, next) => {
-    const validationException = parseValidationException(err);
+    const validationException = parseException(err);
 
     if (validationException) {
       appLogger.error(`Validation error: ${validationException}`);
@@ -54,7 +54,8 @@ const createServer = (db) => {
 };
 
 module.exports = {
-  name: `--server`,
+  name: CliCommandName.SERVER,
+  help: `${CliCommandName.SERVER} - запускает приложение`,
   async run(arg) {
     const db = new DB();
 

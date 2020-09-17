@@ -1,15 +1,15 @@
 'use strict';
 
-const {createPostFinder} = require(`./create-post-finder`);
-const {createCommentFinder} = require(`./create-comment-finder`);
-const {createCategoryFinder} = require(`./create-category-finder`);
-const {createPostValidator} = require(`./create-post-validator`);
-const {createCommentValidator} = require(`./create-comment-validator`);
+const CreatePostFinder = require(`./create-post-finder`);
+const CreateCommentFinder = require(`./create-comment-finder`);
+const CreateCategoryFinder = require(`./create-category-finder`);
+const CreateUserFinder = require(`./create-user-finder`);
+const ValidateSchema = require(`./validate-schema`);
 
 module.exports = {
-  createPostFinder,
-  createCommentFinder,
-  createCategoryFinder,
-  createPostValidator,
-  createCommentValidator,
+  ...CreatePostFinder,
+  ...CreateCommentFinder,
+  ...CreateUserFinder,
+  ...CreateCategoryFinder,
+  ...ValidateSchema,
 };

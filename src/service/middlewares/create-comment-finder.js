@@ -1,7 +1,7 @@
 'use strict';
 
 const Joi = require(`joi`);
-const {getValidationException} = require(`../utils`);
+const {createBadRequestException} = require(`../utils`);
 
 const createCommentFinder = (service) => async (req, res, next) => {
   try {
@@ -11,7 +11,7 @@ const createCommentFinder = (service) => async (req, res, next) => {
     const comment = await service.getComment(commentId);
     if (!comment) {
       const message = `Can't find comment with ID='${commentId}'`;
-      throw getValidationException([message]);
+      throw createBadRequestException([message]);
     }
 
     next();

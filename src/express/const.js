@@ -1,6 +1,10 @@
 'use strict';
 
+const MainConst = require(`../const`);
+
 module.exports = {
+  ...MainConst,
+
   DEFAULT_PORT: 8080,
   DATA_SERVER_PORT: 3000,
   TIMEOUT: 3000,
@@ -17,31 +21,6 @@ module.exports = {
     DATE: `date`,
   },
 
-  CategoryLength: {
-    MIN: 5,
-    MAX: 30,
-  },
-
-  TitleLength: {
-    MIN: 30,
-    MAX: 250,
-  },
-
-  AnnounceLength: {
-    MIN: 30,
-    MAX: 250,
-  },
-
-  TextLength: {
-    MIN: 0,
-    MAX: 1000,
-  },
-
-  UserNameLength: {
-    MIN: 2,
-    MAX: 50,
-  },
-
   ErrorType: {
     BAD_DB_REQUEST: `Bad DB request`,
   },
@@ -49,5 +28,18 @@ module.exports = {
   UserFormType: {
     REGISTER: `register`,
     LOGIN: `login`,
+  },
+
+  UserRole: {
+    ADMIN: `admin`,
+    READER: `reader`,
+  },
+
+  SESSION_NAME: `session_id`,
+
+  LoggerName: {
+    APP: `front:app`,
+    AXIOS: `front:axios`,
   }
+
 };

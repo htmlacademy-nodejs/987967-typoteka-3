@@ -1,21 +1,28 @@
 'use strict';
 
 const Joi = require(`joi`);
-const {PasswordLength} = require(`../const`);
+const {FileNameLength, UserNameLength, PasswordLength} = require(`../const`);
+
+const userLogin = {
+  email: Joi.string().email().required(),
+  password: Joi.string().min(PasswordLength.MIN).max(PasswordLength.MAX).required(),
+};
+
+const userLoginSchema = Joi.object({
+  ...userLogin
+});
 
 const userSchema = Joi.object({
-  email: Joi.string().max(250).email().required(),
-  firstname: Joi.string().max(250).required(),
-  lastname: Joi.string().max(250).required(),
-
+  ...userLogin,
+  firstname: Joi.string().min(UserNameLength.MIN).max(UserNameLength.MAX).required(),
+  lastname: Joi.string().min(UserNameLength.MIN).max(UserNameLength.MAX).required(),
   avatar: Joi.object({
-    originalName: Joi.string().max(250).required(),
-    name: Joi.string().max(100).required(),
+    originalName: Joi.string().min(FileNameLength.MIN).max(FileNameLength.MAX).required(),
+    name: Joi.string().min(FileNameLength.MIN).max(FileNameLength.MAX).required(),
   }).allow(null),
-
-  password: Joi.string().min(PasswordLength.MIN).max(PasswordLength.MAX).required()
 });
 
 module.exports = {
   userSchema,
+  userLoginSchema,
 };

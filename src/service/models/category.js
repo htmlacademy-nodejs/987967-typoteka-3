@@ -1,6 +1,7 @@
 'use strict';
 
 const {DataTypes, Model} = require(`sequelize`);
+const {CategoryLength} = require(`../const`);
 
 class Category extends Model {
   static init(sequelize) {
@@ -12,7 +13,7 @@ class Category extends Model {
       },
 
       name: {
-        type: DataTypes[`STRING`](60),
+        type: DataTypes[`STRING`](CategoryLength.MAX),
         allowNull: false,
         unique: true,
       },

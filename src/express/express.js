@@ -2,9 +2,10 @@
 
 const express = require(`express`);
 const expressPinoLogger = require(`express-pino-logger`);
+const expressSession = require(`express-session`);
 const path = require(`path`);
-const {DEFAULT_PORT} = require(`./const`);
-const {getLogger} = require(`../logger`);
+const {DEFAULT_PORT, HttpStatusCode, SESSION_NAME} = require(`./const`);
+const {appLogger} = require(`./logger`);
 const {articleRouter} = require(`./routes/articles`);
 const {mainRouter} = require(`./routes/main`);
 const {categoryRouter} = require(`./routes/categories`);
@@ -12,6 +13,10 @@ const {loginRouter} = require(`./routes/login`);
 const {myRouter} = require(`./routes/my`);
 const {registerRouter} = require(`./routes/register`);
 const {searchRouter} = require(`./routes/search`);
+const {SECRET} = require(`./config`);
+const {privateRoute} = require(`./middlewares`);
+const {getSequelizeStore} = require(`./sequelize-store`);
+const {render} = require(`./utils`);
 
 const pino = expressPinoLogger({
   req: (req) => ({
@@ -25,10 +30,21 @@ const pino = expressPinoLogger({
 });
 
 const app = express();
-const loggerApp = getLogger(`app`);
 
 app.set(`views`, path.resolve(__dirname, `templates`));
 app.set(`view engine`, `pug`);
+
+app.use(expressSession({
+  secret: SECRET,
+  resave: false,
+  saveUninitialized: false,
+  name: SESSION_NAME,
+  store: getSequelizeStore(expressSession.Store),
+  cookie: {
+    sameSite: true,
+    httpOnly: true,
+  }
+}));
 
 app.use(express.static(path.resolve(__dirname, `public`)));
 app.use(pino);
@@ -38,24 +54,24 @@ app.use(`/`, mainRouter);
 app.use(`/articles`, articleRouter);
 app.use(`/categories`, categoryRouter);
 app.use(`/login`, loginRouter);
-app.use(`/my`, myRouter);
+app.use(`/my`, privateRoute, myRouter);
 app.use(`/register`, registerRouter);
 app.use(`/search`, searchRouter);
 
 app.use((req, res) => {
-  res.status(404).render(`400.pug`);
+  render(`400`, {}, req, res, HttpStatusCode.NOT_FOUND);
 });
 
 app.use((err, req, res, next) => {
   const errorMessage = err.msg ? `${err.msg}: ${err.filename}, line: ${err.line}` : err;
-  loggerApp.error(errorMessage);
-  res.status(500).render(`500.pug`);
+  appLogger.error(errorMessage);
+  render(`500`, {}, req, res, HttpStatusCode.SERVER_ERROR);
   next();
 });
 
 try {
   app.listen(DEFAULT_PORT);
-  loggerApp.info(`Listenint port ${DEFAULT_PORT}...`);
+  appLogger.info(`Listenint port ${DEFAULT_PORT}...`);
 } catch (err) {
-  loggerApp.error(`Can't start server: ${err}`);
+  appLogger.error(`Can't start server: ${err}`);
 }

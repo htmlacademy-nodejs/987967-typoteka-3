@@ -1,27 +1,17 @@
 'use strict';
 
 const Joi = require(`joi`);
+const {TitleLength, TextLength, AnnounceLength, FileNameLength, CategoryLength} = require(`../const`);
 
-const createPostSchema = (categories) => {
-  const categoryIds = categories.map((it) => it.id);
-
-  return Joi.object({
-    title: Joi.string().min(30).max(250).required(),
-    announce: Joi.string().min(30).max(250).required(),
-    categories: Joi.array().items(Joi.valid(...categoryIds)).min(1).required(),
-    date: Joi.string().isoDate(),
-    text: Joi.string().max(1000).allow(``).required(),
-    picture: Joi.object({
-      name: Joi.when(`originalName`, {
-        is: Joi.valid(``),
-        then: Joi.valid(``),
-        otherwise: Joi.string()
-      }).required(),
-      originalName: Joi.string().allow(``).required()
-    }).optional()
-  });
-};
+const postSchema = Joi.object({
+  title: Joi.string().min(TitleLength.MIN).max(TitleLength.MAX).required(),
+  announce: Joi.string().min(AnnounceLength.MIN).max(AnnounceLength.MAX).required(),
+  date: Joi.string().isoDate(),
+  text: Joi.string().max(TextLength.MAX).allow(``).required(),
+  originalName: Joi.string().max(FileNameLength.MAX).allow(``),
+  fileName: Joi.string().max(FileNameLength.MAX).allow(``),
+}).pattern(/category-id-\d+/, Joi.string().min(CategoryLength.MIN).max(CategoryLength.MAX), {matches: Joi.array().min(1)});
 
 module.exports = {
-  createPostSchema,
+  postSchema,
 };

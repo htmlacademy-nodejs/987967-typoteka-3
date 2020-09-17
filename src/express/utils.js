@@ -1,5 +1,7 @@
 'use strict';
 
+const {HttpStatusCode} = require(`./const`);
+
 const getPagination = (page, pageCount, url) => ({
   page,
   prev: page > 1 ? page - 1 : null,
@@ -43,10 +45,58 @@ const parseJoiException = (exception) => {
   return [];
 };
 
+const splitJoiException = (exception) => {
+  const errors = {};
+
+  exception.details.forEach((it) => {
+    const key = it.context.key;
+    if (!errors[key]) {
+      errors[key] = [];
+    }
+
+    errors[key].push(it.message);
+  });
+
+  return errors;
+};
+
+const extractPicture = (req) => {
+  const {originalName, fileName} = req.body;
+
+  const storedPictureData = originalName && fileName ? {
+    originalName,
+    name: fileName
+  } : null;
+
+  const uploadPicture = req.file ? {
+    originalName: req.file.originalname,
+    name: req.file.filename
+  } : null;
+
+  return uploadPicture || storedPictureData;
+};
+
+const render = (template, data, req, res, status = HttpStatusCode.OK) => {
+  const {user} = req.session || {user: null};
+  const url = encodeURIComponent(req.originalUrl);
+  const back = decodeURIComponent(req.query.back || `/`);
+
+  res.status(status).render(template, {
+    ...data,
+    user,
+    url,
+    back,
+  });
+};
+
+
 module.exports = {
   getPagination,
   formatDate,
   formatDateTime,
   parseJoiException,
+  splitJoiException,
   simplify,
+  extractPicture,
+  render,
 };

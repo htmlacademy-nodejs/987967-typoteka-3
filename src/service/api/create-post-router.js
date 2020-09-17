@@ -2,14 +2,14 @@
 
 const {Router} = require(`express`);
 const {HttpStatusCode} = require(`../const`);
-const {postLimitSchema, commentSchema} = require(`../joi-schemas`);
-const {createPostFinder, createPostValidator, createCommentValidator, createCommentFinder} = require(`../middlewares`);
+const {postLimitSchema, commentSchema, postSchema} = require(`../joi-schemas`);
+const {createPostFinder, createCommentFinder, createUserFinder, validateSchema, createCategoryAvailability} = require(`../middlewares`);
 
 const createPostRouter = (service) => {
   const findPost = createPostFinder(service);
   const findComment = createCommentFinder(service);
-  const validatePost = createPostValidator(service);
-  const validateComment = createCommentValidator(service);
+  const findUser = createUserFinder(service);
+  const categoryAvailability = createCategoryAvailability(service);
   const router = new Router();
 
   router.get(`/`, async (req, res, next) => {
@@ -25,7 +25,7 @@ const createPostRouter = (service) => {
     }
   });
 
-  router.post(`/`, validatePost, async (req, res, next) => {
+  router.post(`/`, [validateSchema(postSchema), categoryAvailability], async (req, res, next) => {
     try {
       const post = await service.createPost(req.body);
       res.status(HttpStatusCode.CREATE).json(post);
@@ -51,7 +51,7 @@ const createPostRouter = (service) => {
     res.status(HttpStatusCode.OK).json(res.locals.post);
   });
 
-  router.put(`/:articleId`, [findPost, validatePost], async (req, res, next) => {
+  router.put(`/:articleId`, [findPost, validateSchema(postSchema), categoryAvailability], async (req, res, next) => {
     try {
       res.status(HttpStatusCode.OK).json(await service.updatePost(req.params.articleId, req.body));
     } catch (err) {
@@ -69,7 +69,7 @@ const createPostRouter = (service) => {
     }
   });
 
-  router.post(`/:articleId/comments`, [findPost, validateComment], async (req, res, next) => {
+  router.post(`/:articleId/comments`, [findPost, findUser, validateSchema(commentSchema)], async (req, res, next) => {
     try {
       await commentSchema.validateAsync(req.body);
 

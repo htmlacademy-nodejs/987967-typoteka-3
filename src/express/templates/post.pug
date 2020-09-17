@@ -12,7 +12,6 @@ block append body
   script(src="js/main.js")
 
 block prepend header
-  -var headerType="AUTH"
 
 block content
   main
@@ -22,7 +21,7 @@ block content
         h2.visually-hidden &Ocy;&scy;&ncy;&ocy;&vcy;&ncy;&ocy;&iecy; &scy;&ocy;&dcy;&iecy;&rcy;&zhcy;&acy;&ncy;&icy;&iecy;
         .post__wrapper
           .post__head
-            a.post__backwards.button.button--backwards(href='#') &Ncy;&acy;&zcy;&acy;&dcy;
+            a.post__backwards.button.button--backwards(href=back) &Ncy;&acy;&zcy;&acy;&dcy;
             time.post__date(datetime=post.dateTime) #{post.dateTimeLocalized}
             h2.post__title.title.title--main #{post.title}
             ul.post__themes.themes
@@ -40,22 +39,36 @@ block content
             p #{post.text}
       .post__wrapper.post__wrapper--comments
         section.post__comments.comments
-          h2.comments__title.title.title--middle &Kcy;&ocy;&mcy;&mcy;&iecy;&ncy;&tcy;&acy;&rcy;&icy;&icy;
-          ul.comments__list
-            each comment in post.comments
-              li.comments__comment
+          h2.comments__title.title.title--middle #{post.comments.length ? `Комментарии` : `Комментарии отсутствуют`}
+          if post.comments.length
+            ul.comments__list
+              each comment in post.comments
+                li.comments__comment
+                  .comments__avatar.avatar
+                    img(src=`img/avatars/${comment.author.avatar.name}` alt='аватар пользователя')
+                  .comments__text
+                    .comments__head
+                      p #{comment.author.firstname} #{comment.author.lastname} &bull;
+                      time.comments__date(datetime=comment.dateTime) #{comment.dateTimeLocalized}
+                    p.comments__message #{comment.text}
+          if user
+            .comments__footer.comments__footer--user
+              form(action=`/articles/${post.id}` method='POST')
                 .comments__avatar.avatar
-                  img(src=`img/avatars/${comment.author.avatar.name}` alt='аватар пользователя')
-                .comments__text
-                  .comments__head
-                    p #{comment.author.firstname} #{comment.author.lastname} &bull;
-                    time.comments__date(datetime=comment.dateTime) #{comment.dateTimeLocalized}
-                  p.comments__message #{comment.text}
-          .comments__footer.comments__footer--user
-            form(action='#' method='POST')
-              .comments__avatar.avatar
-                img(src='img/avatar-2.png' alt='аватар пользователя')
-              label
-                textarea(rows='1' placeholder='Присоединиться к обсуждению')
-              button.comments__button.button.button--colored(type='submit') &Ocy;&pcy;&ucy;&bcy;&lcy;&icy;&kcy;&ocy;&vcy;&acy;&tcy;&softcy;
+                  img(src=`img/avatars/${user.avatar}` alt='аватар пользователя')
+                label
+                  textarea(rows='1' placeholder='Присоединиться к обсуждению' name='text') #{formData ? formData.text : ``}
+                button.comments__button.button.button--colored(type='submit') &Ocy;&pcy;&ucy;&bcy;&lcy;&icy;&kcy;&ocy;&vcy;&acy;&tcy;&softcy;
+              if errors
+                each error in allErrors
+                  p.comments__error #{error}
+
+          if !user
+            .comments__footer.comments__footer--visitor
+              a.comments__button.button.button--colored(href="/login") Войти
+              .comments__registration
+                p.text.text--signature
+                  a.title.title--small(href="/register") Регистрация
+                  br
+                  | Чтобы присоединиться к переписке нужно зарегистрироваться
 

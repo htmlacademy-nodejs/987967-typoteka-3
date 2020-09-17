@@ -1,12 +1,10 @@
 'use strict';
 
 const Joi = require(`joi`);
+const {CommentLength} = require(`../const`);
 
 const commentSchema = Joi.object({
-  date: Joi.string().isoDate().required(),
-  text: Joi.string().min(20).max(1000).required(),
-  userId: Joi.number().required(),
-  // postId: Joi.number().required(),
+  text: Joi.string().min(CommentLength.MIN).max(CommentLength.MAX).required()
 });
 
 module.exports = {

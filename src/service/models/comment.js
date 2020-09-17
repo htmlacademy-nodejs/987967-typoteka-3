@@ -1,6 +1,7 @@
 'use strict';
 
 const {DataTypes, Model, Sequelize} = require(`sequelize`);
+const {CommentLength} = require(`../const`);
 
 class Comment extends Model {
   static init(sequelize) {
@@ -41,7 +42,7 @@ class Comment extends Model {
       },
 
       text: {
-        type: DataTypes[`STRING`](250),
+        type: DataTypes[`STRING`](CommentLength.MAX),
         allowNull: false,
       },
     }, {

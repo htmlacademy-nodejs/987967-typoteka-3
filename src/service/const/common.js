@@ -27,25 +27,12 @@ module.exports = {
     MAX: 3
   },
 
-  PasswordLength: {
-    MIN: 5,
-    MAX: 25,
-  },
-
   ANNOUNCE_SENTENCES_COUNT: 5,
 
   MOCK_FILE: `data/mocks.json`,
-  SQL_FILE: `sql/fill-db.sql`,
+  SQL_FILE: `sql/mocks.sql`,
   ID_LENGTH: 6,
   DEFAULT_PORT: 3000,
-
-  HttpStatusCode: {
-    OK: 200,
-    CREATE: 201,
-    BAD_REQUEST: 400,
-    NOT_FOUND: 404,
-    SERVER_ERROR: 500,
-  },
 
   HttpStatusInfo: {
     NOT_FOUND: `Not found`,
@@ -68,8 +55,8 @@ module.exports = {
     WRONG_USER_COUNT: `No more than ${MAX_USER_COUNT} articles`,
     FILE_ERROR: `Can't write data to file...`,
     FILE_SUCCESS: `Operation success. File was created.`,
-    DB_ERROR: `Can't create the mock data base...`,
-    DB_SUCCESS: `Operation success. The mock data base was created.`,
+    DB_ERROR: `Can't create the mock database...`,
+    DB_SUCCESS: `Operation success. The mock database was created.`,
   },
 
   DataFileName: {
@@ -85,7 +72,13 @@ module.exports = {
   AVATAR_FOLDER: `src/express/public/img/avatars`,
   PICTURE_FOLDER: `src/express/public/img/post-images`,
 
-  VALIDATION_EXCEPTION: `Validation exception`,
+  BAD_REQUEST_EXCEPTION: `Bad request exception`,
 
   BCRYPT_SALT: 10,
+
+  UserRole: {
+    ADMIN: `admin`,
+    READER: `reader`,
+    UNAUTHORIZED: `unauthorized`,
+  }
 };

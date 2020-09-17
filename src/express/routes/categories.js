@@ -5,7 +5,8 @@ const {Router} = require(`express`);
 const Joi = require(`joi`);
 const {DataServer} = require(`../data-server`);
 const {categorySchema} = require(`../joi-schemas`);
-const {parseJoiException} = require(`../utils`);
+const {parseJoiException, render} = require(`../utils`);
+const {privateRoute} = require(`../middlewares`);
 
 const isEmpty = (object) => Object.keys(object).length === 0;
 const isUnique = (name, categories) => categories.find((it) => it.name === name) === undefined;
@@ -49,13 +50,13 @@ const validateQuery = async (req, res, next) => {
   }
 };
 
-categoryRouter.get(`/`, validateQuery, async (req, res, next) => {
+categoryRouter.get(`/`, [privateRoute, validateQuery], async (req, res, next) => {
   try {
     const categories = await dataServer.getCategories(false);
     const newCategory = {name: ``};
 
     if (isEmpty(req.query)) {
-      res.render(`all-categories`, {categories, newCategory});
+      render(`all-categories`, {categories, newCategory}, req, res);
       return;
     }
 
@@ -85,13 +86,13 @@ categoryRouter.get(`/`, validateQuery, async (req, res, next) => {
         }
     }
 
-    res.render(`all-categories`, {categories, newCategory});
+    render(`all-categories`, {categories, newCategory}, req, res);
   } catch (err) {
     next(err);
   }
 });
 
-categoryRouter.post(`/`, async (req, res, next) => {
+categoryRouter.post(`/`, privateRoute, async (req, res, next) => {
   const {name} = req.body;
   const query = {
     name,
@@ -113,7 +114,7 @@ categoryRouter.post(`/`, async (req, res, next) => {
   }
 });
 
-categoryRouter.post(`/:categoryId`, async (req, res, next) => {
+categoryRouter.post(`/:categoryId`, privateRoute, async (req, res, next) => {
   const id = req.params.categoryId;
   const {name, action} = req.body;
   const query = {action, id, name};
