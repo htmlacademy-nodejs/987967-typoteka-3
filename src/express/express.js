@@ -5,7 +5,7 @@ const expressPinoLogger = require(`express-pino-logger`);
 const expressSession = require(`express-session`);
 const path = require(`path`);
 const {DEFAULT_PORT, HttpStatusCode, SESSION_NAME} = require(`./const`);
-const {getLogger} = require(`../logger`);
+const {appLogger} = require(`./logger`);
 const {articleRouter} = require(`./routes/articles`);
 const {mainRouter} = require(`./routes/main`);
 const {categoryRouter} = require(`./routes/categories`);
@@ -30,7 +30,6 @@ const pino = expressPinoLogger({
 });
 
 const app = express();
-const loggerApp = getLogger(`app`);
 
 app.set(`views`, path.resolve(__dirname, `templates`));
 app.set(`view engine`, `pug`);
@@ -65,14 +64,14 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   const errorMessage = err.msg ? `${err.msg}: ${err.filename}, line: ${err.line}` : err;
-  loggerApp.error(errorMessage);
+  appLogger.error(errorMessage);
   render(`500`, {}, req, res, HttpStatusCode.SERVER_ERROR);
   next();
 });
 
 try {
   app.listen(DEFAULT_PORT);
-  loggerApp.info(`Listenint port ${DEFAULT_PORT}...`);
+  appLogger.info(`Listenint port ${DEFAULT_PORT}...`);
 } catch (err) {
-  loggerApp.error(`Can't start server: ${err}`);
+  appLogger.error(`Can't start server: ${err}`);
 }

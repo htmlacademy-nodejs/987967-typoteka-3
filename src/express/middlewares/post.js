@@ -2,7 +2,7 @@
 
 const Joi = require(`joi`);
 const {DataServer} = require(`../data-server`);
-const loggerApp = require(`../../logger`).getLogger(`app`);
+const {appLogger} = require(`../logger`);
 const {render} = require(`../utils`);
 const {HttpStatusCode} = require(`../const`);
 
@@ -30,7 +30,7 @@ const findPost = async (postId, req, res, next) => {
   } catch (err) {
     if (err.isJoi || err.isDBServer) {
       render(`400.pug`, {}, req, res, HttpStatusCode.NOT_FOUND);
-      loggerApp.error(err);
+      appLogger.error(err);
       return;
     }
 

@@ -1,14 +1,14 @@
 'use strict';
 
 const {parseJoiException, splitJoiException, render} = require(`../utils`);
-const logger = require(`../../logger`).getLogger(`app`);
+const {appLogger} = require(`../logger`);
 
 const validateSchema = (schema, data, template, templateData = {}) => async (req, res, next) => {
   try {
     await schema.validateAsync(data, {abortEarly: false});
     next();
   } catch (err) {
-    logger.info(`Validate error ${err}`);
+    appLogger.info(`Validate error ${err}`);
     const allErrors = parseJoiException(err);
     const errors = splitJoiException(err);
 

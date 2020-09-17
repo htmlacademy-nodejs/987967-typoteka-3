@@ -2,10 +2,10 @@
 
 const QueryString = require(`querystring`);
 const axios = require(`axios`).default;
-const {TIMEOUT, DATA_SERVER_PORT} = require(`./const`);
+const {TIMEOUT, DATA_SERVER_PORT, HttpStatusCode} = require(`./const`);
 const {simplify} = require(`./utils`);
 const {ServiceToExpressAdapter} = require(`./data-adapter`);
-const logger = require(`../logger`).getLogger(`axios`);
+const {axiosLogger} = require(`./logger`);
 
 const createAPI = () => {
   const api = axios.create({
@@ -15,18 +15,18 @@ const createAPI = () => {
   });
 
   api.interceptors.request.use((req) => {
-    logger.debug(`Start request at ${req.baseURL}`);
+    axiosLogger.debug(`Start request at ${req.baseURL}`);
     return req;
   }, (err) => {
-    logger.error(err);
+    axiosLogger.error(err);
     return Promise.reject(err);
   });
 
   api.interceptors.response.use((res) => {
-    logger.debug(`End request at ${res.config.baseURL} with status ${res.status}`);
+    axiosLogger.debug(`End request at ${res.config.baseURL} with status ${res.status}`);
     return res;
   }, (err) => {
-    logger.error(err);
+    axiosLogger.error(err);
     return Promise.reject(err);
   });
 
@@ -125,17 +125,17 @@ class DataServer {
       return res.data;
 
     } catch (err) {
-      if (err.response.status === 400) {
+      if (err.response.status === HttpStatusCode.BAD_REQUEST) {
         const message = `Bad database request: ${err.response.data}`;
         const error = new Error(message);
         error.errors = err.response.data;
         error.isDBServer = true;
 
-        logger.info(message);
+        axiosLogger.info(message);
         throw error;
       }
 
-      logger.error(err);
+      axiosLogger.error(err);
       throw new Error(err);
     }
   }
