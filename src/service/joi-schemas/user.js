@@ -1,11 +1,11 @@
 'use strict';
 
 const Joi = require(`joi`);
-const {FileNameLength, UserNameLength, PasswordHashLength} = require(`../const`);
+const {FileNameLength, UserNameLength, PasswordLength} = require(`../const`);
 
 const userLogin = {
   email: Joi.string().email().required(),
-  password: Joi.string().min(PasswordHashLength.MIN).max(PasswordHashLength.MAX).required(),
+  password: Joi.string().min(PasswordLength.MIN).max(PasswordLength.MAX).required(),
 };
 
 const userLoginSchema = Joi.object({

@@ -3,20 +3,28 @@
 const {getHash} = require(`./common`);
 
 const createUserSQL = async ({firstname, lastname, email, avatar, originalAvatar, password}) => `
-INSERT INTO avatars (id, original_name)
-  VALUES ('${avatar}', '${originalAvatar}');
-
-INSERT INTO passwords (id, password)
-  VALUES (DEFAULT, '${await getHash(password)}');
-
-INSERT INTO users (email, avatar_id, password_id, firstname, lastname)
+INSERT INTO users (id, email, firstname, lastname)
   VALUES (
+    DEFAULT,
     '${email}',
-    '${avatar}',
-    currval('passwords_id_seq'),
     '${firstname}',
     '${lastname}'
-    );`;
+    );
+
+INSERT INTO avatars (id, name, "originalName", user_id)
+  VALUES (
+    DEFAULT, 
+    '${avatar}', 
+    '${originalAvatar}',
+    currval('users_id_seq')
+  );
+    
+  INSERT INTO passwords (id, password, user_id)
+  VALUES (
+    DEFAULT,
+    '${await getHash(password)}',
+    currval('users_id_seq')
+  );`;
 
 const createUsersSQL = async (users) => {
   const userSQLs = await Promise.all(users.map((it) => createUserSQL(it)));
@@ -36,14 +44,14 @@ const createCommentsSQL = (comments) => {
     const commentDate = new Date(date);
     return `(
       DEFAULT,
-      '${user.email}',
+      (SELECT id FROM users WHERE email = '${user.email}'),
       currval('posts_id_seq'),
       '${commentDate.toISOString()}',
       '${text}'
     )`;
   });
 
-  return `INSERT INTO comments (id, user_email, post_id, date, text) VALUES ${values.join(`, `)};`;
+  return `INSERT INTO comments (id, user_id, post_id, date, text) VALUES ${values.join(`, `)};`;
 };
 
 const createPostCategorySQL = (postCategories) => {
@@ -52,23 +60,22 @@ const createPostCategorySQL = (postCategories) => {
   return `INSERT INTO posts_categories (post_id, category_id) VALUES ${values.join(`, `)};`;
 };
 
-const createPostSQL = ({title, date: createdDate, announce, fullText, categories, comments, picture, originalPicture, user}) => {
-  const pictureSQL = picture ? `INSERT INTO pictures (id, original_name) VALUES ('${picture}', '${originalPicture}');` : ``;
+const createPostSQL = ({title, date: createdDate, announce, text, categories, comments, picture, originalPicture}) => {
+  const pictureSQL = picture
+    ? `INSERT INTO pictures (id, name, "originalName", post_id) VALUES (DEFAULT, '${picture}', '${originalPicture}', currval('posts_id_seq'));` : ``;
 
   const date = new Date(createdDate);
   const postSQL = `
-INSERT INTO posts (id, user_email, picture_id, date, title, announce, text)
+INSERT INTO posts (id, date, title, announce, text)
   VALUES (
     DEFAULT,
-    '${user.email}',
-    ${picture ? `'${picture}'` : `null`},
     '${date.toISOString()}',
     '${title}',
     '${announce}',
-    '${fullText}'
+    '${text}'
     );`;
 
-  return [pictureSQL, postSQL, createCommentsSQL(comments), createPostCategorySQL(categories)].join(`\n`);
+  return [postSQL, pictureSQL, createCommentsSQL(comments), createPostCategorySQL(categories)].join(`\n`);
 };
 
 const createPostsSQL = (posts) => posts.map((it) => createPostSQL(it)).join(`\n`);

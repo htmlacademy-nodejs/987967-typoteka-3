@@ -1,0 +1,15 @@
+DROP TABLE IF EXISTS public.avatars CASCADE;
+
+DROP TABLE IF EXISTS public.categories CASCADE;
+
+DROP TABLE IF EXISTS public.comments CASCADE;
+
+DROP TABLE IF EXISTS public.passwords CASCADE;
+
+DROP TABLE IF EXISTS public.pictures CASCADE;
+
+DROP TABLE IF EXISTS public.posts CASCADE;
+
+DROP TABLE IF EXISTS public.posts_categories CASCADE;
+
+DROP TABLE IF EXISTS public.users CASCADE;
