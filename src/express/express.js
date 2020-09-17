@@ -4,7 +4,7 @@ const express = require(`express`);
 const expressPinoLogger = require(`express-pino-logger`);
 const expressSession = require(`express-session`);
 const path = require(`path`);
-const {DEFAULT_PORT, HttpStatusCode} = require(`./const`);
+const {DEFAULT_PORT, HttpStatusCode, SESSION_NAME} = require(`./const`);
 const {getLogger} = require(`../logger`);
 const {articleRouter} = require(`./routes/articles`);
 const {mainRouter} = require(`./routes/main`);
@@ -39,7 +39,7 @@ app.use(expressSession({
   secret: SECRET,
   resave: false,
   saveUninitialized: false,
-  name: `session_id`,
+  name: SESSION_NAME,
   store: getSequelizeStore(expressSession.Store),
   cookie: {
     sameSite: true,

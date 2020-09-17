@@ -1,5 +1,7 @@
 'use strict';
 
+const {HttpStatusCode} = require(`./const`);
+
 const getPagination = (page, pageCount, url) => ({
   page,
   prev: page > 1 ? page - 1 : null,
@@ -74,7 +76,7 @@ const extractPicture = (req) => {
   return uploadPicture || storedPictureData;
 };
 
-const render = (template, data, req, res, status = 200) => {
+const render = (template, data, req, res, status = HttpStatusCode.OK) => {
   const {user} = req.session || {user: null};
   const url = encodeURIComponent(req.originalUrl);
   const back = decodeURIComponent(req.query.back || `/`);
