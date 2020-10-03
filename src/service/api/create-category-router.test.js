@@ -108,7 +108,7 @@ it(`should return 200 and delete a category`, async () => {
 });
 
 it(`should return 400 when category data is not valid`, async () => {
-  let res = await supertest(server).put(`/api/categories/1`).send({name: `12`});
+  let res = await supertest(server).put(`/api/categories/1`).send({name: `a`});
   expect(res.status).toBe(400);
   res = await supertest(server).post(`/api/categories`).send({name: `1234567890 1234567890 1234567890`});
   expect(res.status).toBe(400);
