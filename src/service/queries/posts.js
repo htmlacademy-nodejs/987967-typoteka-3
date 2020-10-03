@@ -2,7 +2,7 @@
 
 const {Op} = require(`sequelize`);
 const {Post, PostCategory} = require(`../models`);
-const {addPagination} = require(`../utils`);
+const {getLimitConstrain} = require(`../utils`);
 const {PostSortType} = require(`../const`);
 
 const queryPostsByIds = (sequelize, ids) =>({
@@ -39,7 +39,7 @@ const getPostsSortedByPopularity = async (sequelize, limit, offset) => {
     }],
     group: `Post.id`,
     order: [[sequelize.fn(`COUNT`, sequelize.col(`comments.id`)), `DESC`], [`id`, `ASC`]],
-    ...addPagination(limit, offset),
+    ...getLimitConstrain(limit, offset),
     subQuery: false,
     raw: true
   });
@@ -59,7 +59,7 @@ const getPostsSortedByDate = async (sequelize, limit, offset) => {
   const {rows, count} = await Post.findAndCountAll({
     attributes: [`id`, `date`],
     order: [[`date`, `DESC`], [`id`, `ASC`]],
-    ...addPagination(limit, offset),
+    ...getLimitConstrain(limit, offset),
     raw: true
   });
 
@@ -84,7 +84,7 @@ const getCategoryPosts = async (sequelize, categoryId, limit, offset) => {
     where: {[`category_id`]: categoryId},
     raw: true,
     order: [[sequelize.col(`post.date`), `DESC`], [sequelize.col(`post.title`), `ASC`]],
-    ...addPagination(limit, offset),
+    ...getLimitConstrain(limit, offset),
   });
 
   const postIds = rows.map((it) => Number(it.id));

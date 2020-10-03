@@ -4,7 +4,7 @@ const fs = require(`fs`);
 const {Client} = require(`pg`);
 const {ADMIN, PSW, POSTGRES_PSW, HOST, DB_PORT} = require(`../config`);
 
-const addPagination = (limit, offset = 0) => {
+const getLimitConstrain = (limit, offset = 0) => {
   return limit ? {
     limit,
     offset
@@ -107,7 +107,7 @@ const createDataBase = async (dbName) => {
 };
 
 module.exports = {
-  addPagination,
+  getLimitConstrain,
   createSchemaCommands,
   createEmptyDataBase,
   createSchema,

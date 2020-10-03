@@ -6,7 +6,7 @@ const models = require(`./models`);
 const {PostSortType, UserRole} = require(`./const`);
 const {getPostsSortedByDate, getPostsSortedByPopularity, getCategoryPosts, getCategories, updatePicture} = require(`./queries`);
 const {User, PostCategory, Category, Comment, Post} = require(`./models`);
-const {addPagination, getHash, compareHash} = require(`./utils`);
+const {getLimitConstrain, getHash, compareHash} = require(`./utils`);
 
 const prepareUserData = async ({email, firstname, lastname, password, avatar, originalAvatar}) => {
   const userData = {email, firstname, lastname};
@@ -303,7 +303,7 @@ class DB {
         attributes: [`id`, `title`]
       }],
       order: [[`date`, `DESC`]],
-      ...addPagination(limit, offset)
+      ...getLimitConstrain(limit, offset)
     };
 
     return Comment.findAll(query);
