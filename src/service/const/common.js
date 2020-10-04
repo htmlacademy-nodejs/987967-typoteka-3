@@ -1,5 +1,7 @@
 'use strict';
 
+const {б} = require(`.`);
+
 const MAX_POSTS_COUNT = 1000;
 const MAX_USER_COUNT = 10;
 
@@ -80,5 +82,10 @@ module.exports = {
     ADMIN: `admin`,
     READER: `reader`,
     UNAUTHORIZED: `unauthorized`,
-  }
+  },
+
+  AppEvent: {
+    CHANGE_POST_COMMENT: `change_post_comment`,
+    CHANGE_POPULAR_POSTS: `change_popular_posts`,
+  },
 };

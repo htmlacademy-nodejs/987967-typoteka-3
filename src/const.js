@@ -57,9 +57,6 @@ module.exports = {
     SERVER_ERROR: 500,
   },
 
-  AppEvent: {
-    CHANGE_COMMENT: `change_comment`,
-    CHANGE_POPULAR_LIST: `change_popular_list`,
-    CHANGE_POST_COMMENT: `change_post_comment`,
-  },
+  POPULAR_POST_COUNT: 4,
+  LASTST_COMMENT_COUNT: 4,
 };
