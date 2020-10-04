@@ -3,25 +3,29 @@
 const supertest = require(`supertest`);
 const {createServer} = require(`../cli/server`);
 const {createDataBase, dropDataBase, readTestMockFiles} = require(`../utils`);
-const {DB} = require(`../db`);
+const {configureSequelize} = require(`../configure-sequelize`);
+const db = require(`../db-services`);
+const {ADMIN, PSW} = require(`../config`);
 
 let server;
 let dbName;
-let db;
+let sequelize;
 
 beforeAll(async () => {
   dbName = `test_${Date.now()}`;
   const {users, posts, categories} = await readTestMockFiles();
-  await createDataBase(dbName);
 
-  db = new DB(dbName, undefined, undefined, true);
-  await db.fillDataBase(posts, users, categories);
+  await createDataBase(dbName);
+  sequelize = await configureSequelize(dbName, ADMIN, PSW, true);
+  await db.fillDataBase(sequelize, posts, users, categories);
 
   server = createServer(db);
 });
 
 afterAll(async () => {
-  db.close();
+  if (sequelize) {
+    sequelize.close();
+  }
   await dropDataBase(dbName);
 });
 

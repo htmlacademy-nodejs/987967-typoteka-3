@@ -3,40 +3,46 @@
 const supertest = require(`supertest`);
 const {createServer} = require(`../cli/server`);
 const {createDataBase, dropDataBase, readTestMockFiles, readJsonFile} = require(`../utils`);
-const {DB} = require(`../db`);
+const {configureSequelize} = require(`../configure-sequelize`);
+const db = require(`../db-services`);
+const {ADMIN, PSW} = require(`../config`);
 
 const searchResult = readJsonFile(`${process.cwd()}/data/mock-for-test/results/search.json`);
 
 let server;
 let dbName;
-let db;
+let sequelize;
 
 beforeAll(async () => {
   dbName = `test_${Date.now()}`;
   const {users, posts, categories} = await readTestMockFiles();
-  await createDataBase(dbName);
 
-  db = new DB(dbName, undefined, undefined, true);
-  await db.fillDataBase(posts, users, categories);
+  await createDataBase(dbName);
+  sequelize = await configureSequelize(dbName, ADMIN, PSW, true);
+  await db.fillDataBase(sequelize, posts, users, categories);
 
   server = createServer(db);
 });
 
 afterAll(async () => {
-  db.close();
+  if (sequelize) {
+    sequelize.close();
+  }
   await dropDataBase(dbName);
 });
 
 it(`should return an empty array if the query string donesn't match any title of posts`, async () => {
   const res = await supertest(server).get(`/api/search?query=AAA`);
-  expect(res.status).toBe(200);
-  expect(res.body).toEqual([]);
+  const {status, body} = res;
+  expect(status).toBe(200);
+  expect(body).toEqual([]);
 });
 
 it(`should return a list of posts whoes title matches the query string`, async () => {
   const res = await supertest(server).get(`/api/search?query=%D0%91%D0%B8%D0%BB%D0%BB%D1%8C`);
-  expect(res.status).toBe(200);
-  expect(res.body).toEqual(searchResult);
+  const {status, body} = res;
+  expect(status).toBe(200);
+  expect(body).toEqual(searchResult);
 });
 
 it(`should return 400 when query string is not valid`, async () => {
