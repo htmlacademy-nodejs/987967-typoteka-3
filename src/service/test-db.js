@@ -1,10 +1,10 @@
 'use strict';
 
-const {configureSequelize} = require(`./configure-sequelize`);
+const {createSequelize} = require(`./create-sequelize`);
 const db = require(`./db-services`);
 
 (async () => {
-  const seq = await configureSequelize();
+  const seq = await createSequelize();
 
   try {
     const result = await db.getAdminId();

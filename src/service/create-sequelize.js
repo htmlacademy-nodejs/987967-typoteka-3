@@ -4,7 +4,7 @@ const {Sequelize} = require(`sequelize`);
 const {HOST, DBNAME, ADMIN, PSW} = require(`./config`);
 const models = require(`./models`);
 
-const configureSequelize = async (dbName = DBNAME, admin = ADMIN, psw = PSW, silent = false) => {
+const createSequelize = async (dbName = DBNAME, admin = ADMIN, psw = PSW, silent = false) => {
   const sequelize = new Sequelize(dbName, admin, psw, {
     host: HOST,
     dialect: `postgres`,
@@ -32,6 +32,6 @@ const configureSequelize = async (dbName = DBNAME, admin = ADMIN, psw = PSW, sil
 };
 
 module.exports = {
-  configureSequelize,
+  createSequelize,
 };
 

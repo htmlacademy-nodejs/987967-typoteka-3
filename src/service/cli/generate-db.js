@@ -5,7 +5,7 @@ const fs = require(`fs`);
 const {generatePosts} = require(`../utils`);
 const {createDataBase} = require(`../utils`);
 const {ADMIN, PSW, DBNAME} = require(`../config`);
-const {configureSequelize} = require(`../configure-sequelize`);
+const {createSequelize} = require(`../create-sequelize`);
 const {fillDataBase} = require(`../db-services`);
 const {
   ExitCode,
@@ -25,7 +25,7 @@ const createDB = async (postCount, userCount) => {
     await fs.promises.writeFile(MOCK_FILE, JSON.stringify({categories, users, posts}));
     await createDataBase(DBNAME);
 
-    const sequelize = await configureSequelize(DBNAME, ADMIN, PSW, true);
+    const sequelize = await createSequelize(DBNAME, ADMIN, PSW, true);
     await fillDataBase(posts, users, categories, false);
     sequelize.close();
 

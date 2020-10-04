@@ -4,7 +4,7 @@ const supertest = require(`supertest`);
 const {createServer} = require(`../cli/server`);
 const {createDataBase, dropDataBase, readTestMockFiles, compareHash} = require(`../utils`);
 const {UserRole} = require(`../const`);
-const {configureSequelize} = require(`../configure-sequelize`);
+const {createSequelize} = require(`../create-sequelize`);
 const db = require(`../db-services`);
 const {ADMIN, PSW} = require(`../config`);
 
@@ -17,7 +17,7 @@ beforeAll(async () => {
   const {users, posts, categories} = await readTestMockFiles();
 
   await createDataBase(dbName);
-  sequelize = await configureSequelize(dbName, ADMIN, PSW, true);
+  sequelize = await createSequelize(dbName, ADMIN, PSW, true);
   await db.fillDataBase(sequelize, posts, users, categories);
 
   server = createServer(db);

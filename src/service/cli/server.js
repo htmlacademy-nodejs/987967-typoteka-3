@@ -7,7 +7,7 @@ const {createAPI} = require(`../api`);
 const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo, CliCommandName} = require(`../const`);
 const {parseException} = require(`../utils`);
 const {getLogger} = require(`../../logger`);
-const {configureSequelize} = require(`../configure-sequelize`);
+const {createSequelize} = require(`../create-sequelize`);
 const db = require(`../db-services`);
 const {DBNAME, ADMIN, PSW} = require(`../config`);
 
@@ -60,7 +60,7 @@ module.exports = {
   help: `${CliCommandName.SERVER} - запускает приложение`,
   async run(arg) {
     try {
-      await configureSequelize(DBNAME, ADMIN, PSW, true);
+      await createSequelize(DBNAME, ADMIN, PSW, true);
       appLogger.info(`Connection to database succsessfully`);
     } catch (err) {
       const errorMessage = `Error connecting to database: ${err}`;
