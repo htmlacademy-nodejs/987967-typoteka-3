@@ -7,7 +7,9 @@ const {createAPI} = require(`../api`);
 const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo, CliCommandName} = require(`../const`);
 const {parseException} = require(`../utils`);
 const {getLogger} = require(`../../logger`);
-const {DB} = require(`../db`);
+const {configureSequelize} = require(`../configure-sequelize`);
+const db = require(`../db-services`);
+const {DBNAME, ADMIN, PSW} = require(`../config`);
 
 const pino = expressPinoLogger({
   serializers: {
@@ -24,13 +26,13 @@ const pino = expressPinoLogger({
 
 const appLogger = getLogger(`app`);
 
-const createServer = (db) => {
+const createServer = (database) => {
   const app = express();
 
   app.use(express.json());
   app.use(pino);
 
-  app.use(`/api`, createAPI(db));
+  app.use(`/api`, createAPI(database));
 
   app.use((req, res) => {
     req.log.error(`Wrong path: ${req.originalUrl}`);
@@ -57,10 +59,8 @@ module.exports = {
   name: CliCommandName.SERVER,
   help: `${CliCommandName.SERVER} - запускает приложение`,
   async run(arg) {
-    const db = new DB();
-
     try {
-      await db.authenticate();
+      await configureSequelize(DBNAME, ADMIN, PSW, true);
       appLogger.info(`Connection to database succsessfully`);
     } catch (err) {
       const errorMessage = `Error connecting to database: ${err}`;

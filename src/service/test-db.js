@@ -1,22 +1,18 @@
 'use strict';
 
-const {DB} = require(`./db`);
-const {User} = require(`./models`);
-const {ADMIN} = require(`./config`);
+const {configureSequelize} = require(`./configure-sequelize`);
+const db = require(`./db-services`);
 
-console.log(ADMIN);
+(async () => {
+  const seq = await configureSequelize();
 
-// const db = new DB();
-
-// (async () => {
-//   try {
-//     await db.authenticate();
-//     const userInfo = await db.checkUser(`sophie.sophia@gmail.com`, `hSiohapepSio`);
-
-//     console.log(userInfo);// .get({plain: true}));
-//   } catch (err) {
-//     console.log(`Error!!! ${err}`);
-//   }
-
-//   db.close();
-// })();
+  try {
+    const result = await db.getAdminId();
+    console.log(result);
+    const result2 = await db.getAdminId();
+    console.log(result2);
+  } catch (err) {
+    console.log(err);
+  }
+  seq.close();
+})();
