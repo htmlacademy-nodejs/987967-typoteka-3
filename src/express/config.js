@@ -8,4 +8,6 @@ module.exports = {
   ADMIN: process.env.TK_ADMIN,
   PSW: process.env.TK_PSW,
   HOST: process.env.TK_HOST,
+  EXPRESS_SOCKET_PORT: process.env.TK_EXPRESS_SOCKET_PORT,
+  SERVICE_SOCKET_PORT: process.env.TK_SERVICE_SOCKET_PORT,
 };

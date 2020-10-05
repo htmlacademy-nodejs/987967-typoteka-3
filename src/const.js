@@ -58,5 +58,5 @@ module.exports = {
   },
 
   POPULAR_POST_COUNT: 4,
-  LASTST_COMMENT_COUNT: 4,
+  RECENT_COMMENT_COUNT: 4,
 };

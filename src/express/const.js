@@ -38,6 +38,11 @@ module.exports = {
   LoggerName: {
     APP: `front:app`,
     AXIOS: `front:axios`,
-  }
+  },
 
+  AppEvents: {
+    CHANGE_RECENT_COMMENTS: `change_recent_comments`,
+    CHANGE_POPULAR_POSTS: `change_popular_posts`,
+    CHANGE_POST_COMMENTS: `change_post_comments`,
+  }
 };
