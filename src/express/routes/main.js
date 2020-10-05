@@ -3,7 +3,7 @@
 const {Router} = require(`express`);
 const Joi = require(`joi`);
 const {DataServer} = require(`../data-server`);
-const {getPagination, render} = require(`../utils`);
+const {getPagination, render, reduceText} = require(`../utils`);
 const {validateQuerySchema} = require(`../middlewares`);
 const {
   POST_PREVIEW_COUNT,
@@ -13,10 +13,6 @@ const {
   COMMENT_PREVIEW_LENGTH,
   PostSortType,
 } = require(`../const`);
-
-const reduceText = (text, length) => {
-  return text.length > length ? `${text.slice(0, length)}...` : text;
-};
 
 const mainRouter = new Router();
 const dataServer = new DataServer();

@@ -40,8 +40,9 @@ const validatePostData = (formType) => async (req, res, next) => {
 
 const validateCommentData = async (req, res, next) => {
   const {post, categories} = res.locals;
+  const {comments} = post;
   post.categories = filterCategories(post.categories, categories);
-  await validateBodySchema(commentSchema, `post`, {post})(req, res, next);
+  await validateBodySchema(commentSchema, `post`, {post, comments})(req, res, next);
 };
 
 const validatePagination = async (req, res, next) => {
@@ -78,9 +79,10 @@ articleRouter.get(`/add`, [privateRoute, getAllCategories], async (req, res, nex
 articleRouter.get(`/:postId`, [getCategories, findPostByParam], async (req, res, next) => {
   try {
     const {categories, post} = res.locals;
+    const {comments} = post;
 
     post.categories = filterCategories(post.categories, categories);
-    render(`post`, {post}, req, res);
+    render(`post`, {post, comments}, req, res);
   } catch (err) {
     next(err);
   }
