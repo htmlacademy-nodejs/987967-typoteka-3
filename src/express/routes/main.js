@@ -7,7 +7,7 @@ const {getPagination, render} = require(`../utils`);
 const {validateQuerySchema} = require(`../middlewares`);
 const {
   POST_PREVIEW_COUNT,
-  LASTST_COMMENT_COUNT,
+  RECENT_COMMENT_COUNT,
   POPULAR_POST_COUNT,
   ANNOUNCE_PREVIEW_LENGTH,
   COMMENT_PREVIEW_LENGTH,
@@ -53,7 +53,7 @@ mainRouter.get(`/`, getPopularPosts, validatePagination, async (req, res, next) 
     const [categories, {posts}, comments] = await Promise.all([
       dataServer.getCategories(true),
       dataServer.getPostPreviews(PostSortType.DATE, POST_PREVIEW_COUNT, (page - 1) * POST_PREVIEW_COUNT),
-      dataServer.getComments(LASTST_COMMENT_COUNT, 0),
+      dataServer.getComments(RECENT_COMMENT_COUNT, 0),
     ]);
 
     const renderData = {

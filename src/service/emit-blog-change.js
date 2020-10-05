@@ -8,8 +8,8 @@ const socketServer = io(SERVICE_SOCKET_PORT);
 
 let storedPopularPostList;
 
-const emitBlogChange = ({post, lastestCommentList, popularPostList}) => {
-  socketServer.emit(AppEvent.CHANGE_POST_COMMENT, post, lastestCommentList);
+const emitBlogChange = ({post, recentCommentList, popularPostList}) => {
+  socketServer.emit(AppEvent.CHANGE_POST_COMMENT, post, recentCommentList);
 
   const popularPostListData = JSON.stringify(popularPostList);
   if (popularPostListData !== storedPopularPostList) {

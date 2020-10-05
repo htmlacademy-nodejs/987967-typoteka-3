@@ -14,9 +14,9 @@
   <script>
     const socket = io('http://localhost:4001');
 
-    socket.addEventListener('change_post_comment', (postData, lastestCommentList) => {
+    socket.addEventListener('change_post_comment', (postData, recentCommentList) => {
       console.log(`Event: change_post_comment; postData: ${JSON.stringify(postData)}`);
-      console.log(`Event: change_post_comment; lastestCommentList: ${JSON.stringify(lastestCommentList)}`);
+      console.log(`Event: change_post_comment; recentCommentList: ${JSON.stringify(recentCommentList)}`);
     })
     socket.addEventListener('change_popular_posts', (popularPostList) => {
       console.log(`Event: change_popular_posts; popularPostList: ${JSON.stringify(popularPostList)}`);

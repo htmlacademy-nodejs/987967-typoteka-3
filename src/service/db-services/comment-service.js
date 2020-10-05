@@ -2,21 +2,21 @@
 
 const {Comment, User} = require(`../models`);
 const {getLimitConstrain} = require(`../utils`);
-const {LASTST_COMMENT_COUNT, POPULAR_POST_COUNT, PostSortType} = require(`../const`);
+const {RECENT_COMMENT_COUNT, POPULAR_POST_COUNT, PostSortType} = require(`../const`);
 const {getPosts} = require(`./posts-service`);
 const {getPost} = require(`./post-service`);
 const {emitBlogChange} = require(`../emit-blog-change`);
 
 const getChangedBlogData = async (postId) => {
-  const [post, lastestCommentList, popularPostList] = await Promise.all([
+  const [post, recentCommentList, popularPostList] = await Promise.all([
     getPost(postId),
-    getComments(LASTST_COMMENT_COUNT),
+    getComments(RECENT_COMMENT_COUNT),
     getPosts(PostSortType.BY_POPULARITY, POPULAR_POST_COUNT)
   ]);
 
   return {
     post,
-    lastestCommentList,
+    recentCommentList,
     popularPostList,
   };
 };
