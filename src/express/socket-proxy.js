@@ -3,27 +3,25 @@
 const io = require(`socket.io`);
 const ioClient = require(`socket.io-client`);
 const {PugTemplateName, PugRender} = require(`./pug-render`);
-const {AppEvents} = require(`./const`);
+const {AppEvent, ServerEvent} = require(`./const`);
 const {customEventName} = require(`./utils`);
 
 const createSocketProxy = (inputPort, outputPort) => {
   const socketClient = ioClient(`http://localhost:${inputPort}`);
   const socketServer = io(outputPort);
 
-  socketClient.addEventListener(`change_post_comment`, (post, recentCommentList) => {
+  socketClient.addEventListener(ServerEvent.CHANGE_POST_COMMENTS, (post, recentCommentList) => {
     const recentCommentHtml = PugRender[PugTemplateName.RECENT_COMMENTS](recentCommentList);
-    socketServer.emit(AppEvents.CHANGE_RECENT_COMMENTS, recentCommentHtml);
+    socketServer.emit(AppEvent.CHANGE_RECENT_COMMENTS, recentCommentHtml);
 
     const {id} = post;
     const postCommentHtml = PugRender[PugTemplateName.POST_COMMENTS](post);
-    socketServer.emit(customEventName(AppEvents.CHANGE_POST_COMMENTS, id), postCommentHtml);
-
-    // console.log(`postCommentHtml: ${postCommentHtml}`);
+    socketServer.emit(customEventName(AppEvent.CHANGE_POST_COMMENTS, id), postCommentHtml);
   });
 
-  socketClient.addEventListener(`change_popular_posts`, (popularPostList) => {
+  socketClient.addEventListener(ServerEvent.CHANGE_POPULAR_POSTS, (popularPostList) => {
     const html = PugRender[PugTemplateName.POPULAR_POSTS](popularPostList);
-    socketServer.emit(AppEvents.CHANGE_POPULAR_POSTS, html);
+    socketServer.emit(AppEvent.CHANGE_POPULAR_POSTS, html);
   });
 };
 

@@ -85,7 +85,7 @@ module.exports = {
   },
 
   AppEvent: {
-    CHANGE_POST_COMMENT: `change_post_comment`,
+    CHANGE_POST_COMMENTS: `change_post_comments`,
     CHANGE_POPULAR_POSTS: `change_popular_posts`,
   },
 };
