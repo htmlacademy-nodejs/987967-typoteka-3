@@ -26,10 +26,11 @@ const createDB = async (postCount, userCount) => {
     await createDataBase(DBNAME);
 
     const sequelize = await createSequelize(DBNAME, ADMIN, PSW, true);
-    await fillDataBase(posts, users, categories, false);
+    await fillDataBase(sequelize, posts, users, categories);
     sequelize.close();
 
     console.info(chalk.green(Message.DB_SUCCESS));
+    console.info(chalk.green(`Open ${MOCK_FILE} to see the generated data`));
     return ExitCode.SUCCESS;
   } catch (err) {
     console.error(chalk.red(`${Message.DB_ERROR}: ${err}`));
