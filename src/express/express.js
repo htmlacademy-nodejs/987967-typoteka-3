@@ -1,5 +1,6 @@
 'use strict';
 
+const http = require(`http`);
 const path = require(`path`);
 const express = require(`express`);
 const expressPinoLogger = require(`express-pino-logger`);
@@ -70,11 +71,15 @@ app.use((err, req, res, next) => {
   next();
 });
 
-createSocketProxy(SERVICE_SOCKET_PORT, EXPRESS_SOCKET_PORT);
+const server = http.createServer(app);
 
-try {
-  app.listen(DEFAULT_PORT);
-  appLogger.info(`Listenint port ${DEFAULT_PORT}...`);
-} catch (err) {
-  appLogger.error(`Can't start server: ${err}`);
-}
+server.on(`error`, (message) => {
+  appLogger.error(`Can't start server: ${message}`);
+});
+
+server.on(`listening`, () => {
+  appLogger.info(`Listening port ${DEFAULT_PORT}...`);
+});
+
+server.listen(DEFAULT_PORT);
+createSocketProxy(SERVICE_SOCKET_PORT, EXPRESS_SOCKET_PORT);
