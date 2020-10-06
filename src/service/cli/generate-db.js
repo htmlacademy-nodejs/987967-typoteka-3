@@ -6,7 +6,7 @@ const {generatePosts} = require(`../utils`);
 const {createDataBase} = require(`../utils`);
 const {ADMIN, PSW, DBNAME} = require(`../config`);
 const {createSequelize} = require(`../create-sequelize`);
-const {fillDataBase} = require(`../db-services`);
+const {fillDataBase} = require(`../db-service`);
 const {
   ExitCode,
   Message,

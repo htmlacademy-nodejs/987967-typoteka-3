@@ -4,7 +4,7 @@ const supertest = require(`supertest`);
 const {createServer} = require(`../cli/server`);
 const {createDataBase, dropDataBase, readTestMockFiles, readJsonFile} = require(`../utils`);
 const {createSequelize} = require(`../create-sequelize`);
-const db = require(`../db-services`);
+const db = require(`../db-service`);
 const {ADMIN, PSW} = require(`../config`);
 
 const allComments = readJsonFile(`${process.cwd()}/data/mock-for-test/results/all-comments.json`);

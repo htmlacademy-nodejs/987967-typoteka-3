@@ -5,7 +5,7 @@ const {createServer} = require(`../cli/server`);
 const {createDataBase, dropDataBase, readTestMockFiles, compareHash} = require(`../utils`);
 const {UserRole} = require(`../const`);
 const {createSequelize} = require(`../create-sequelize`);
-const db = require(`../db-services`);
+const db = require(`../db-service`);
 const {ADMIN, PSW} = require(`../config`);
 
 let server;

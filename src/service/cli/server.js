@@ -8,7 +8,7 @@ const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo, CliCommandName} =
 const {parseException} = require(`../utils`);
 const {getLogger} = require(`../../logger`);
 const {createSequelize} = require(`../create-sequelize`);
-const db = require(`../db-services`);
+const db = require(`../db-service`);
 const {DBNAME, ADMIN, PSW} = require(`../config`);
 
 const pino = expressPinoLogger({
