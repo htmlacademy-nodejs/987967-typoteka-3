@@ -6,6 +6,7 @@ const PostsService = require(`./posts-service`);
 const PostService = require(`./post-service`);
 const UserService = require(`./user-service`);
 const DBService = require(`./fill-database`);
+const {dbEventEmitter} = require(`./db-event-emitter`);
 
 module.exports = {
   ...CategoryService,
@@ -14,4 +15,5 @@ module.exports = {
   ...PostService,
   ...UserService,
   ...DBService,
+  dbEventEmitter,
 };

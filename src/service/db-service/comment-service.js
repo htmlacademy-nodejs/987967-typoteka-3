@@ -1,25 +1,11 @@
 'use strict';
 
+const {EventEmitter} = require(`events`);
 const {Comment, User} = require(`../models`);
 const {getLimitConstrain} = require(`../utils`);
-const {RECENT_COMMENT_COUNT, POPULAR_POST_COUNT, PostSortType} = require(`../const`);
-const {getPosts} = require(`./posts-service`);
-const {getPost} = require(`./post-service`);
-const {emitBlogChange} = require(`../emit-blog-change`);
+const {DBInternalEvent} = require(`./const`);
 
-const getChangedBlogData = async (postId) => {
-  const [post, recentCommentList, popularPostList] = await Promise.all([
-    getPost(postId),
-    getComments(RECENT_COMMENT_COUNT),
-    getPosts(PostSortType.BY_POPULARITY, POPULAR_POST_COUNT)
-  ]);
-
-  return {
-    post,
-    recentCommentList,
-    popularPostList,
-  };
-};
+const commentEventEmitter = new EventEmitter();
 
 const createComment = async ({text, date, userId, postId}) => {
   const comment = await Comment.create({
@@ -29,7 +15,7 @@ const createComment = async ({text, date, userId, postId}) => {
     [`post_id`]: postId,
   });
 
-  emitBlogChange(await getChangedBlogData(postId));
+  commentEventEmitter.emit(DBInternalEvent.ADD_COMMENT, postId);
 
   return comment;
 };
@@ -63,7 +49,7 @@ const deleteComment = async (commentId, postId) => {
     where: {id: commentId}
   });
 
-  emitBlogChange(await getChangedBlogData(postId));
+  commentEventEmitter.emit(DBInternalEvent.REMOVE_COMMENT, postId);
 
   return result;
 };
@@ -73,4 +59,5 @@ module.exports = {
   getComment,
   getComments,
   deleteComment,
+  commentEventEmitter,
 };

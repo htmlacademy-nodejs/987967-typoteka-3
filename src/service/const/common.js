@@ -1,7 +1,5 @@
 'use strict';
 
-const {б} = require(`.`);
-
 const MAX_POSTS_COUNT = 1000;
 const MAX_USER_COUNT = 10;
 
