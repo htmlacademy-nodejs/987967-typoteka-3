@@ -54,7 +54,7 @@ app.use(express.urlencoded({extended: false}));
 
 app.use(`/`, mainRouter);
 app.use(`/articles`, articleRouter);
-app.use(`/categories`, categoryRouter);
+app.use(`/categories`, privateRoute, categoryRouter);
 app.use(`/login`, loginRouter);
 app.use(`/my`, privateRoute, myRouter);
 app.use(`/register`, registerRouter);

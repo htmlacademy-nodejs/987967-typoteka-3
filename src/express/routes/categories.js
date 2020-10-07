@@ -6,14 +6,12 @@ const Joi = require(`joi`);
 const {dataServer} = require(`../data-server`);
 const {categorySchema} = require(`../joi-schemas`);
 const {parseJoiException, render} = require(`../utils`);
-const {privateRoute} = require(`../middlewares`);
 
 const isEmpty = (object) => Object.keys(object).length === 0;
 const isUnique = (name, categories) => categories.find((it) => it.name === name) === undefined;
 const getCategoryIndex = (id, categories) => categories.findIndex((it) => it.id === id);
 
 const categoryRouter = new Router();
- 
 
 const querySchema = Joi.object({
   id: Joi.string().pattern(new RegExp(`^([0-9]+|new)$`)).required(),
@@ -50,7 +48,7 @@ const validateQuery = async (req, res, next) => {
   }
 };
 
-categoryRouter.get(`/`, [privateRoute, validateQuery], async (req, res, next) => {
+categoryRouter.get(`/`, validateQuery, async (req, res, next) => {
   try {
     const categories = await dataServer.getCategories(false);
     const newCategory = {name: ``};
@@ -92,7 +90,7 @@ categoryRouter.get(`/`, [privateRoute, validateQuery], async (req, res, next) =>
   }
 });
 
-categoryRouter.post(`/`, privateRoute, async (req, res, next) => {
+categoryRouter.post(`/`, async (req, res, next) => {
   const {name} = req.body;
   const query = {
     name,
@@ -114,7 +112,7 @@ categoryRouter.post(`/`, privateRoute, async (req, res, next) => {
   }
 });
 
-categoryRouter.post(`/:categoryId`, privateRoute, async (req, res, next) => {
+categoryRouter.post(`/:categoryId`, async (req, res, next) => {
   const id = req.params.categoryId;
   const {name, action} = req.body;
   const query = {action, id, name};
