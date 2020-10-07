@@ -50,9 +50,7 @@ const getRenderFunctions = (templateNames, compileFunctions, dataAdapters) => {
     const dataAdapter = dataAdapters[templateName];
     const compileFunction = compileFunctions[templateName];
 
-    const renderFunction = dataAdapter ?
-      (data) => compileFunction(dataAdapter(data)) :
-      (data) => compileFunction(data);
+    const renderFunction = dataAdapter ? (data) => compileFunction(dataAdapter(data)) : compileFunction;
 
     renderFunctions[templateName] = renderFunction;
   });

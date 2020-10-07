@@ -14,9 +14,8 @@ const createSocketProxy = (inputPort, outputPort) => {
     const recentCommentHtml = PugRender[PugTemplateName.RECENT_COMMENTS](recentCommentList);
     socketServer.emit(AppEvent.CHANGE_RECENT_COMMENTS, recentCommentHtml);
 
-    const {id} = post;
     const postCommentHtml = PugRender[PugTemplateName.POST_COMMENTS](post);
-    socketServer.emit(customEventName(AppEvent.CHANGE_POST_COMMENTS, id), postCommentHtml);
+    socketServer.emit(customEventName(AppEvent.CHANGE_POST_COMMENTS, post.id), postCommentHtml);
   });
 
   socketClient.addEventListener(ServerEvent.CHANGE_POPULAR_POSTS, (popularPostList) => {
