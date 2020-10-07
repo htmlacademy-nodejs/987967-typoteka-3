@@ -1,12 +1,12 @@
 'use strict';
 
 const Joi = require(`joi`);
-const {DataServer} = require(`../data-server`);
+const {dataServer} = require(`../data-server`);
 const {appLogger} = require(`../logger`);
 const {render} = require(`../utils`);
 const {HttpStatusCode} = require(`../const`);
 
-const dataServer = new DataServer();
+ 
 
 const findPostByParam = async (req, res, next) => {
   const {postId} = req.params;

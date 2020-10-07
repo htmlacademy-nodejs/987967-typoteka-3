@@ -3,7 +3,7 @@
 const {Router} = require(`express`);
 const Joi = require(`joi`);
 const multer = require(`multer`);
-const {DataServer} = require(`../data-server`);
+const {dataServer} = require(`../data-server`);
 const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT} = require(`../const`);
 const {getPagination, extractPicture, render} = require(`../utils`);
 const {findPostByParam, getCategories, getAllCategories, getCategory, privateRoute, privateReaderRoute, validateBodySchema, validateQuerySchema} = require(`../middlewares`);
@@ -15,7 +15,7 @@ const FormType = {
 };
 
 const articleRouter = new Router();
-const dataServer = new DataServer();
+ 
 const upload = multer({dest: `src/express/public/img/post-images`});
 
 const filterCategories = (postCategories, categories) => categories.filter((category) => postCategories.find((it) => it.id === category.id));

@@ -3,7 +3,7 @@
 const QueryString = require(`querystring`);
 const {Router} = require(`express`);
 const Joi = require(`joi`);
-const {DataServer} = require(`../data-server`);
+const {dataServer} = require(`../data-server`);
 const {categorySchema} = require(`../joi-schemas`);
 const {parseJoiException, render} = require(`../utils`);
 const {privateRoute} = require(`../middlewares`);
@@ -13,7 +13,7 @@ const isUnique = (name, categories) => categories.find((it) => it.name === name)
 const getCategoryIndex = (id, categories) => categories.findIndex((it) => it.id === id);
 
 const categoryRouter = new Router();
-const dataServer = new DataServer();
+ 
 
 const querySchema = Joi.object({
   id: Joi.string().pattern(new RegExp(`^([0-9]+|new)$`)).required(),

@@ -5,11 +5,11 @@ const Joi = require(`joi`);
 const {UserFormType} = require(`../const`);
 const {render} = require(`../utils`);
 const {userLoginSchema} = require(`../joi-schemas`);
-const {DataServer} = require(`../data-server`);
+const {dataServer} = require(`../data-server`);
 const {validateBodySchema} = require(`../middlewares`);
 
 const loginRouter = new Router();
-const dataServer = new DataServer();
+ 
 
 loginRouter.get(`/`, (req, res) => {
   const {logout} = req.query;

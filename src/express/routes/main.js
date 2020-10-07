@@ -2,7 +2,7 @@
 
 const {Router} = require(`express`);
 const Joi = require(`joi`);
-const {DataServer} = require(`../data-server`);
+const {dataServer} = require(`../data-server`);
 const {getPagination, render, reduceText} = require(`../utils`);
 const {validateQuerySchema} = require(`../middlewares`);
 const {
@@ -15,7 +15,7 @@ const {
 } = require(`../const`);
 
 const mainRouter = new Router();
-const dataServer = new DataServer();
+ 
 
 const validatePagination = async (req, res, next) => {
   const {postCount} = res.locals;

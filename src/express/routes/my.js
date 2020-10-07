@@ -1,14 +1,13 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {DataServer} = require(`../data-server`);
+const {dataServer} = require(`../data-server`);
 const {PostSortType, HttpStatusCode} = require(`../const`);
 const {render} = require(`../utils`);
 const {findPostByQuery} = require(`../middlewares`);
 const Joi = require(`joi`);
 
 const myRouter = new Router();
-const dataServer = new DataServer();
 
 myRouter.get(`/`, findPostByQuery, async (req, res, next) => {
   const {post} = res.locals;

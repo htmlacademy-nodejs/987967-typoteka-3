@@ -1,14 +1,13 @@
 'use strict';
 
 const {Router} = require(`express`);
-const {DataServer} = require(`../data-server`);
+const {dataServer} = require(`../data-server`);
 const Joi = require(`joi`);
 const {TitleLength} = require(`../const`);
 const {validateQuerySchema} = require(`../middlewares`);
 const {render} = require(`../utils`);
 
 const searchRouter = new Router();
-const dataServer = new DataServer();
 
 const querySchema = Joi.object({
   query: Joi.string().max(TitleLength.MAX).required()

@@ -1,12 +1,12 @@
 'use strict';
 
 const Joi = require(`joi`);
-const {DataServer} = require(`../data-server`);
+const {dataServer} = require(`../data-server`);
 const {render} = require(`../utils`);
 const {HttpStatusCode} = require(`../const`);
 const {appLogger} = require(`../logger`);
 
-const dataServer = new DataServer();
+ 
 
 const getCategories = async (req, res, next) => {
   try {

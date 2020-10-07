@@ -141,6 +141,9 @@ class DataServer {
   }
 }
 
+const dataServer = new DataServer();
+
 module.exports = {
-  DataServer
+  DataServer,
+  dataServer,
 };
