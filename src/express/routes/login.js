@@ -21,7 +21,7 @@ loginRouter.get(`/`, (req, res) => {
 
   render(`login`, {
     activeForm: UserFormType.LOGIN,
-    formData: {},
+    // formData: {},
   }, req, res);
 });
 

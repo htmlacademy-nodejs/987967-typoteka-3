@@ -31,13 +31,13 @@ block content
             form(action="/register" method="post" enctype='multipart/form-data')
               div(class="form__field")
                 label
-                  input(type="email" placeholder="Электронная почта" required="" name="email" value=formData.email)
+                  input(type="email" placeholder="Электронная почта" required="" name="email" value=`${formData? formData.email : ''}`)
               div(class="form__field")
                 label
-                  input(type="text" placeholder="Имя" required="" name="firstname" value=formData.firstname)
+                  input(type="text" placeholder="Имя" required="" name="firstname" value=`${formData? formData.firstname : ''}`)
               div(class="form__field")
                 label
-                  input(type="text" placeholder="Фамилия" name="lastname" value=formData.lastname)
+                  input(type="text" placeholder="Фамилия" name="lastname" value=`${formData? formData.lastname : ''}`)
               div(class="form__field")
                 label
                   input(type="password" placeholder="Пароль" required="" name="password" value="")
@@ -54,8 +54,8 @@ block content
                 label
                   input(type="file" class="visually-hidden" name="avatarFile")
                   | Загрузить фото профиля
-                input(type="hidden" name="fileName" value=formData.fileName)
-                input(type="hidden" name="originalName" value=formData.originalName)
+                input(type="hidden" name="fileName" value=`${formData ? formData.fileName : ''}`)
+                input(type="hidden" name="originalName" value=`${formData ? formData.originalName : ''}`)
               
               button(class="form__submit-btn form__submit-btn--register button button--colored" type="submit") 
                 | Зарегистрироваться
@@ -64,7 +64,7 @@ block content
             form(action="/login" method="post")
               div(class="form__field")
                 label
-                  input(type="email" placeholder="Электронная почта" required="" name="email" value=formData.email)
+                  input(type="email" placeholder="Электронная почта" required="" name="email" value=`${formData ? formData.email : ''}`)
               if errors && errors.email
                 each error in errors.email
                   p.form__error-message #{error}
