@@ -1,18 +1,26 @@
 if (pagination.pageCount > 1)
   ul.preview__pagination.pagination
     li
-      a.pagination__button.button.button--backwards(
-        class=`${pagination.prev ? `` : `button--disabled`}`
-        href=`${pagination.pageHref}?page=${pagination.prev}`
-        aria-label='Страница назад') &Ncy;&acy;&zcy;&acy;&dcy;
+      if pagination.prev
+        a.pagination__button.button.button--backwards(
+          href=`${pagination.pageHref}?page=${pagination.prev}`
+          aria-label='Страница назад') &Ncy;&acy;&zcy;&acy;&dcy;
+      else
+        a.pagination__button.button.button--backwards.button--disabled(aria-label='Страница назад') &Ncy;&acy;&zcy;&acy;&dcy;
     
     -var index = 0
     while index < pagination.pageCount
-      li.pagination__item(class=`${++index === pagination.page ? `pagination__item--active` : ``}`)
-        a(href=`${pagination.pageHref}?page=${index}`) #{index}
+      if ++index === pagination.page
+        li.pagination__item.pagination__item--active
+          a #{index}
+      else
+        li.pagination__item
+          a(href=`${pagination.pageHref}?page=${index}`) #{index}
 
     li
-      a.pagination__button.button.button--forward(
-        class=`${pagination.next ? `` : `button--disabled`}`
-        href=`${pagination.pageHref}?page=${pagination.next}`
-        aria-label='Страница вперед') &Vcy;&pcy;&iecy;&rcy;&iecy;&dcy;
+      if pagination.next
+        a.pagination__button.button.button--forward(
+          href=`${pagination.pageHref}?page=${pagination.next}`
+          aria-label='Страница вперед') &Vcy;&pcy;&iecy;&rcy;&iecy;&dcy;
+      else
+        a.pagination__button.button.button--forward.button--disabled(aria-label='Страница вперед') &Vcy;&pcy;&iecy;&rcy;&iecy;&dcy;
