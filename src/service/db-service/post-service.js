@@ -46,7 +46,7 @@ const getPost = async (id) => {
       attributes: [`name`, `originalName`]
     }],
     where: {id},
-    order: [[Post.Comment, `date`, `ASC`]]
+    order: [[Post.Comment, `date`, `DESC`]]
   };
 
   return await Post.findOne(query);
@@ -125,7 +125,8 @@ const search = async (query) => {
       title: {
         [Sequelize.Op.regexp]: query
       }
-    }
+    },
+    order: [[`date`, `DESC`]]
   });
 };
 

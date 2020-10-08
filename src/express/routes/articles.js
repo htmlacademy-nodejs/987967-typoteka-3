@@ -15,7 +15,6 @@ const FormType = {
 };
 
 const articleRouter = new Router();
- 
 const upload = multer({dest: `src/express/public/img/post-images`});
 
 const filterCategories = (postCategories, categories) => categories.filter((category) => postCategories.find((it) => it.id === category.id));
@@ -90,7 +89,7 @@ articleRouter.get(`/:postId`, [getCategories, findPostByParam], async (req, res,
 
 articleRouter.get(`/category/:categoryId`, [getCategories, getCategory, validatePagination], async (req, res, next) => {
   const {categories, category} = res.locals;
-  const page = req.query.page || 1;
+  const page = Number(req.query.page) || 1;
 
   const categoryPostCount = category.count;
   const pageCount = Math.ceil(categoryPostCount / POST_PREVIEW_COUNT);

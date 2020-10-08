@@ -15,7 +15,6 @@ const {
 } = require(`../const`);
 
 const mainRouter = new Router();
- 
 
 const validatePagination = async (req, res, next) => {
   const {postCount} = res.locals;
