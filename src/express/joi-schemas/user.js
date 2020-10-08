@@ -19,6 +19,7 @@ const getNameMessages = (isFirstName) => {
     [`string.min`]: `${nameType} должно быть не менее ${UserNameLength.MIN} символов`,
     [`string.max`]: `${nameType} должно быть не более ${UserNameLength.MAX} символов`,
     [`string.pattern.base`]: `${nameType} может состоять из букв, дефисов и пробелов`,
+    [`any.required`]: `${nameType} - обязательное поле`
   };
 };
 

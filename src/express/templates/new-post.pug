@@ -40,6 +40,10 @@ block content
                 .form__field
                   label
                     input(type='text' placeholder='Заголовок' required='' name='title' value=formData.title)
+                  if errors && errors.title
+                    each error in errors.title
+                      p.form__error-message #{error}
+
                 .form__field.form__field--post-image
                   label
                     input#image-name-field(type='text' placeholder='Фотография' readonly='' name='originalName' value=formData.originalName)
@@ -54,13 +58,22 @@ block content
                     input(id=`category-${category.id}` type='checkbox' name=`category-id-${category.id}` checked=formData[`category-id-${category.id}`] !== undefined)
                     label(for=`category-${category.id}`) #{category.name}
                 a.new-publication__form-link.button.button--transparent(href='/categories') &Dcy;&ocy;&bcy;&acy;&vcy;&icy;&tcy;&softcy; &kcy;&acy;&tcy;&iecy;&gcy;&ocy;&rcy;&icy;&yucy;
+
               .form__wrapper.form__wrapper--text
                 .form__field.form__field--publication-text
                   label
                     textarea(rows='5' placeholder='Анонс публикации' name='announce') #{formData.announce}
+                  if errors && errors.announce
+                    each error in errors.announce
+                      p.form__error-message #{error}
+                    
                 .form__field.form__field--publication-text
                   label
                     textarea(rows='20' placeholder='Полный текст публикации' name='text') #{formData.text}
+                  if errors && errors.text
+                    each error in errors.text
+                      p.form__error-message #{error}
+                      
           if allErrors
             include includes/form-validation-error.pug
       .modal__overlay

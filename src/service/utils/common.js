@@ -117,7 +117,7 @@ const generatePost = ({sentences, titles, categories, comments, users, pictureFi
     date,
     announce: announceSentences.join(`\n`).slice(0, 250),
     text: correctStringLength(textSentences.join(`\n`), TextLength),
-    categories: getRandomUniqueElements(categories, getRandomInt(CategoryCount.MIN, CategoryCount.MAX)),
+    categories: getRandomUniqueElements(categories, getRandomInt(CategoryCount.MIN, CategoryCount.MAX)).map((it) => correctStringLength(it, CategoryLength)),
     comments: getRandomElements(comments, getRandomInt(CommentCount.MIN, CommentCount.MAX)).map((it) => ({
       id: nanoid(ID_LENGTH),
       text: correctStringLength(it, CommentLength),
