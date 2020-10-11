@@ -89,6 +89,9 @@ const render = (template, data, req, res, status = HttpStatusCode.OK) => {
   });
 };
 
+const customEventName = (eventName, postId) => `${eventName}-${postId}`;
+
+const reduceText = (text, length) => text.length > length ? `${text.slice(0, length)}...` : text;
 
 module.exports = {
   getPagination,
@@ -99,4 +102,6 @@ module.exports = {
   simplify,
   extractPicture,
   render,
+  customEventName,
+  reduceText,
 };

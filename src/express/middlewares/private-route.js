@@ -5,7 +5,7 @@ const {UserRole} = require(`../const`);
 const privateRoute = (req, res, next) => {
   const {user} = req.session;
   if (!user || user.role !== UserRole.ADMIN) {
-    res.redirect(`login`);
+    res.redirect(`/login`);
   } else {
     next();
   }
@@ -14,7 +14,7 @@ const privateRoute = (req, res, next) => {
 const privateReaderRoute = (req, res, next) => {
   const {user} = req.session;
   if (!user) {
-    res.redirect(`login`);
+    res.redirect(`/login`);
   } else {
     next();
   }

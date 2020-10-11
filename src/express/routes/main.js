@@ -2,24 +2,20 @@
 
 const {Router} = require(`express`);
 const Joi = require(`joi`);
-const {DataServer} = require(`../data-server`);
-const {getPagination, render} = require(`../utils`);
+const {dataServer} = require(`../data-server`);
+const {getPagination, render, reduceText} = require(`../utils`);
 const {validateQuerySchema} = require(`../middlewares`);
 const {
   POST_PREVIEW_COUNT,
-  LASTST_COMMENT_COUNT,
+  RECENT_COMMENT_COUNT,
   POPULAR_POST_COUNT,
   ANNOUNCE_PREVIEW_LENGTH,
   COMMENT_PREVIEW_LENGTH,
   PostSortType,
 } = require(`../const`);
 
-const reduceText = (text, length) => {
-  return text.length > length ? `${text.slice(0, length)}...` : text;
-};
-
 const mainRouter = new Router();
-const dataServer = new DataServer();
+ 
 
 const validatePagination = async (req, res, next) => {
   const {postCount} = res.locals;
@@ -53,7 +49,7 @@ mainRouter.get(`/`, getPopularPosts, validatePagination, async (req, res, next) 
     const [categories, {posts}, comments] = await Promise.all([
       dataServer.getCategories(true),
       dataServer.getPostPreviews(PostSortType.DATE, POST_PREVIEW_COUNT, (page - 1) * POST_PREVIEW_COUNT),
-      dataServer.getComments(LASTST_COMMENT_COUNT, 0),
+      dataServer.getComments(RECENT_COMMENT_COUNT, 0),
     ]);
 
     const renderData = {

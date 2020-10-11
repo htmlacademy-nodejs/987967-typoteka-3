@@ -80,5 +80,10 @@ module.exports = {
     ADMIN: `admin`,
     READER: `reader`,
     UNAUTHORIZED: `unauthorized`,
-  }
+  },
+
+  AppEvent: {
+    CHANGE_POST_COMMENTS: `change_post_comments`,
+    CHANGE_POPULAR_POSTS: `change_popular_posts`,
+  },
 };

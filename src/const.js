@@ -57,4 +57,6 @@ module.exports = {
     SERVER_ERROR: 500,
   },
 
+  POPULAR_POST_COUNT: 4,
+  RECENT_COMMENT_COUNT: 4,
 };

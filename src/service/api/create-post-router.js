@@ -90,10 +90,10 @@ const createPostRouter = (service) => {
   });
 
   router.delete(`/:articleId/comments/:commentId`, [findPost, findComment], async (req, res, next) => {
-    const {commentId} = req.params;
+    const {commentId, articleId} = req.params;
 
     try {
-      await service.deleteComment(commentId);
+      await service.deleteComment(commentId, articleId);
       res.status(HttpStatusCode.OK).json(commentId);
     } catch (err) {
       next(err);

@@ -6,6 +6,13 @@ block prepend head
 block prepend body
   -var wrapperClasses=["wrapper"]
 
+block append body
+  script(src="js/socket.io.js")
+  script(src="js/socket-client.js")
+  script.
+    createSocket(['change_popular_posts', 'change_recent_comments'], [['.hot__empty', '.hot__list'], ['.last__empty', '.last__list']], ['.main-page__hot', '.main-page__last']);
+
+
 block prepend header
 
 block content
@@ -22,28 +29,14 @@ block content
           h2.hot__name
             | &Scy;&acy;&mcy;&ocy;&iecy; &ocy;&bcy;&scy;&ucy;&zhcy;&dcy;&acy;&iecy;&mcy;&ocy;&iecy; 
             span.hot__icon.hot__icon--fire
-          if popularPosts.length
-            ul.hot__list
-              each hotPost in popularPosts
-                li.hot__list-item
-                  a.hot__list-link(href=`/articles/${hotPost.id}`) #{hotPost.announce}
-                    sup.hot__link-sup #{hotPost.comment_count}
-          else
-            p.hot__empty &Zcy;&dcy;&iecy;&scy;&softcy; &pcy;&ocy;&kcy;&acy; &ncy;&icy;&chcy;&iecy;&gcy;&ocy; &ncy;&iecy;&tcy;...
+          include includes/popular-post-list.pug
 
         section.main-page__last.last
           h2.last__name
             | &Pcy;&ocy;&scy;&lcy;&iecy;&dcy;&ncy;&icy;&iecy; &kcy;&ocy;&mcy;&mcy;&iecy;&ncy;&tcy;&acy;&rcy;&icy;&icy; 
             span.last__icon.last__icon--cloud
-          if comments.length
-            ul.last__list
-              each comment in comments
-                li.last__list-item
-                  img.last__list-image(src=`img/avatars/${comment.author.avatar.name}` width='20' height='20' alt='Аватар пользователя')
-                  b.last__list-name #{`${comment.author.firstname} ${comment.author.lastname}`}
-                  a.last__list-link(href=`/articles/${comment.post.id}`) #{comment.text}
-          else
-            p.last__empty &Zcy;&dcy;&iecy;&scy;&softcy; &pcy;&ocy;&kcy;&acy; &ncy;&icy;&chcy;&iecy;&gcy;&ocy; &ncy;&iecy;&tcy;...
+          include includes/recent-comment-list.pug
+          
       section.main-page__list.preview
         h2.visually-hidden &Scy;&pcy;&icy;&scy;&ocy;&kcy; &pcy;&rcy;&iecy;&vcy;&softcy;&yucy; &scy;&tcy;&acy;&tcy;&iecy;&jcy;
         ul.preview__list

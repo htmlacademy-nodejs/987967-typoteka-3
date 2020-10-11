@@ -1,5 +1,6 @@
 'use strict';
 
+const http = require(`http`);
 const chalk = require(`chalk`);
 const express = require(`express`);
 const expressPinoLogger = require(`express-pino-logger`);
@@ -7,7 +8,10 @@ const {createAPI} = require(`../api`);
 const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo, CliCommandName} = require(`../const`);
 const {parseException} = require(`../utils`);
 const {getLogger} = require(`../../logger`);
-const {DB} = require(`../db`);
+const {createSequelize} = require(`../create-sequelize`);
+const db = require(`../db-service`);
+const {DBNAME, ADMIN, PSW, SERVICE_SOCKET_PORT} = require(`../config`);
+const {createSocketServer} = require(`../create-socket-server`);
 
 const pino = expressPinoLogger({
   serializers: {
@@ -24,13 +28,13 @@ const pino = expressPinoLogger({
 
 const appLogger = getLogger(`app`);
 
-const createServer = (db) => {
+const createServer = (database) => {
   const app = express();
 
   app.use(express.json());
   app.use(pino);
 
-  app.use(`/api`, createAPI(db));
+  app.use(`/api`, createAPI(database));
 
   app.use((req, res) => {
     req.log.error(`Wrong path: ${req.originalUrl}`);
@@ -57,10 +61,8 @@ module.exports = {
   name: CliCommandName.SERVER,
   help: `${CliCommandName.SERVER} - запускает приложение`,
   async run(arg) {
-    const db = new DB();
-
     try {
-      await db.authenticate();
+      await createSequelize(DBNAME, ADMIN, PSW, true);
       appLogger.info(`Connection to database succsessfully`);
     } catch (err) {
       const errorMessage = `Error connecting to database: ${err}`;
@@ -73,18 +75,23 @@ module.exports = {
     const [customPort] = arg;
     const port = parseInt(customPort, 10) || DEFAULT_PORT;
     const app = createServer(db);
+    const server = http.createServer(app);
 
-    try {
-      app.listen(port);
-      appLogger.info(`Server listens at port ${port}...`);
-    } catch (err) {
-      appLogger.error(`Error starting server at port ${port}: ${err}`);
+    server.on(`error`, (message) => {
+      appLogger.error(`Error starting server at port ${port}: ${message}`);
       process.exit(ExitCode.ERROR);
-    }
+    });
 
-    console.info(chalk.green(`Listening port ${port}...`));
+    server.on(`listening`, () => {
+      appLogger.info(`Server listens at port ${port}...`);
+      console.info(chalk.green(`Listening port ${port}...`));
+    });
+
+    server.listen(port);
+    createSocketServer(SERVICE_SOCKET_PORT);
 
     return ExitCode.WORKING;
   },
+
   createServer
 };

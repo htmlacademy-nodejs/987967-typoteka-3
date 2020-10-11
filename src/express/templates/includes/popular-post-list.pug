@@ -1,0 +1,8 @@
+if popularPosts.length
+  ul.hot__list
+    each hotPost in popularPosts
+      li.hot__list-item
+        a.hot__list-link(href=`/articles/${hotPost.id}`) #{hotPost.announce}
+          sup.hot__link-sup #{hotPost.comment_count}
+else
+  p.hot__empty &Zcy;&dcy;&iecy;&scy;&softcy; &pcy;&ocy;&kcy;&acy; &ncy;&icy;&chcy;&iecy;&gcy;&ocy; &ncy;&iecy;&tcy;...

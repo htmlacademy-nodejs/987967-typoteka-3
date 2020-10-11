@@ -3,7 +3,10 @@
 const chalk = require(`chalk`);
 const fs = require(`fs`);
 const {generatePosts} = require(`../utils`);
-
+const {createDataBase} = require(`../utils`);
+const {ADMIN, PSW, DBNAME} = require(`../config`);
+const {createSequelize} = require(`../create-sequelize`);
+const {fillDataBase} = require(`../db-service`);
 const {
   ExitCode,
   Message,
@@ -15,10 +18,6 @@ const {
   CliCommandName,
 } = require(`../const`);
 
-const {createDataBase} = require(`../utils`);
-const {DB} = require(`../db`);
-const {ADMIN, PSW, DBNAME} = require(`../config`);
-
 const createDB = async (postCount, userCount) => {
   try {
     const {users, posts, categories} = await generatePosts(postCount, userCount);
@@ -26,11 +25,12 @@ const createDB = async (postCount, userCount) => {
     await fs.promises.writeFile(MOCK_FILE, JSON.stringify({categories, users, posts}));
     await createDataBase(DBNAME);
 
-    const db = new DB(DBNAME, ADMIN, PSW, false);
-    await db.fillDataBase(posts, users, categories, false);
-    db.close();
+    const sequelize = await createSequelize(DBNAME, ADMIN, PSW, true);
+    await fillDataBase(sequelize, posts, users, categories);
+    sequelize.close();
 
     console.info(chalk.green(Message.DB_SUCCESS));
+    console.info(chalk.green(`Open ${MOCK_FILE} to see the generated data`));
     return ExitCode.SUCCESS;
   } catch (err) {
     console.error(chalk.red(`${Message.DB_ERROR}: ${err}`));

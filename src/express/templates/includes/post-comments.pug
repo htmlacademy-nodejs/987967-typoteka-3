@@ -1,0 +1,12 @@
+h2.comments__title.title.title--middle #{comments.length ? `Комментарии` : `Комментарии отсутствуют`}
+if comments.length
+  ul.comments__list
+    each comment in comments
+      li.comments__comment
+        .comments__avatar.avatar
+          img(src=`img/avatars/${comment.author.avatar.name}` alt='аватар пользователя')
+        .comments__text
+          .comments__head
+            p #{comment.author.firstname} #{comment.author.lastname} &bull;
+            time.comments__date(datetime=comment.dateTime) #{comment.dateTimeLocalized}
+          p.comments__message #{comment.text}

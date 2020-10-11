@@ -3,7 +3,9 @@
 const supertest = require(`supertest`);
 const {createServer} = require(`../cli/server`);
 const {createDataBase, dropDataBase, readTestMockFiles, readJsonFile} = require(`../utils`);
-const {DB} = require(`../db`);
+const {createSequelize} = require(`../create-sequelize`);
+const db = require(`../db-service`);
+const {ADMIN, PSW} = require(`../config`);
 
 const allPostSortedDate = readJsonFile(`${process.cwd()}/data/mock-for-test/results/all-posts-sorted-date.json`);
 const allPostSortedPopularity = readJsonFile(`${process.cwd()}/data/mock-for-test/results/all-posts-sorted-popularity.json`);
@@ -12,21 +14,23 @@ const post10Comments = readJsonFile(`${process.cwd()}/data/mock-for-test/results
 
 let server;
 let dbName;
-let db;
+let sequelize;
 
 beforeAll(async () => {
   dbName = `test_${Date.now()}`;
   const {users, posts, categories} = await readTestMockFiles();
-  await createDataBase(dbName);
 
-  db = new DB(dbName, undefined, undefined, true);
-  await db.fillDataBase(posts, users, categories);
+  await createDataBase(dbName);
+  sequelize = await createSequelize(dbName, ADMIN, PSW, true);
+  await db.fillDataBase(sequelize, posts, users, categories);
 
   server = createServer(db);
 });
 
 afterAll(async () => {
-  db.close();
+  if (sequelize) {
+    sequelize.close();
+  }
   await dropDataBase(dbName);
 });
 

@@ -4,13 +4,13 @@ const {Router} = require(`express`);
 const multer = require(`multer`);
 const {validateBodySchema} = require(`../middlewares`);
 const {UserFormType} = require(`../const`);
-const {DataServer} = require(`../data-server`);
+const {dataServer} = require(`../data-server`);
 const {userRegisterSchema} = require(`../joi-schemas`);
 const {extractPicture, render} = require(`../utils`);
 
 const registerRouter = new Router();
 const upload = multer({dest: `src/express/public/img/avatars`});
-const dataServer = new DataServer();
+
 
 registerRouter.get(`/`, (req, res) => {
   render(`login`, {

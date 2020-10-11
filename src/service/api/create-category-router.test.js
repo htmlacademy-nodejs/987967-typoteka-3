@@ -3,25 +3,29 @@
 const supertest = require(`supertest`);
 const {createServer} = require(`../cli/server`);
 const {createDataBase, dropDataBase, readTestMockFiles} = require(`../utils`);
-const {DB} = require(`../db`);
+const {createSequelize} = require(`../create-sequelize`);
+const db = require(`../db-service`);
+const {ADMIN, PSW} = require(`../config`);
 
 let server;
 let dbName;
-let db;
+let sequelize;
 
 beforeAll(async () => {
   dbName = `test_${Date.now()}`;
   const {users, posts, categories} = await readTestMockFiles();
-  await createDataBase(dbName);
 
-  db = new DB(dbName, undefined, undefined, true);
-  await db.fillDataBase(posts, users, categories);
+  await createDataBase(dbName);
+  sequelize = await createSequelize(dbName, ADMIN, PSW, true);
+  await db.fillDataBase(sequelize, posts, users, categories);
 
   server = createServer(db);
 });
 
 afterAll(async () => {
-  db.close();
+  if (sequelize) {
+    sequelize.close();
+  }
   await dropDataBase(dbName);
 });
 
@@ -108,7 +112,7 @@ it(`should return 200 and delete a category`, async () => {
 });
 
 it(`should return 400 when category data is not valid`, async () => {
-  let res = await supertest(server).put(`/api/categories/1`).send({name: `12`});
+  let res = await supertest(server).put(`/api/categories/1`).send({name: `a`});
   expect(res.status).toBe(400);
   res = await supertest(server).post(`/api/categories`).send({name: `1234567890 1234567890 1234567890`});
   expect(res.status).toBe(400);

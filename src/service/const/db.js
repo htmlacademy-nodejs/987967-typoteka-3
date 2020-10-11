@@ -10,7 +10,13 @@ const PostSortType = {
   BY_POPULARITY: `popularity`,
 };
 
+const DBEvent = {
+  CHANGE_POST_COMMENTS: `change_post_comments`,
+  CHANGE_POPULAR_POSTS: `change_popular_posts`,
+};
+
 module.exports = {
   CategorySortType,
   PostSortType,
+  DBEvent,
 };

@@ -10,6 +10,10 @@ block prepend body
 
 block append body
   script(src="js/main.js")
+  script(src="js/socket.io.js")
+  script(src="js/socket-client.js")
+  script.
+    createSocket(customEventNames([`change_post_comments`]), [['.comments__list', '.comments__title']], ['.post__comments']);
 
 block prepend header
 
@@ -39,18 +43,8 @@ block content
             p #{post.text}
       .post__wrapper.post__wrapper--comments
         section.post__comments.comments
-          h2.comments__title.title.title--middle #{post.comments.length ? `Комментарии` : `Комментарии отсутствуют`}
-          if post.comments.length
-            ul.comments__list
-              each comment in post.comments
-                li.comments__comment
-                  .comments__avatar.avatar
-                    img(src=`img/avatars/${comment.author.avatar.name}` alt='аватар пользователя')
-                  .comments__text
-                    .comments__head
-                      p #{comment.author.firstname} #{comment.author.lastname} &bull;
-                      time.comments__date(datetime=comment.dateTime) #{comment.dateTimeLocalized}
-                    p.comments__message #{comment.text}
+          include includes/post-comments.pug
+          
           if user
             .comments__footer.comments__footer--user
               form(action=`/articles/${post.id}` method='POST')

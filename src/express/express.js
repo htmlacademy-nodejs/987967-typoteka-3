@@ -1,9 +1,10 @@
 'use strict';
 
+const http = require(`http`);
+const path = require(`path`);
 const express = require(`express`);
 const expressPinoLogger = require(`express-pino-logger`);
 const expressSession = require(`express-session`);
-const path = require(`path`);
 const {DEFAULT_PORT, HttpStatusCode, SESSION_NAME} = require(`./const`);
 const {appLogger} = require(`./logger`);
 const {articleRouter} = require(`./routes/articles`);
@@ -13,10 +14,11 @@ const {loginRouter} = require(`./routes/login`);
 const {myRouter} = require(`./routes/my`);
 const {registerRouter} = require(`./routes/register`);
 const {searchRouter} = require(`./routes/search`);
-const {SECRET} = require(`./config`);
+const {SECRET, SERVICE_SOCKET_PORT, EXPRESS_SOCKET_PORT} = require(`./config`);
 const {privateRoute} = require(`./middlewares`);
 const {getSequelizeStore} = require(`./sequelize-store`);
 const {render} = require(`./utils`);
+const {createSocketProxy} = require(`./socket-proxy`);
 
 const pino = expressPinoLogger({
   req: (req) => ({
@@ -52,7 +54,7 @@ app.use(express.urlencoded({extended: false}));
 
 app.use(`/`, mainRouter);
 app.use(`/articles`, articleRouter);
-app.use(`/categories`, categoryRouter);
+app.use(`/categories`, privateRoute, categoryRouter);
 app.use(`/login`, loginRouter);
 app.use(`/my`, privateRoute, myRouter);
 app.use(`/register`, registerRouter);
@@ -69,9 +71,15 @@ app.use((err, req, res, next) => {
   next();
 });
 
-try {
-  app.listen(DEFAULT_PORT);
-  appLogger.info(`Listenint port ${DEFAULT_PORT}...`);
-} catch (err) {
-  appLogger.error(`Can't start server: ${err}`);
-}
+const server = http.createServer(app);
+
+server.on(`error`, (message) => {
+  appLogger.error(`Can't start server: ${message}`);
+});
+
+server.on(`listening`, () => {
+  appLogger.info(`Listening port ${DEFAULT_PORT}...`);
+});
+
+server.listen(DEFAULT_PORT);
+createSocketProxy(SERVICE_SOCKET_PORT, EXPRESS_SOCKET_PORT);

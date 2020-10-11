@@ -12,6 +12,8 @@ logs
 log
 node_modules/
 http/
+src/todo.txt
+src/service/test-db.js
 
 # Папка с собранными файлами проекта
 build/
