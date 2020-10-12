@@ -4,7 +4,7 @@ const {createUsers} = require(`./user-service`);
 const {createCategories} = require(`./category-service`);
 const {createPosts} = require(`./posts-service`);
 
-const fillDataBase = async (sequelize, posts, users, categories) => {
+const fillDatabase = async (sequelize, posts, users, categories) => {
   await sequelize.sync({force: true});
 
   const [dbUsers, dbCategories] = await Promise.all([
@@ -22,5 +22,5 @@ const fillDataBase = async (sequelize, posts, users, categories) => {
 };
 
 module.exports = {
-  fillDataBase,
+  fillDatabase,
 };

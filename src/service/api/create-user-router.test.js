@@ -2,7 +2,7 @@
 
 const supertest = require(`supertest`);
 const {createServer} = require(`../cli/server`);
-const {createDataBase, dropDataBase, readTestMockFiles, compareHash} = require(`../utils`);
+const {createDatabase, dropDatabase, readTestMockFiles, compareHash} = require(`../utils`);
 const {UserRole} = require(`../const`);
 const {createSequelize} = require(`../create-sequelize`);
 const db = require(`../db-service`);
@@ -16,9 +16,9 @@ beforeAll(async () => {
   dbName = `test_${Date.now()}`;
   const {users, posts, categories} = await readTestMockFiles();
 
-  await createDataBase(dbName);
+  await createDatabase(dbName);
   sequelize = await createSequelize(dbName, ADMIN, PSW, true);
-  await db.fillDataBase(sequelize, posts, users, categories);
+  await db.fillDatabase(sequelize, posts, users, categories);
 
   server = createServer(db);
 });
@@ -27,7 +27,7 @@ afterAll(async () => {
   if (sequelize) {
     sequelize.close();
   }
-  await dropDataBase(dbName);
+  await dropDatabase(dbName);
 });
 
 it(`should return status 201 and user plain object`, async () => {

@@ -3,10 +3,10 @@
 const chalk = require(`chalk`);
 const fs = require(`fs`);
 const {generatePosts} = require(`../utils`);
-const {createDataBase} = require(`../utils`);
+const {createDatabase} = require(`../utils`);
 const {ADMIN, PSW, DBNAME} = require(`../config`);
 const {createSequelize} = require(`../create-sequelize`);
-const {fillDataBase} = require(`../db-service`);
+const {fillDatabase} = require(`../db-service`);
 const {
   ExitCode,
   Message,
@@ -23,10 +23,10 @@ const createDB = async (postCount, userCount) => {
     const {users, posts, categories} = await generatePosts(postCount, userCount);
 
     await fs.promises.writeFile(MOCK_FILE, JSON.stringify({categories, users, posts}));
-    await createDataBase(DBNAME);
+    await createDatabase(DBNAME);
 
     const sequelize = await createSequelize(DBNAME, ADMIN, PSW, true);
-    await fillDataBase(sequelize, posts, users, categories);
+    await fillDatabase(sequelize, posts, users, categories);
     sequelize.close();
 
     console.info(chalk.green(Message.DB_SUCCESS));
