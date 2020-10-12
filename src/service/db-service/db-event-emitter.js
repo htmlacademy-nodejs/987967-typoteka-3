@@ -6,22 +6,27 @@ const {DBInternalEvent} = require(`./const`);
 const {commentEventEmitter, getComments} = require(`./comment-service`);
 const {getPosts} = require(`./posts-service`);
 const {getPost} = require(`./post-service`);
+const logger = require(`../../logger`).getLogger(`app`);
 
 const dbEventEmitter = new EventEmitter();
 
 const changeCommentHandler = async (postId) => {
-  const [post, recentCommentList, popularPostList] = await Promise.all([
-    getPost(postId),
-    getComments(RECENT_COMMENT_COUNT),
-    getPosts(PostSortType.BY_POPULARITY, POPULAR_POST_COUNT)
-  ]);
+  try {
+    const [post, recentCommentList, popularPostList] = await Promise.all([
+      getPost(postId),
+      getComments(RECENT_COMMENT_COUNT),
+      getPosts(PostSortType.BY_POPULARITY, POPULAR_POST_COUNT)
+    ]);
 
-  dbEventEmitter.emit(DBEvent.CHANGE_POST_COMMENTS, post, recentCommentList);
+    dbEventEmitter.emit(DBEvent.CHANGE_POST_COMMENTS, post, recentCommentList);
 
-  const popularPostListData = JSON.stringify(popularPostList);
-  if (popularPostListData !== storedPopularPostList) {
-    storedPopularPostList = popularPostListData;
-    dbEventEmitter.emit(DBEvent.CHANGE_POPULAR_POSTS, popularPostList);
+    const popularPostListData = JSON.stringify(popularPostList);
+    if (popularPostListData !== storedPopularPostList) {
+      storedPopularPostList = popularPostListData;
+      dbEventEmitter.emit(DBEvent.CHANGE_POPULAR_POSTS, popularPostList);
+    }
+  } catch (err) {
+    logger.error(`Error in changeCommentHandler: ${err}`);
   }
 };
 
