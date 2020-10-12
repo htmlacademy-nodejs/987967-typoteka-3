@@ -1,17 +1,17 @@
 [
   {
-    "id": "20",
-    "user_id": "1",
+    "id": "22",
+    "user_id": "2",
     "post_id": "10",
-    "date": "2020-07-14T22:03:38.191Z",
-    "text": "Мне кажется или я уже читал это где-то?",
+    "date": "2020-08-09T07:41:04.412Z",
+    "text": "Совсем немного...",
     "author": {
-      "id": "1",
-      "email": "noah.ggeero@test.com",
-      "firstname": "Noah",
-      "lastname": "George",
+      "id": "2",
+      "email": "phoebe.learhci@test.com",
+      "firstname": "Phoebe",
+      "lastname": "Charlie",
       "avatar": {
-        "name": "ec_Ut"
+        "name": "vEWwI"
       }
     }
   },
@@ -32,18 +32,18 @@
     }
   },
   {
-    "id": "22",
-    "user_id": "2",
+    "id": "20",
+    "user_id": "1",
     "post_id": "10",
-    "date": "2020-08-09T07:41:04.412Z",
-    "text": "Совсем немного...",
+    "date": "2020-07-14T22:03:38.191Z",
+    "text": "Мне кажется или я уже читал это где-то?",
     "author": {
-      "id": "2",
-      "email": "phoebe.learhci@test.com",
-      "firstname": "Phoebe",
-      "lastname": "Charlie",
+      "id": "1",
+      "email": "noah.ggeero@test.com",
+      "firstname": "Noah",
+      "lastname": "George",
       "avatar": {
-        "name": "vEWwI"
+        "name": "ec_Ut"
       }
     }
   }

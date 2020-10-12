@@ -22,12 +22,7 @@ block content
 
         if (newCategory.errors)
             each error in newCategory.errors
-              p(style={
-                color: 'red',
-                ['font-size']: '0.7rem',
-                ['min-height']: '10px',
-                ['padding-top']: 0,
-              }) #{error}
+              p.form__error-message #{error}
 
       ul.category__list
         each category, index in categories
@@ -41,10 +36,4 @@ block content
 
           if (category.errors)
             each error in category.errors
-              li.category__list-item(style={
-                color: 'red',
-                ['font-size']: '0.7rem',
-                ['min-height']: '10px',
-                ['padding-top']: 0,
-                ['margin-top']: '-20px',
-              }) #{error}
+              li.category__list-item.form__error-message #{error}

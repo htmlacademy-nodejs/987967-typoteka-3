@@ -5,8 +5,6 @@ const MainConst = require(`../const`);
 module.exports = {
   ...MainConst,
 
-  DEFAULT_PORT: 8080,
-  DATA_SERVER_PORT: 3000,
   TIMEOUT: 3000,
   POST_PREVIEW_COUNT: 8,
   ANNOUNCE_PREVIEW_LENGTH: 100,

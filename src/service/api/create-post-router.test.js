@@ -2,7 +2,7 @@
 
 const supertest = require(`supertest`);
 const {createServer} = require(`../cli/server`);
-const {createDataBase, dropDataBase, readTestMockFiles, readJsonFile} = require(`../utils`);
+const {createDatabase, dropDatabase, readTestMockFiles, readJsonFile} = require(`../utils`);
 const {createSequelize} = require(`../create-sequelize`);
 const db = require(`../db-service`);
 const {ADMIN, PSW} = require(`../config`);
@@ -20,9 +20,9 @@ beforeAll(async () => {
   dbName = `test_${Date.now()}`;
   const {users, posts, categories} = await readTestMockFiles();
 
-  await createDataBase(dbName);
+  await createDatabase(dbName);
   sequelize = await createSequelize(dbName, ADMIN, PSW, true);
-  await db.fillDataBase(sequelize, posts, users, categories);
+  await db.fillDatabase(sequelize, posts, users, categories);
 
   server = createServer(db);
 });
@@ -31,7 +31,7 @@ afterAll(async () => {
   if (sequelize) {
     sequelize.close();
   }
-  await dropDataBase(dbName);
+  await dropDatabase(dbName);
 });
 
 it(`should return status 400 when :postId or :commentId are not a numbers`, async () => {

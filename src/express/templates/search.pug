@@ -12,14 +12,15 @@ block append body
 block prepend header
   
 block content
+  -var notFound = queryString && foundPosts && foundPosts.length === 0
   main
     section.search-page
-      .search-page__wrapper(class=`${query && foundPosts && foundPosts.length === 0 ? `search-page__wrapper--empty` : ``}`)
+      .search-page__wrapper(class=`${notFound ? `search-page__wrapper--empty` : ``}`)
         h1 &Pcy;&ocy;&icy;&scy;&kcy;
         .search.search-page__form
           form(action='/search' method='get')
             label
-              input(type='text' placeholder='Что ищем?' name='query' value=query)
+              input(type='text' placeholder='Что ищем?' name='query' value=queryString)
             button.search__button.button.button--transparent(type='submit') &Ncy;&acy;&jcy;&tcy;&icy;
           if allErrors
             each error in allErrors
@@ -29,9 +30,9 @@ block content
             each post in foundPosts
               .search__result
                 time.search__date(datetime=post.dateTime) #{post.dateTimeLocalized}
-                a.search__link(href=`/articles/${post.id}`) !{post.title}
+                a.search__link(href=`/articles/${post.id}?back=${url}`) !{post.title}
 
-          if query && foundPosts && foundPosts.length === 0
-            p.search-page__empty Ничего не нашлось
+        if notFound
+          p.search-page__empty Ничего не нашлось
 
         

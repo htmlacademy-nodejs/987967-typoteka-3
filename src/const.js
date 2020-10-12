@@ -2,7 +2,7 @@
 
 module.exports = {
   CategoryLength: {
-    MIN: 2,
+    MIN: 5,
     MAX: 30,
   },
 
