@@ -130,7 +130,15 @@ const generatePost = ({sentences, titles, categories, comments, users, pictureFi
   };
 };
 
+const clearFolder = (folderName) => {
+  fs.rmdirSync(folderName, {recursive: true});
+  fs.mkdirSync(folderName);
+};
+
 const generatePosts = async (postCount, userCount) => {
+  clearFolder(PICTURE_FOLDER);
+  clearFolder(AVATAR_FOLDER);
+
   const [titles, sentences, categoryNames, comments, userNames, pictureFiles, avatarFiles] = await Promise.all([
     readContent(`./data/${DataFileName.TITLE}`),
     readContent(`./data/${DataFileName.DESCRIPTION}`),
