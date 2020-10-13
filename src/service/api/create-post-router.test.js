@@ -192,7 +192,6 @@ it(`should return status 400 when post is not valid`, async () => {
     categories: [`category1`],
   }, {
     title: `Title Title Title Title Title`,
-    // text: 123,
     announce: `Announce announce announce announce`,
     date: `2020-08-04T06:15:45.470Z`,
     picture: `name.jpg`,

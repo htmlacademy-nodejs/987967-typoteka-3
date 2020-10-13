@@ -9,7 +9,7 @@ const {dataServer} = require(`../data-server`);
 const {validateBodySchema} = require(`../middlewares`);
 
 const loginRouter = new Router();
- 
+
 
 loginRouter.get(`/`, (req, res) => {
   const {logout} = req.query;
@@ -21,7 +21,6 @@ loginRouter.get(`/`, (req, res) => {
 
   render(`login`, {
     activeForm: UserFormType.LOGIN,
-    // formData: {},
   }, req, res);
 });
 
