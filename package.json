@@ -6,16 +6,13 @@
   "scripts": {
     "test": "npm run test:rest",
     "test:rest": "jest api",
-    "eslint": "eslint --ext .js src/",
     "start:service": "node ./src/service/service.js",
-    "start": "node ./src/service/service.js --server",
-    "start:dev": "nodemon ./src/service/service.js --server | npx pino-pretty -t",
-    "start:debug": "cross-env LOG_LEVEL=debug nodemon ./src/service/service.js --server",
-    "start-front-server": "node ./src/express/express.js",
-    "start-front-server:dev": "nodemon -e js,pug ./src/express/express.js | npx pino-pretty -t",
-    "start-front-server:dev:debug": "cross-env LOG_LEVEL=debug nodemon -e js,pug ./src/express/express.js",
-    "start:server:dev": "concurrently --names \"REST,SSR\" --prefix-colors \"blue,green\" \"npm:start:dev\" \"npm:start-front-server:dev\"",
-    "start:server": "concurrently --names \"REST,SSR\" --prefix-colors \"blue,green\" \"npm:start\" \"npm:start-front-server\""
+    "start:rest-server": "node ./src/service/service.js --server",
+    "start:rest-server:dev": "nodemon ./src/service/service.js --server | npx pino-pretty -t",
+    "start:front-server": "node ./src/express/express.js",
+    "start:front-server:dev": "nodemon -e js,pug ./src/express/express.js | npx pino-pretty -t",
+    "start": "concurrently --names \"REST,SSR\" --prefix-colors \"blue,green\" \"npm:start:rest-server\" \"npm:start:front-server\"",
+    "start:dev": "concurrently --names \"REST,SSR\" --prefix-colors \"blue,green\" \"npm:start:rest-server:dev\" \"npm:start:front-server:dev\""
   },
   "repository": {
     "type": "git",
