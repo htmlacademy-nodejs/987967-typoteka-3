@@ -24,6 +24,7 @@ const {
   CommentLength,
   CategoryLength,
   TextLength,
+  AnnounceLength,
 } = require(`../const`);
 
 const getRandomInt = (min, max) => {
@@ -115,8 +116,8 @@ const generatePost = ({sentences, titles, categories, comments, users, pictureFi
     id: nanoid(ID_LENGTH),
     title: correctStringLength(getRandomElement(titles), TitleLength),
     date,
-    announce: announceSentences.join(`\n`).slice(0, 250),
-    text: correctStringLength(textSentences.join(`\n`), TextLength),
+    announce: correctStringLength(announceSentences.join(` `), AnnounceLength),
+    text: correctStringLength(textSentences.join(getRandomBoolean() ? ` ` : `\n`), TextLength),
     categories: getRandomUniqueElements(categories, getRandomInt(CategoryCount.MIN, CategoryCount.MAX)).map((it) => correctStringLength(it, CategoryLength)),
     comments: getRandomElements(comments, getRandomInt(CommentCount.MIN, CommentCount.MAX)).map((it) => ({
       id: nanoid(ID_LENGTH),
@@ -221,8 +222,11 @@ const getHash = async (password) => bcrypt.hash(password, BCRYPT_SALT);
 const compareHash = async (password, hash) => bcrypt.compare(password, hash);
 
 const correctStringLength = (string, range) => {
-  if (string.length > range.MAX) {
-    return string.slice(0, range.MAX);
+  const newLines = String(string).match(/\n/g);
+  const max = newLines ? range.MAX - newLines.length : range.MAX;
+
+  if (string.length > max) {
+    return string.slice(0, max);
   }
 
   if (string.length < range.MIN) {

@@ -1,7 +1,7 @@
 'use strict';
 
 const Joi = require(`joi`);
-const {TitleLength, TextLength, AnnounceLength, FileNameLength, CategoryLength} = require(`../const`);
+const {TitleLength, TextLength, AnnounceLength, FileNameLength} = require(`../const`);
 const {getJoiStringErrors} = require(`../utils`);
 
 const postSchema = Joi.object({
@@ -11,7 +11,7 @@ const postSchema = Joi.object({
   text: Joi.string().max(TextLength.MAX).allow(``).required().messages(getJoiStringErrors(`Text`, TextLength, false)),
   originalName: Joi.string().max(FileNameLength.MAX).allow(``),
   fileName: Joi.string().max(FileNameLength.MAX).allow(``),
-}).pattern(/category-id-\d+/, Joi.string().min(CategoryLength.MIN).max(CategoryLength.MAX), {matches: Joi.array().min(1)}).messages({
+}).pattern(/category-id-\d+/, Joi.string(), {matches: Joi.array().min(1)}).messages({
   [`object.pattern.match`]: `Необходимо выбрать минимум одну категорию`
 });
 
