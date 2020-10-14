@@ -30,7 +30,7 @@ const createDB = async (postCount, userCount) => {
     sequelize.close();
 
     console.info(chalk.green(Message.DB_SUCCESS));
-    console.info(chalk.green(`Open ${MOCK_FILE} to see the generated data`));
+    console.info(chalk.green(`Open ${MOCK_FILE} to see generated data and users' login info`));
     return ExitCode.SUCCESS;
   } catch (err) {
     console.error(chalk.red(`${Message.DB_ERROR}: ${err}`));
@@ -40,7 +40,7 @@ const createDB = async (postCount, userCount) => {
 
 module.exports = {
   name: CliCommandName.GENERATE_DB,
-  help: `${CliCommandName.GENERATE_DB} <post-count> <user-count> - формирует базу данных`,
+  help: `${CliCommandName.GENERATE_DB} <post-count> <user-count> - создает и наполняет моками базу данных`,
   async run(arg) {
     let [postCount, userCount] = arg;
     postCount = parseInt(postCount, 10) || DEFAULT_POSTS_COUNT;

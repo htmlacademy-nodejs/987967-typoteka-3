@@ -10,10 +10,10 @@ const generateDB = require(`./generate-db`);
 module.exports = {
   Cli: {
     [help.name]: help,
-    [version.name]: version,
-    [server.name]: server,
+    [generateDB.name]: generateDB,
     [generateJSON.name]: generateJSON,
     [generateSQL.name]: generateSQL,
-    [generateDB.name]: generateDB,
+    [version.name]: version,
+    [server.name]: server,
   }
 };

@@ -59,7 +59,7 @@ const createServer = (database) => {
 
 module.exports = {
   name: CliCommandName.SERVER,
-  help: `${CliCommandName.SERVER} - запускает приложение`,
+  help: `${CliCommandName.SERVER} - запускает REST сервис`,
   async run() {
     try {
       await createSequelize(DBNAME, ADMIN, PSW, true);
