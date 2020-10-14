@@ -10,7 +10,7 @@ block append bodyContent
   script(src="js/socket.io.js")
   script(src="js/socket-client.js")
   script.
-    createSocket(['change_popular_posts', 'change_recent_comments'], [['.hot__empty', '.hot__list'], ['.last__empty', '.last__list']], ['.main-page__hot', '.main-page__last']);
+    createSocket(['change_popular_posts', 'change_recent_comments'], [['.hot__empty', '.hot__list'], ['.last__empty', '.last__list']], ['.main-page__hot', '.main-page__last'], #{socketPort});
 
 
 block prepend header

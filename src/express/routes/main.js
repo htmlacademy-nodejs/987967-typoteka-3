@@ -13,6 +13,7 @@ const {
   COMMENT_PREVIEW_LENGTH,
   PostSortType,
 } = require(`../const`);
+const {EXPRESS_SOCKET_PORT} = require(`../config`);
 
 const mainRouter = new Router();
 
@@ -65,6 +66,8 @@ mainRouter.get(`/`, getPopularPosts, validatePagination, async (req, res, next) 
       })),
 
       pagination: getPagination(page, pageCount, req.path),
+
+      socketPort: EXPRESS_SOCKET_PORT,
     };
 
     render(`main`, renderData, req, res);

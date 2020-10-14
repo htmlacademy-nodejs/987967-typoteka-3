@@ -13,7 +13,7 @@ block append bodyContent
   script(src="js/socket.io.js")
   script(src="js/socket-client.js")
   script.
-    createSocket(customEventNames([`change_post_comments`]), [['.comments__list', '.comments__title']], ['.post__comments']);
+    createSocket(customEventNames([`change_post_comments`]), [['.comments__list', '.comments__title']], ['.post__comments'], #{socketPort});
 
 block prepend header
 

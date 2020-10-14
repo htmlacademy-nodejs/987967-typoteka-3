@@ -17,7 +17,7 @@ const {searchRouter} = require(`./routes/search`);
 const {SECRET, SERVICE_SOCKET_PORT, EXPRESS_SOCKET_PORT, PORT} = require(`./config`);
 const {privateRoute} = require(`./middlewares`);
 const {getSequelizeStore} = require(`./sequelize-store`);
-const {render, createBrowserSocketScript} = require(`./utils`);
+const {render} = require(`./utils`);
 const {createSocketProxy} = require(`./socket-proxy`);
 
 const pino = expressPinoLogger({
@@ -81,6 +81,5 @@ server.on(`listening`, () => {
   appLogger.info(`Listening port ${PORT}...`);
 });
 
-createBrowserSocketScript(EXPRESS_SOCKET_PORT);
 server.listen(PORT);
 createSocketProxy(SERVICE_SOCKET_PORT, EXPRESS_SOCKET_PORT);

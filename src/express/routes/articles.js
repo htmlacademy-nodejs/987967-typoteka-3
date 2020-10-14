@@ -8,6 +8,7 @@ const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT} = require(`../const`
 const {getPagination, extractPicture, render} = require(`../utils`);
 const {findPostByParam, getCategories, getAllCategories, getCategory, privateRoute, privateReaderRoute, validateBodySchema, validateQuerySchema} = require(`../middlewares`);
 const {postSchema, commentSchema} = require(`../joi-schemas`);
+const {EXPRESS_SOCKET_PORT} = require(`../config`);
 
 const FormType = {
   CREATE: `create`,
@@ -81,7 +82,7 @@ articleRouter.get(`/:postId`, [getCategories, findPostByParam], async (req, res,
     const {comments} = post;
 
     post.categories = filterCategories(post.categories, categories);
-    render(`post`, {post, comments}, req, res);
+    render(`post`, {post, comments, socketPort: EXPRESS_SOCKET_PORT}, req, res);
   } catch (err) {
     next(err);
   }

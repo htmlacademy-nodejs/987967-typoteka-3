@@ -1,11 +1,11 @@
 'use strict';
 
-const socket = io('http://localhost:8081');
-
 const removedValue = String(Date.now());
 const removedPattern = RegExp(`(${removedValue})+`);
 
-const createSocket = function(eventList, selectorList, parentList) {
+const createSocket = (eventList, selectorList, parentList, port) => {
+  const socket = io(`http://localhost:${port}`);
+
   eventList.forEach((evt, index) => {
     const parent = document.querySelector(parentList[index]);
     const selectors = selectorList[index];
@@ -24,14 +24,14 @@ const createSocket = function(eventList, selectorList, parentList) {
   });
 }
 
-const customEventNames = function (eventList) {
+const customEventNames = (eventList) => {
   const pathSegments = document.location.pathname.split('/');
   if (pathSegments[pathSegments.length-2] !== 'articles') {
     return eventList;
   }
 
   const postId = pathSegments[pathSegments.length-1];
-  if (!/^d+$/.test(postId)) {
+  if (!/^\d+$/.test(postId)) {
     return eventList
   }
 
