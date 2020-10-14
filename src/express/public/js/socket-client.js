@@ -31,7 +31,7 @@ const customEventNames = function (eventList) {
   }
 
   const postId = pathSegments[pathSegments.length-1];
-  if (!/^\d+$/.test(postId)) {
+  if (!/^d+$/.test(postId)) {
     return eventList
   }
 

@@ -1,6 +1,11 @@
 'use strict';
 
+const path = require(`path`);
+const fs = require(`fs`);
 const {HttpStatusCode} = require(`./const`);
+
+const STATIC_SCRIPT_FOLDER = `src/express/public/js`;
+const BROWSER_SOCKER_SCRIPT_NAME = `socket-client.js`;
 
 const getPagination = (page, pageCount, url) => ({
   page,
@@ -113,6 +118,17 @@ const getJoiStringErrors = (name, range, empty = true) => {
   };
 };
 
+const createBrowserSocketScript = (port) => {
+  const scriptPath = path.resolve(process.cwd(), STATIC_SCRIPT_FOLDER, BROWSER_SOCKER_SCRIPT_NAME);
+  const script = fs.readFileSync(scriptPath).toString();
+
+  const pattern = RegExp(`io\\('http://localhost:${port}'\\)`);
+
+  if (!pattern.test(script)) {
+    fs.writeFileSync(scriptPath, script.replace(/io\('http:\/\/localhost:8081'\)/, `io('http://localhost:${port}')`));
+  }
+};
+
 module.exports = {
   getPagination,
   formatDate,
@@ -125,4 +141,5 @@ module.exports = {
   customEventName,
   reduceText,
   getJoiStringErrors,
+  createBrowserSocketScript,
 };
