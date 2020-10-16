@@ -1,7 +1,7 @@
 'use strict';
 
 const supertest = require(`supertest`);
-const {createServer} = require(`../cli/server`);
+const {createApp} = require(`../cli/server`);
 const {createDatabase, dropDatabase, readTestMockFiles, readJsonFile} = require(`../utils`);
 const {createSequelize} = require(`../create-sequelize`);
 const db = require(`../db-service`);
@@ -24,7 +24,7 @@ beforeAll(async () => {
   sequelize = await createSequelize(dbName, ADMIN, PSW, true);
   await db.fillDatabase(sequelize, posts, users, categories);
 
-  server = createServer(db);
+  server = createApp(db);
 });
 
 afterAll(async () => {
