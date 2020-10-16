@@ -8,6 +8,7 @@ const {NEW_POST_TITLE, EDIT_POST_TITLE, POST_PREVIEW_COUNT} = require(`../const`
 const {getPagination, extractPicture, render} = require(`../utils`);
 const {findPostByParam, getCategories, getAllCategories, getCategory, privateRoute, privateReaderRoute, validateBodySchema, validateQuerySchema} = require(`../middlewares`);
 const {postSchema, commentSchema} = require(`../joi-schemas`);
+const {EXPRESS_SOCKET_PORT} = require(`../config`);
 
 const FormType = {
   CREATE: `create`,
@@ -15,7 +16,6 @@ const FormType = {
 };
 
 const articleRouter = new Router();
- 
 const upload = multer({dest: `src/express/public/img/post-images`});
 
 const filterCategories = (postCategories, categories) => categories.filter((category) => postCategories.find((it) => it.id === category.id));
@@ -82,7 +82,7 @@ articleRouter.get(`/:postId`, [getCategories, findPostByParam], async (req, res,
     const {comments} = post;
 
     post.categories = filterCategories(post.categories, categories);
-    render(`post`, {post, comments}, req, res);
+    render(`post`, {post, comments, socketPort: EXPRESS_SOCKET_PORT}, req, res);
   } catch (err) {
     next(err);
   }
@@ -90,7 +90,7 @@ articleRouter.get(`/:postId`, [getCategories, findPostByParam], async (req, res,
 
 articleRouter.get(`/category/:categoryId`, [getCategories, getCategory, validatePagination], async (req, res, next) => {
   const {categories, category} = res.locals;
-  const page = req.query.page || 1;
+  const page = Number(req.query.page) || 1;
 
   const categoryPostCount = category.count;
   const pageCount = Math.ceil(categoryPostCount / POST_PREVIEW_COUNT);

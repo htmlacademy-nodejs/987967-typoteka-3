@@ -1,6 +1,11 @@
 'use strict';
 
+const path = require(`path`);
+const fs = require(`fs`);
 const {HttpStatusCode} = require(`./const`);
+
+const STATIC_SCRIPT_FOLDER = `src/express/public/js`;
+const BROWSER_SOCKER_SCRIPT_NAME = `socket-client.js`;
 
 const getPagination = (page, pageCount, url) => ({
   page,
@@ -93,6 +98,26 @@ const customEventName = (eventName, postId) => `${eventName}-${postId}`;
 
 const reduceText = (text, length) => text.length > length ? `${text.slice(0, length)}...` : text;
 
+const getJoiStringErrors = (name, range, empty = true) => {
+  const minMessage = range.MIN !== undefined ? {
+    [`string.min`]: `Длина ${name} должна быть не менее ${range.MIN} символов`
+  } : {};
+
+  const maxMessage = range.MAX !== undefined ? {
+    [`string.max`]: `Длина ${name} должна быть не более ${range.MAX} символов`
+  } : {};
+
+  const requireMessage = empty ? {
+    [`string.empty`]: `Поле ${name} является обязательным`
+  } : {};
+
+  return {
+    ...minMessage,
+    ...maxMessage,
+    ...requireMessage,
+  };
+};
+
 module.exports = {
   getPagination,
   formatDate,
@@ -104,4 +129,5 @@ module.exports = {
   render,
   customEventName,
   reduceText,
+  getJoiStringErrors,
 };

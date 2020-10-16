@@ -5,12 +5,12 @@ const chalk = require(`chalk`);
 const express = require(`express`);
 const expressPinoLogger = require(`express-pino-logger`);
 const {createAPI} = require(`../api`);
-const {ExitCode, DEFAULT_PORT, HttpStatusCode, HttpStatusInfo, CliCommandName} = require(`../const`);
+const {ExitCode, HttpStatusCode, HttpStatusInfo, CliCommandName} = require(`../const`);
 const {parseException} = require(`../utils`);
 const {getLogger} = require(`../../logger`);
 const {createSequelize} = require(`../create-sequelize`);
 const db = require(`../db-service`);
-const {DBNAME, ADMIN, PSW, SERVICE_SOCKET_PORT} = require(`../config`);
+const {DBNAME, ADMIN, PSW, SERVICE_SOCKET_PORT, PORT} = require(`../config`);
 const {createSocketServer} = require(`../create-socket-server`);
 
 const pino = expressPinoLogger({
@@ -59,8 +59,8 @@ const createServer = (database) => {
 
 module.exports = {
   name: CliCommandName.SERVER,
-  help: `${CliCommandName.SERVER} - запускает приложение`,
-  async run(arg) {
+  help: `${CliCommandName.SERVER} - запускает REST сервис`,
+  async run() {
     try {
       await createSequelize(DBNAME, ADMIN, PSW, true);
       appLogger.info(`Connection to database succsessfully`);
@@ -72,22 +72,20 @@ module.exports = {
       process.exit(ExitCode.ERROR);
     }
 
-    const [customPort] = arg;
-    const port = parseInt(customPort, 10) || DEFAULT_PORT;
     const app = createServer(db);
     const server = http.createServer(app);
 
     server.on(`error`, (message) => {
-      appLogger.error(`Error starting server at port ${port}: ${message}`);
+      appLogger.error(`Error starting server at port ${PORT}: ${message}`);
       process.exit(ExitCode.ERROR);
     });
 
     server.on(`listening`, () => {
-      appLogger.info(`Server listens at port ${port}...`);
-      console.info(chalk.green(`Listening port ${port}...`));
+      appLogger.info(`Server listens at port ${PORT}...`);
+      console.info(chalk.green(`Listening port ${PORT}...`));
     });
 
-    server.listen(port);
+    server.listen(PORT);
     createSocketServer(SERVICE_SOCKET_PORT);
 
     return ExitCode.WORKING;

@@ -5,7 +5,7 @@ const path = require(`path`);
 const express = require(`express`);
 const expressPinoLogger = require(`express-pino-logger`);
 const expressSession = require(`express-session`);
-const {DEFAULT_PORT, HttpStatusCode, SESSION_NAME} = require(`./const`);
+const {HttpStatusCode, SESSION_NAME} = require(`./const`);
 const {appLogger} = require(`./logger`);
 const {articleRouter} = require(`./routes/articles`);
 const {mainRouter} = require(`./routes/main`);
@@ -14,7 +14,7 @@ const {loginRouter} = require(`./routes/login`);
 const {myRouter} = require(`./routes/my`);
 const {registerRouter} = require(`./routes/register`);
 const {searchRouter} = require(`./routes/search`);
-const {SECRET, SERVICE_SOCKET_PORT, EXPRESS_SOCKET_PORT} = require(`./config`);
+const {SECRET, SERVICE_SOCKET_PORT, EXPRESS_SOCKET_PORT, PORT} = require(`./config`);
 const {privateRoute} = require(`./middlewares`);
 const {getSequelizeStore} = require(`./sequelize-store`);
 const {render} = require(`./utils`);
@@ -78,8 +78,8 @@ server.on(`error`, (message) => {
 });
 
 server.on(`listening`, () => {
-  appLogger.info(`Listening port ${DEFAULT_PORT}...`);
+  appLogger.info(`Listening port ${PORT}...`);
 });
 
-server.listen(DEFAULT_PORT);
+server.listen(PORT);
 createSocketProxy(SERVICE_SOCKET_PORT, EXPRESS_SOCKET_PORT);

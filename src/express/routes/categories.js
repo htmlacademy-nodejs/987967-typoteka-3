@@ -7,6 +7,17 @@ const {dataServer} = require(`../data-server`);
 const {categorySchema} = require(`../joi-schemas`);
 const {parseJoiException, render} = require(`../utils`);
 
+const NEW_CATEGORY_ID = `new`;
+
+const RouterAction = {
+  CREATE: `create`,
+  UPDATE: `update`,
+  DELETE: `delete`,
+};
+
+const routerActions = Object.values(RouterAction);
+const categoryIdPattern = RegExp(`^([0-9]+|${NEW_CATEGORY_ID})$`);
+
 const isEmpty = (object) => Object.keys(object).length === 0;
 const isUnique = (name, categories) => categories.find((it) => it.name === name) === undefined;
 const getCategoryIndex = (id, categories) => categories.findIndex((it) => it.id === id);
@@ -14,21 +25,21 @@ const getCategoryIndex = (id, categories) => categories.findIndex((it) => it.id 
 const categoryRouter = new Router();
 
 const querySchema = Joi.object({
-  id: Joi.string().pattern(new RegExp(`^([0-9]+|new)$`)).required(),
+  id: Joi.string().pattern(categoryIdPattern).required(),
   name: categorySchema.required(),
-  action: Joi.string().valid(`delete`, `update`, `create`).required(),
+  action: Joi.string().valid(...routerActions).required(),
 });
 
 const simpleQuerySchema = Joi.object({
-  id: Joi.string().pattern(new RegExp(`^([0-9]+|new)$`)).required(),
+  id: Joi.string().pattern(categoryIdPattern).required(),
   name: Joi.string().required(),
-  action: Joi.string().valid(`delete`, `update`, `create`).required(),
+  action: Joi.string().valid(...routerActions).required(),
 });
 
 const validateCategoryName = (name, categories) => {
   const errors = parseJoiException(categorySchema.validate(name, {abortEarly: false}).error);
   if (!isUnique(name, categories)) {
-    errors.push(`Category name must be unique`);
+    errors.push(`Такая категория уже существует`);
   }
 
   return errors;
@@ -67,20 +78,20 @@ categoryRouter.get(`/`, validateQuery, async (req, res, next) => {
     }
 
     switch (action) {
-      case `create`:
+      case RouterAction.CREATE:
         newCategory.errors = validateCategoryName(name, categories);
         newCategory.name = name;
         break;
 
-      case `update`:
+      case RouterAction.UPDATE:
         categories[targetCategoryIndex].errors = validateCategoryName(name, categories);
         categories[targetCategoryIndex].name = name;
         break;
 
-      case `delete`:
+      case RouterAction.DELETE:
         const postCount = categories[targetCategoryIndex].count;
         if (postCount !== 0) {
-          categories[targetCategoryIndex].errors = [`Can't delete a category, contains any posts (${postCount})`];
+          categories[targetCategoryIndex].errors = [`Нельзя удалить категорию, которой принадлежат посты (количество постов в категории: ${postCount})`];
         }
     }
 
@@ -94,8 +105,8 @@ categoryRouter.post(`/`, async (req, res, next) => {
   const {name} = req.body;
   const query = {
     name,
-    id: `new`,
-    action: `create`
+    id: NEW_CATEGORY_ID,
+    action: RouterAction.CREATE
   };
 
   try {
@@ -121,11 +132,11 @@ categoryRouter.post(`/:categoryId`, async (req, res, next) => {
     querySchema.validateAsync(query);
 
     switch (action) {
-      case `update`:
+      case RouterAction.UPDATE:
         await dataServer.updateCategory(id, name);
         break;
 
-      case `delete`:
+      case RouterAction.DELETE:
         await dataServer.deleteCategory(id);
     }
 

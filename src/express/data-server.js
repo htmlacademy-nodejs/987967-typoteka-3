@@ -2,14 +2,15 @@
 
 const QueryString = require(`querystring`);
 const axios = require(`axios`).default;
-const {TIMEOUT, DATA_SERVER_PORT, HttpStatusCode} = require(`./const`);
+const {TIMEOUT, HttpStatusCode} = require(`./const`);
+const {SERVICE_PORT} = require(`./config`);
 const {simplify} = require(`./utils`);
 const {ServiceToExpressAdapter} = require(`./data-adapter`);
 const {axiosLogger} = require(`./logger`);
 
 const createAPI = () => {
   const api = axios.create({
-    baseURL: `http://localhost:${DATA_SERVER_PORT}/api`,
+    baseURL: `http://localhost:${SERVICE_PORT}/api`,
     timeout: TIMEOUT,
     withCredentials: true,
   });

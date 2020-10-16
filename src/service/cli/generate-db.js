@@ -3,10 +3,10 @@
 const chalk = require(`chalk`);
 const fs = require(`fs`);
 const {generatePosts} = require(`../utils`);
-const {createDataBase} = require(`../utils`);
+const {createDatabase} = require(`../utils`);
 const {ADMIN, PSW, DBNAME} = require(`../config`);
 const {createSequelize} = require(`../create-sequelize`);
-const {fillDataBase} = require(`../db-service`);
+const {fillDatabase} = require(`../db-service`);
 const {
   ExitCode,
   Message,
@@ -23,14 +23,14 @@ const createDB = async (postCount, userCount) => {
     const {users, posts, categories} = await generatePosts(postCount, userCount);
 
     await fs.promises.writeFile(MOCK_FILE, JSON.stringify({categories, users, posts}));
-    await createDataBase(DBNAME);
+    await createDatabase(DBNAME);
 
     const sequelize = await createSequelize(DBNAME, ADMIN, PSW, true);
-    await fillDataBase(sequelize, posts, users, categories);
+    await fillDatabase(sequelize, posts, users, categories);
     sequelize.close();
 
     console.info(chalk.green(Message.DB_SUCCESS));
-    console.info(chalk.green(`Open ${MOCK_FILE} to see the generated data`));
+    console.info(chalk.green(`Open ${MOCK_FILE} to see generated data and users' login info`));
     return ExitCode.SUCCESS;
   } catch (err) {
     console.error(chalk.red(`${Message.DB_ERROR}: ${err}`));
@@ -40,7 +40,7 @@ const createDB = async (postCount, userCount) => {
 
 module.exports = {
   name: CliCommandName.GENERATE_DB,
-  help: `${CliCommandName.GENERATE_DB} <post-count> <user-count> - формирует базу данных`,
+  help: `${CliCommandName.GENERATE_DB} <post-count> <user-count> - создает и наполняет моками базу данных`,
   async run(arg) {
     let [postCount, userCount] = arg;
     postCount = parseInt(postCount, 10) || DEFAULT_POSTS_COUNT;
