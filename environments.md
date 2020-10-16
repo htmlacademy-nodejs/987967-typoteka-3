@@ -1,5 +1,6 @@
 ## ОСНОВНЫЕ
-TK_HOST - хост
+TK_SERVICE_HOST - хост сервиса рест апи 
+TK_EXPRESS_HOST - хост приложения
 TK_SERVICE_PORT - порт сервиса рест апи 
 TK_EXPRESS_PORT - порт приложения
 

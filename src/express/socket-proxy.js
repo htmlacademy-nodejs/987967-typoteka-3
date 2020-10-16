@@ -7,8 +7,8 @@ const {AppEvent, ServerEvent} = require(`./const`);
 const {customEventName} = require(`./utils`);
 const {ServiceToExpressAdapter} = require(`./data-adapter`);
 
-const createSocketProxy = (inputPort, server) => {
-  const socketClient = ioClient(`http://localhost:${inputPort}`);
+const createSocketProxy = (inputPort, inputHost, server) => {
+  const socketClient = ioClient(`http://${inputHost}:${inputPort}`);
   const socketServer = io(server);
 
   socketClient.addEventListener(ServerEvent.CHANGE_POST_COMMENTS, (post, recentCommentList) => {

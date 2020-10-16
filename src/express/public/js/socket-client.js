@@ -3,8 +3,8 @@
 const removedValue = String(Date.now());
 const removedPattern = RegExp(`(${removedValue})+`);
 
-const createSocket = (eventList, selectorList, parentList, port) => {
-  const socket = io(`http://localhost:${port}`);
+const createSocket = (eventList, selectorList, parentList, port, host) => {
+  const socket = io(`http://${host}:${port}`);
 
   eventList.forEach((evt, index) => {
     const parent = document.querySelector(parentList[index]);

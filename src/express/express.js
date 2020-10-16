@@ -14,7 +14,7 @@ const {loginRouter} = require(`./routes/login`);
 const {myRouter} = require(`./routes/my`);
 const {registerRouter} = require(`./routes/register`);
 const {searchRouter} = require(`./routes/search`);
-const {SECRET, PORT, SERVICE_PORT} = require(`./config`);
+const {SECRET, PORT, SERVICE_PORT, SERVICE_HOST} = require(`./config`);
 const {privateRoute} = require(`./middlewares`);
 const {getSequelizeStore} = require(`./sequelize-store`);
 const {render} = require(`./utils`);
@@ -81,5 +81,5 @@ server.on(`listening`, () => {
   appLogger.info(`Listening port ${PORT}...`);
 });
 
-createSocketProxy(SERVICE_PORT, server);
+createSocketProxy(SERVICE_PORT, SERVICE_HOST, server);
 server.listen(PORT);
