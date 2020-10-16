@@ -5,6 +5,7 @@ const ioClient = require(`socket.io-client`);
 const {PugTemplateName, PugRender} = require(`./pug-render`);
 const {AppEvent, ServerEvent} = require(`./const`);
 const {customEventName} = require(`./utils`);
+const {ServiceToExpressAdapter} = require(`./data-adapter`);
 
 const createSocketProxy = (inputPort, server) => {
   const socketClient = ioClient(`http://localhost:${inputPort}`);
@@ -14,7 +15,8 @@ const createSocketProxy = (inputPort, server) => {
     const recentCommentHtml = PugRender[PugTemplateName.RECENT_COMMENTS](recentCommentList);
     socketServer.emit(AppEvent.CHANGE_RECENT_COMMENTS, recentCommentHtml);
 
-    const postCommentHtml = PugRender[PugTemplateName.POST_COMMENTS](post);
+    const adaptedPost = ServiceToExpressAdapter.getPost(post);
+    const postCommentHtml = PugRender[PugTemplateName.POST_COMMENTS](adaptedPost);
     socketServer.emit(customEventName(AppEvent.CHANGE_POST_COMMENTS, post.id), postCommentHtml);
   });
 
