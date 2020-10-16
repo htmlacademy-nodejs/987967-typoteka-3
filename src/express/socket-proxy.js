@@ -6,9 +6,9 @@ const {PugTemplateName, PugRender} = require(`./pug-render`);
 const {AppEvent, ServerEvent} = require(`./const`);
 const {customEventName} = require(`./utils`);
 
-const createSocketProxy = (inputPort, outputPort) => {
+const createSocketProxy = (inputPort, server) => {
   const socketClient = ioClient(`http://localhost:${inputPort}`);
-  const socketServer = io(outputPort);
+  const socketServer = io(server);
 
   socketClient.addEventListener(ServerEvent.CHANGE_POST_COMMENTS, (post, recentCommentList) => {
     const recentCommentHtml = PugRender[PugTemplateName.RECENT_COMMENTS](recentCommentList);

@@ -10,7 +10,7 @@ const {parseException} = require(`../utils`);
 const {getLogger} = require(`../../logger`);
 const {createSequelize} = require(`../create-sequelize`);
 const db = require(`../db-service`);
-const {DBNAME, ADMIN, PSW, SERVICE_SOCKET_PORT, PORT} = require(`../config`);
+const {DBNAME, ADMIN, PSW, PORT} = require(`../config`);
 const {createSocketServer} = require(`../create-socket-server`);
 
 const pino = expressPinoLogger({
@@ -28,7 +28,7 @@ const pino = expressPinoLogger({
 
 const appLogger = getLogger(`app`);
 
-const createServer = (database) => {
+const createApp = (database) => {
   const app = express();
 
   app.use(express.json());
@@ -72,7 +72,7 @@ module.exports = {
       process.exit(ExitCode.ERROR);
     }
 
-    const app = createServer(db);
+    const app = createApp(db);
     const server = http.createServer(app);
 
     server.on(`error`, (message) => {
@@ -85,11 +85,11 @@ module.exports = {
       console.info(chalk.green(`Listening port ${PORT}...`));
     });
 
+    createSocketServer(server);
     server.listen(PORT);
-    createSocketServer(SERVICE_SOCKET_PORT);
 
     return ExitCode.WORKING;
   },
 
-  createServer
+  createApp
 };

@@ -10,6 +10,4 @@ module.exports = {
   HOST: process.env.TK_HOST,
   PORT: process.env.TK_EXPRESS_PORT,
   SERVICE_PORT: process.env.TK_SERVICE_PORT,
-  EXPRESS_SOCKET_PORT: process.env.TK_EXPRESS_SOCKET_PORT,
-  SERVICE_SOCKET_PORT: process.env.TK_SERVICE_SOCKET_PORT,
 };

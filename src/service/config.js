@@ -10,5 +10,4 @@ module.exports = {
   PORT: process.env.TK_SERVICE_PORT,
   POSTGRES_PSW: process.env.TK_POSTGRES_PSW,
   DB_PORT: process.env.TK_DB_PORT,
-  SERVICE_SOCKET_PORT: process.env.TK_SERVICE_SOCKET_PORT,
 };

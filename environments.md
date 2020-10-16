@@ -12,7 +12,3 @@ TK_POSTGRES_PSW - пароль пользователя postgres
 
 ## СЕССИЯ
 TK_SECRET - секрет для сессий
-
-## ВЕБ-СОКЕТ
-TK_SERVICE_SOCKET_PORT - порт веб-сокет сервера рест апи
-TK_EXPRESS_SOCKET_PORT - порт веб-сокет сервера приложения
