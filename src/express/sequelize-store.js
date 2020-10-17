@@ -2,13 +2,14 @@
 
 const createSequelizeStore = require(`connect-session-sequelize`);
 const {Sequelize} = require(`sequelize`);
-const {DBNAME, PSW, ADMIN, HOST} = require(`./config`);
+const {DB_NAME, DB_PORT, PSW, ADMIN, HOST} = require(`./config`);
 
 
 const getSequelizeStore = (storeConstructor) => {
   const SequelizeStore = createSequelizeStore(storeConstructor);
-  const db = new Sequelize(DBNAME, ADMIN, PSW, {
+  const db = new Sequelize(DB_NAME, ADMIN, PSW, {
     host: HOST,
+    port: DB_PORT,
     dialect: `postgres`,
     logging: false,
   });
