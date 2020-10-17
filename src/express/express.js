@@ -64,11 +64,10 @@ app.use((req, res) => {
   render(`400`, {}, req, res, HttpStatusCode.NOT_FOUND);
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   const errorMessage = err.msg ? `${err.msg}: ${err.filename}, line: ${err.line}` : err;
   appLogger.error(errorMessage);
   render(`500`, {}, req, res, HttpStatusCode.SERVER_ERROR);
-  next();
 });
 
 const server = http.createServer(app);
