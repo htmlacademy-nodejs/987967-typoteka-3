@@ -31,8 +31,6 @@ module.exports = {
     READER: `reader`,
   },
 
-  SESSION_NAME: `session_id`,
-
   LoggerName: {
     APP: `front:app`,
     AXIOS: `front:axios`,

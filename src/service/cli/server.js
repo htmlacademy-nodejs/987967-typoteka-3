@@ -10,7 +10,7 @@ const {parseException} = require(`../utils`);
 const {getLogger} = require(`../../logger`);
 const {createSequelize} = require(`../create-sequelize`);
 const db = require(`../db-service`);
-const {DBNAME, ADMIN, PSW, PORT} = require(`../config`);
+const {DB_NAME, ADMIN, PSW, PORT} = require(`../config`);
 const {createSocketServer} = require(`../create-socket-server`);
 
 const pino = expressPinoLogger({
@@ -62,7 +62,7 @@ module.exports = {
   help: `${CliCommandName.SERVER} - запускает REST сервис`,
   async run() {
     try {
-      await createSequelize(DBNAME, ADMIN, PSW, true);
+      await createSequelize(DB_NAME, ADMIN, PSW, true);
       appLogger.info(`Connection to database succsessfully`);
     } catch (err) {
       const errorMessage = `Error connecting to database: ${err}`;
