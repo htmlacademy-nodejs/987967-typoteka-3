@@ -3,6 +3,7 @@
 const createSequelizeStore = require(`connect-session-sequelize`);
 const {Sequelize} = require(`sequelize`);
 const {DB_NAME, DB_PORT, PSW, ADMIN, HOST} = require(`./config`);
+const {Session} = require(`./const`);
 
 
 const getSequelizeStore = (storeConstructor) => {
@@ -16,8 +17,8 @@ const getSequelizeStore = (storeConstructor) => {
 
   const store = new SequelizeStore({
     db,
-    expiration: 24 * 60 * 60 * 1000,
-    checkExpirationInterval: 10 * 60 * 1000,
+    expiration: Session.EXPIRATION,
+    checkExpirationInterval: Session.CHECK_INTERVAL,
   });
 
   try {

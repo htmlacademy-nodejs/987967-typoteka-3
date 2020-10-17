@@ -48,4 +48,10 @@ module.exports = {
     CHANGE_POPULAR_POSTS: `change_popular_posts`,
     CHANGE_POST_COMMENTS: `change_post_comments`,
   },
+
+  Session: {
+    NAME: `session_id`,
+    EXPIRATION: 24 * 60 * 60 * 1000,
+    CHECK_INTERVAL: 10 * 60 * 1000,
+  }
 };
