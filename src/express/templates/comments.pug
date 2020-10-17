@@ -17,7 +17,8 @@ block content
         each comment in comments
           li.publication__list-item
             .publication__header
-              img.publication__list-image(src=`img/avatars/${comment.author.avatar.name}` width='20' height='20' alt='Аватар пользователя')
+              if (comment.author.avatar)
+                img.publication__list-image(src=`img/avatars/${comment.author.avatar.name}` width='20' height='20' alt='Аватар пользователя')
               b.publication__list-name #{comment.author.firstname} #{comment.author.lastname}
               time.publication__item-time(datetime=comment.dateTime) #{comment.dateTimeLocalized}
             a.publication__item-text(href=`/articles/${comment.post.id}`) #{comment.text}
