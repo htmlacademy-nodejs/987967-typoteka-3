@@ -13,7 +13,7 @@ module.exports = {
   },
 
   run() {
-    const helpMessage = `Гайд:\n\tservice <command>\n\n\tКоманды:\n\t\t${this.message}\n\nПример создания БД: npm run start:service -- --generate-db 50 10\n\nДеплой: https://typoteka.shgk.me`;
+    const helpMessage = `Гайд:\n\tservice <command>\n\n\tКоманды:\n\t\t${this.message}\n\nПример создания БД: npm run start:service -- --generate-db 50 10\n\nЗапуск приложения: npm run start\n\nДеплой: https://typoteka.shgk.me, админ: isabelle.thoasm@gmail.com / obehselImsaaTl`;
 
     console.info(chalk.grey(helpMessage));
     return ExitCode.SUCCESS;
