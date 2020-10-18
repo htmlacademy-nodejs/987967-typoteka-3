@@ -30,6 +30,7 @@ const createDB = async (postCount, userCount) => {
     sequelize.close();
 
     console.info(chalk.green(Message.DB_SUCCESS));
+    console.info(chalk.green(`Admin account: ${users[0].email} / ${users[0].password}`));
     console.info(chalk.green(`Open ${MOCK_FILE} to see generated data and users' login info`));
     return ExitCode.SUCCESS;
   } catch (err) {
