@@ -4,7 +4,8 @@ if comments.length
     each comment in comments
       li.comments__comment
         .comments__avatar.avatar
-          img(src=`img/avatars/${comment.author.avatar.name}` alt='аватар пользователя')
+          if (comment.author.avatar)
+            img(src=`img/avatars/${comment.author.avatar.name}` alt='аватар пользователя')
         .comments__text
           .comments__head
             p #{comment.author.firstname} #{comment.author.lastname} &bull;

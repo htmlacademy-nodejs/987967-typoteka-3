@@ -5,7 +5,7 @@ const path = require(`path`);
 const express = require(`express`);
 const expressPinoLogger = require(`express-pino-logger`);
 const expressSession = require(`express-session`);
-const {HttpStatusCode, SESSION_NAME} = require(`./const`);
+const {HttpStatusCode, Session} = require(`./const`);
 const {appLogger} = require(`./logger`);
 const {articleRouter} = require(`./routes/articles`);
 const {mainRouter} = require(`./routes/main`);
@@ -14,7 +14,7 @@ const {loginRouter} = require(`./routes/login`);
 const {myRouter} = require(`./routes/my`);
 const {registerRouter} = require(`./routes/register`);
 const {searchRouter} = require(`./routes/search`);
-const {SECRET, SERVICE_SOCKET_PORT, EXPRESS_SOCKET_PORT, PORT} = require(`./config`);
+const {SECRET, PORT, SERVICE_PORT, SERVICE_HOST} = require(`./config`);
 const {privateRoute} = require(`./middlewares`);
 const {getSequelizeStore} = require(`./sequelize-store`);
 const {render} = require(`./utils`);
@@ -40,7 +40,7 @@ app.use(expressSession({
   secret: SECRET,
   resave: false,
   saveUninitialized: false,
-  name: SESSION_NAME,
+  name: Session.name,
   store: getSequelizeStore(expressSession.Store),
   cookie: {
     sameSite: true,
@@ -64,11 +64,10 @@ app.use((req, res) => {
   render(`400`, {}, req, res, HttpStatusCode.NOT_FOUND);
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   const errorMessage = err.msg ? `${err.msg}: ${err.filename}, line: ${err.line}` : err;
   appLogger.error(errorMessage);
   render(`500`, {}, req, res, HttpStatusCode.SERVER_ERROR);
-  next();
 });
 
 const server = http.createServer(app);
@@ -81,5 +80,5 @@ server.on(`listening`, () => {
   appLogger.info(`Listening port ${PORT}...`);
 });
 
+createSocketProxy(SERVICE_PORT, SERVICE_HOST, server);
 server.listen(PORT);
-createSocketProxy(SERVICE_SOCKET_PORT, EXPRESS_SOCKET_PORT);

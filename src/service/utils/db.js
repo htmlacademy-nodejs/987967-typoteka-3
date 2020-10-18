@@ -1,7 +1,7 @@
 'use strict';
 
 const {Sequelize} = require(`sequelize`);
-const {ADMIN, POSTGRES_PSW, HOST} = require(`../config`);
+const {ADMIN, POSTGRES_PSW, HOST, DB_PORT} = require(`../config`);
 
 const getLimitConstrain = (limit, offset = 0) => {
   return limit ? {
@@ -12,6 +12,7 @@ const getLimitConstrain = (limit, offset = 0) => {
 
 const createRootSequelize = () => new Sequelize(`postgres`, `postgres`, POSTGRES_PSW, {
   host: HOST,
+  port: DB_PORT,
   dialect: `postgres`,
   logging: false,
 });

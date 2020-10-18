@@ -1,12 +1,13 @@
 'use strict';
 
 const {Sequelize} = require(`sequelize`);
-const {HOST, DBNAME, ADMIN, PSW} = require(`./config`);
+const {HOST, DB_NAME, ADMIN, PSW, DB_PORT} = require(`./config`);
 const models = require(`./models`);
 
-const createSequelize = async (dbName = DBNAME, admin = ADMIN, psw = PSW, silent = false) => {
+const createSequelize = async (dbName = DB_NAME, admin = ADMIN, psw = PSW, silent = false) => {
   const sequelize = new Sequelize(dbName, admin, psw, {
     host: HOST,
+    port: DB_PORT,
     dialect: `postgres`,
     logging: silent ? false : console.log,
     define: {
