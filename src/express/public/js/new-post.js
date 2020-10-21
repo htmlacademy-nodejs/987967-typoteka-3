@@ -1,7 +1,7 @@
 'use strict';
 
-var fileInput = document.querySelector('.form__image-loader--publication input');
-var fileNameInput = document.querySelector('#image-name-field');
+const fileInput = document.querySelector('.form__image-loader--publication input');
+const fileNameInput = document.querySelector('#image-name-field');
 
 document.querySelector('.form__field--post-image > button').addEventListener('click', function() {
   fileInput.value = '';
