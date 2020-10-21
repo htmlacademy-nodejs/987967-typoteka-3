@@ -1,11 +1,6 @@
 'use strict';
 
-const path = require(`path`);
-const fs = require(`fs`);
 const {HttpStatusCode} = require(`./const`);
-
-const STATIC_SCRIPT_FOLDER = `src/express/public/js`;
-const BROWSER_SOCKER_SCRIPT_NAME = `socket-client.js`;
 
 const getPagination = (page, pageCount, url) => ({
   page,

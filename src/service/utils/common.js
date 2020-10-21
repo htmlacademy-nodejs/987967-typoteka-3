@@ -80,7 +80,7 @@ const generateImage = (from, to) => {
 const generateUser = (names, avatars) => {
   const [firstname, lastname] = getRandomUniqueElements(names, 2);
   const email = `${firstname}.${mixString(lastname)}@gmail.com`.toLowerCase();
-  const password = mixString(`${firstname}${lastname}`);
+  const password = mixString(firstname + lastname);
 
   const originalAvatar = getRandomElement(avatars);
   const avatar = generateImage(path.resolve(AVATAR_MOCK_FOLDER, originalAvatar), AVATAR_FOLDER);
@@ -231,7 +231,7 @@ const correctStringLength = (string, range) => {
 
   if (string.length < range.MIN) {
     const addition = Array(range.MIN - string.length).fill(`.`).join(``);
-    return `${string}${addition}`;
+    return string + addition;
   }
 
   return string;

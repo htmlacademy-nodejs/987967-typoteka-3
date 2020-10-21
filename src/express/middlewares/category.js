@@ -6,8 +6,6 @@ const {render} = require(`../utils`);
 const {HttpStatusCode} = require(`../const`);
 const {appLogger} = require(`../logger`);
 
- 
-
 const getCategories = async (req, res, next) => {
   try {
     res.locals.categories = await dataServer.getCategories(true);

@@ -6,8 +6,6 @@ const {appLogger} = require(`../logger`);
 const {render} = require(`../utils`);
 const {HttpStatusCode} = require(`../const`);
 
- 
-
 const findPostByParam = async (req, res, next) => {
   const {postId} = req.params;
   return findPost(postId, req, res, next);
