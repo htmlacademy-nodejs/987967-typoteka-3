@@ -41,8 +41,8 @@ registerRouter.post(`/`, [upload.single(`avatarFile`), validateBodySchema(userRe
           firstname,
           lastname,
           email,
-          fileName: avatar.name,
-          originalName: avatar.originalName
+          fileName: avatar ? avatar.name : ``,
+          originalName: avatar ? avatar.originalName : ``,
         },
       }, req, res);
     } else {
